@@ -67,7 +67,7 @@ export function MainDashboard() {
   const { entradas, saidas, saldo } = calculateSummary();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-knumbers-green/5 via-white to-knumbers-purple/5">
+    <div className="min-h-screen bg-gradient-to-br from-knumbers-green/5 via-background to-knumbers-purple/5">
       <div className="p-4 sm:p-6 space-y-6 w-full max-w-full">
       {/* Header */}
       <div className="space-y-2 px-0 sm:px-2">
