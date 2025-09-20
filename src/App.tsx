@@ -1,59 +1,16 @@
-
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Routes, Route, BrowserRouter } from "react-router-dom";
-import { ProtectedRoute } from "./components/ProtectedRoute";
-import { AuthProvider } from "./contexts/AuthContext";
-import AuthPage from "./pages/Auth";
-import Index from "./pages/Index";
-import Landing from "./pages/Landing";
-import NotFound from "./pages/NotFound";
-import Transactions from "./pages/Transactions";
-import Accounts from "./pages/Accounts";
-import PlanejamentoPessoal from "./pages/PlanejamentoPessoal";
-import Patients from "./pages/Patients";
-import PatientRegistration from "./pages/PatientRegistration";
-import PatientDetails from "./pages/PatientDetails";
-import DashboardBusiness from "./pages/DashboardBusiness";
-
-const queryClient = new QueryClient();
+console.log('App.tsx loading...');
 
 const App = () => {
-  console.log('App rendering...');
+  console.log('App component rendering...');
   
-  try {
-    return (
-      <QueryClientProvider client={queryClient}>
-        <BrowserRouter>
-          <AuthProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
-              <Routes>
-                <Route path="/auth" element={<AuthPage />} />
-                <Route path="/" element={<Landing />} />
-                <Route path="/dashboard" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-                <Route path="/dashboard-business" element={<ProtectedRoute><DashboardBusiness /></ProtectedRoute>} />
-                <Route path="/transações" element={<ProtectedRoute><Transactions /></ProtectedRoute>} />
-                <Route path="/contas" element={<ProtectedRoute><Accounts /></ProtectedRoute>} />
-                <Route path="/planejamento-pessoal" element={<ProtectedRoute><PlanejamentoPessoal /></ProtectedRoute>} />
-                <Route path="/pacientes" element={<ProtectedRoute><Patients /></ProtectedRoute>} />
-                <Route path="/cadastro-paciente" element={<ProtectedRoute><PatientRegistration /></ProtectedRoute>} />
-                <Route path="/paciente/:id" element={<ProtectedRoute><PatientDetails /></ProtectedRoute>} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </TooltipProvider>
-          </AuthProvider>
-        </BrowserRouter>
-      </QueryClientProvider>
-    );
-  } catch (error) {
-    console.error('App render error:', error);
-    return <div>Erro na aplicação: {String(error)}</div>;
-  }
+  return (
+    <div style={{ padding: '20px', fontSize: '24px', color: 'red' }}>
+      <h1>TESTE - A aplicação está funcionando!</h1>
+      <p>Se você vê esta mensagem, o React está funcionando.</p>
+      <p>Rota atual: {window.location.pathname}</p>
+    </div>
+  );
 };
 
+console.log('App.tsx exporting...');
 export default App;
