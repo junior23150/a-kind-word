@@ -8,6 +8,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import AuthPage from "./pages/Auth";
 import Index from "./pages/Index";
 import Landing from "./pages/Landing";
+import LandingSimple from "./pages/LandingSimple";
 import NotFound from "./pages/NotFound";
 import Transactions from "./pages/Transactions";
 import Accounts from "./pages/Accounts";
@@ -26,7 +27,8 @@ const App = () => (
       <Sonner />
       <Routes>
         <Route path="/auth" element={<AuthPage />} />
-        <Route path="/" element={<Landing />} />
+        <Route path="/" element={<LandingSimple />} />
+        <Route path="/landing-original" element={<Landing />} />
         <Route path="/dashboard" element={<ProtectedRoute><Index /></ProtectedRoute>} />
         <Route path="/dashboard-business" element={<ProtectedRoute><DashboardBusiness /></ProtectedRoute>} />
         <Route path="/transações" element={<ProtectedRoute><Transactions /></ProtectedRoute>} />
