@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test WhatsApp Webhook</title>
+</head>
+<body>
+    <h1>Test WhatsApp Webhook</h1>
+    <button onclick="testWebhook()">Test Webhook</button>
+    <button onclick="checkWebhookLogs()">Ver Logs do Webhook</button>
+    <div id="result"></div>
+
+    <script>
+        async function testWebhook() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Enviando mensagem de teste...';
+            
+            try {
+                const response = await fetch('https://gzitpxtmvakgebbpqiuh.supabase.co/functions/v1/whatsapp-webhook', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        object: 'whatsapp_business_account',
+                        entry: [{
+                            id: '123456789',
+                            changes: [{
+                                field: 'messages',
+                                value: {
+                                    messages: [{
+                                        id: 'test123',
+                                        from: '554199690362',
+                                        type: 'text',
+                                        text: { body: 'gasto 50 reais com almoço' },
+                                        timestamp: Date.now()
+                                    }],
+                                    contacts: [{
+                                        profile: { name: 'Teste' },
+                                        wa_id: '554199690362'
+                                    }]
+                                }
+                            }]
+                        }]
+                    })
+                });
+
+                const data = await response.text();
+                resultDiv.innerHTML = `
+                    <h3>Resultado do Teste:</h3>
+                    <p><strong>Status:</strong> ${response.status}</p>
+                    <p><strong>Body:</strong> ${data}</p>
+                    <p><strong>Nota:</strong> Se status = 200, o webhook está funcionando!</p>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;">Erro: ${error.message}</p>`;
+            }
+        }
+        
+        function checkWebhookLogs() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <h3>Para verificar os logs:</h3>
+                <ol>
+                    <li>Acesse: <a href="https://supabase.com/dashboard/project/gzitpxtmvakgebbpqiuh/functions/whatsapp-webhook/logs" target="_blank">Logs do Webhook</a></li>
+                    <li>Verifique se aparecem logs quando você envia mensagens</li>
+                    <li>Se não aparecer nada, o Meta não está enviando para nosso webhook</li>
+                </ol>
+            `;
+        }
+    </script>
+</body>
+</html>
