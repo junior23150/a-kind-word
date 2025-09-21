@@ -182,10 +182,10 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 py-8 overflow-y-auto">
+      <div className="flex-1 py-4 overflow-y-auto">
         <div className="max-w-7xl mx-auto px-6">
           {/* Step Header */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-4">
             <h2 className="text-3xl font-bold text-foreground mb-2">{getStepTitle()}</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{getStepDescription()}</p>
           </div>
