@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,6 +23,20 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
+interface Category {
+  id: string;
+  name: string;
+  type: "income" | "expense";
+  color: string;
+  icon: string;
+}
+
+interface BankAccount {
+  id: string;
+  bank_name: string;
+  account_type: string;
+}
+
 interface TransactionSlideInProps {
   onClose: () => void;
   onTransactionAdded?: () => void;
@@ -42,32 +56,60 @@ export function TransactionSlideIn({
   const [showDateCalendar, setShowDateCalendar] = useState(false);
   const [showCompetenceCalendar, setShowCompetenceCalendar] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
 
   const { toast } = useToast();
   const { user } = useAuth();
 
-  // Lista de categorias (pode ser expandida ou vir do banco de dados)
-  const categories = [
-    "Alimentação",
-    "Transporte",
-    "Saúde",
-    "Educação",
-    "Lazer",
-    "Moradia",
-    "Salário",
-    "Freelance",
-    "Investimentos",
-    "Outros",
-  ];
+  // Carregar categorias e contas do Supabase
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!user?.id) return;
 
-  // Lista de contas (mockada - pode vir do banco de dados)
-  const accounts = [
-    "Caixa",
-    "Banco do Brasil",
-    "Itaú",
-    "Nubank",
-    "Cartão de Crédito",
-  ];
+      try {
+        setLoadingData(true);
+        
+        // Carregar categorias
+        const { data: categoriesData, error: categoriesError } = await supabase
+          .from("categories")
+          .select("*")
+          .eq("user_id", user.id)
+          .eq("is_active", true)
+          .order("name");
+
+        if (categoriesError) throw categoriesError;
+
+        // Carregar contas bancárias
+        const { data: accountsData, error: accountsError } = await supabase
+          .from("bank_accounts")
+          .select("*")
+          .eq("user_id", user.id)
+          .eq("is_active", true)
+          .order("bank_name");
+
+        if (accountsError) throw accountsError;
+
+        setCategories((categoriesData || []) as Category[]);
+        setBankAccounts(accountsData || []);
+      } catch (error) {
+        console.error("Erro ao carregar dados:", error);
+        toast({
+          title: "Erro",
+          description: "Erro ao carregar categorias e contas",
+          variant: "destructive",
+        });
+      } finally {
+        setLoadingData(false);
+      }
+    };
+
+    fetchData();
+  }, [user?.id, toast]);
+
+  // Filtrar categorias por tipo
+  const filteredCategories = categories.filter((cat) => cat.type === type);
 
   const handleDateSelect = (selectedDate: Date | undefined) => {
     if (selectedDate) {
@@ -84,7 +126,7 @@ export function TransactionSlideIn({
   };
 
   const handleSubmit = async () => {
-    if (!category || !value || !account || !description) {
+    if (!category || !value || !description) {
       toast({
         title: "Erro",
         description: "Preencha todos os campos obrigatórios",
@@ -114,6 +156,7 @@ export function TransactionSlideIn({
         date: format(date, "yyyy-MM-dd"),
         source: "manual",
         original_message: `Lançamento manual - ${description}`,
+        bank_account_id: account || null,
       });
 
       if (error) throw error;
@@ -155,7 +198,7 @@ export function TransactionSlideIn({
       />
 
       {/* Slide In Panel */}
-      <div className="fixed top-0 right-0 h-full w-[40%] bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out">
+      <div className="fixed top-0 right-0 h-full w-[40%] bg-white shadow-2xl z-50 animate-slide-in-right">
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
@@ -189,16 +232,26 @@ export function TransactionSlideIn({
               >
                 Categoria
               </Label>
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger className="w-full">
+               <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger className="w-full rounded-xl">
                   <SelectValue placeholder="Sem categoria" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
-                      {cat}
+                  {loadingData ? (
+                    <SelectItem value="loading" disabled>
+                      Carregando...
                     </SelectItem>
-                  ))}
+                  ) : filteredCategories.length === 0 ? (
+                    <SelectItem value="no-categories" disabled>
+                      Nenhuma categoria encontrada
+                    </SelectItem>
+                  ) : (
+                    filteredCategories.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.name}>
+                        {cat.name}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -214,7 +267,7 @@ export function TransactionSlideIn({
                   <Input
                     value={format(date, "dd/MM/yyyy", { locale: pt })}
                     readOnly
-                    className="pr-10 cursor-pointer"
+                    className="pr-10 cursor-pointer rounded-xl"
                     onClick={() => setShowDateCalendar(true)}
                   />
                   <Popover
@@ -258,6 +311,7 @@ export function TransactionSlideIn({
                   placeholder="0,00"
                   value={value}
                   onChange={(e) => setValue(e.target.value)}
+                  className="rounded-xl"
                 />
               </div>
 
@@ -268,11 +322,12 @@ export function TransactionSlideIn({
                 </Label>
                 <Select
                   value={type}
-                  onValueChange={(value: "income" | "expense") =>
-                    setType(value)
-                  }
+                  onValueChange={(value: "income" | "expense") => {
+                    setType(value);
+                    setCategory(""); // Reset category when type changes
+                  }}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="rounded-xl">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -294,7 +349,7 @@ export function TransactionSlideIn({
                   <Input
                     value={format(competenceDate, "dd/MM/yyyy", { locale: pt })}
                     readOnly
-                    className="pr-10 cursor-pointer"
+                    className="pr-10 cursor-pointer rounded-xl"
                     onClick={() => setShowCompetenceCalendar(true)}
                   />
                   <Popover
@@ -330,15 +385,25 @@ export function TransactionSlideIn({
                   Conta financeira
                 </Label>
                 <Select value={account} onValueChange={setAccount}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Caixa" />
+                  <SelectTrigger className="rounded-xl">
+                    <SelectValue placeholder="Selecione a conta" />
                   </SelectTrigger>
                   <SelectContent>
-                    {accounts.map((acc) => (
-                      <SelectItem key={acc} value={acc}>
-                        {acc}
+                    {loadingData ? (
+                      <SelectItem value="loading" disabled>
+                        Carregando...
                       </SelectItem>
-                    ))}
+                    ) : bankAccounts.length === 0 ? (
+                      <SelectItem value="no-accounts" disabled>
+                        Nenhuma conta encontrada
+                      </SelectItem>
+                    ) : (
+                      bankAccounts.map((acc) => (
+                        <SelectItem key={acc.id} value={acc.id}>
+                          {acc.bank_name} - {acc.account_type}
+                        </SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
               </div>
@@ -357,7 +422,7 @@ export function TransactionSlideIn({
                 placeholder="Descreva o lançamento..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="min-h-[120px] resize-none"
+                className="min-h-[120px] resize-none rounded-xl"
               />
             </div>
           </div>
@@ -369,14 +434,14 @@ export function TransactionSlideIn({
                 variant="outline"
                 onClick={onClose}
                 disabled={loading}
-                className="px-6"
+                className="px-6 rounded-xl"
               >
                 Cancelar
               </Button>
               <Button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="px-6 bg-green-600 hover:bg-green-700 text-white"
+                className="px-6 bg-gradient-to-r from-knumbers-green to-knumbers-purple hover:from-knumbers-green/90 hover:to-knumbers-purple/90 text-white border-none rounded-xl"
               >
                 {loading ? "Salvando..." : "Salvar"}
               </Button>
