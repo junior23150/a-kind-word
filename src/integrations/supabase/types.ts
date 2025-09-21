@@ -357,7 +357,7 @@ export type Database = {
             foreignKeyName: "transactions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
-            referencedRelation: "whatsapp_users"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
