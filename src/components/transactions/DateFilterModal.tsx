@@ -90,9 +90,7 @@ export function DateFilterModal({
         return;
     }
 
-    if (filterType !== "customPeriod") {
-      setTempRange({ from, to });
-    }
+    setTempRange({ from, to });
   };
 
   const handleApply = () => {
@@ -115,29 +113,29 @@ export function DateFilterModal({
   const isCustomPeriod = selectedFilter === "customPeriod";
 
   return (
-    <div className="flex bg-white rounded-lg shadow-lg border overflow-hidden">
+    <div className="flex bg-white rounded-xl shadow-lg border overflow-hidden w-auto">
       {/* Seção dos Calendários */}
       <div className="flex-1">
         {isCustomPeriod ? (
           // Dois calendários para período customizado
           <div className="flex">
             {/* Calendário Início */}
-            <div className="p-4 border-r border-gray-200">
-              <div className="text-center mb-3">
+            <div className="p-6 border-r border-gray-200">
+              <div className="text-left mb-4">
                 <div className="text-sm font-medium text-gray-600 mb-2">
                   Início do período
                 </div>
-                <div className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-center">
+                <div className="bg-white border border-gray-300 rounded-xl px-4 py-3 text-center min-w-[160px]">
                   <input
                     type="text"
-                    placeholder="01/08/2025"
+                    placeholder="01/09/2025"
                     value={
                       customStartDate
                         ? format(customStartDate, "dd/MM/yyyy", { locale: pt })
                         : ""
                     }
                     readOnly
-                    className="w-full text-center bg-transparent border-none outline-none text-sm text-gray-700"
+                    className="w-full text-center bg-transparent border-none outline-none text-sm text-gray-700 font-medium"
                   />
                 </div>
               </div>
@@ -145,23 +143,23 @@ export function DateFilterModal({
                 mode="single"
                 selected={customStartDate}
                 onSelect={setCustomStartDate}
-                className="border-0 p-0"
+                className="border-0 p-0 pointer-events-auto"
                 locale={pt}
                 classNames={{
                   months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
                   month: "space-y-4",
                   caption: "flex justify-center pt-1 relative items-center",
-                  caption_label: "text-sm font-medium",
+                  caption_label: "text-sm font-medium text-gray-700",
                   nav: "space-x-1 flex items-center",
                   nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
                   nav_button_previous: "absolute left-1",
                   nav_button_next: "absolute right-1",
                   table: "w-full border-collapse space-y-1",
                   head_row: "flex",
-                  head_cell: "text-muted-foreground rounded-md w-8 font-normal text-[0.8rem]",
+                  head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
                   row: "flex w-full mt-2",
                   cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                  day: "h-8 w-8 p-0 font-normal aria-selected:opacity-100 hover:bg-gray-100 rounded-md",
+                  day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-gray-100 rounded-md",
                   day_selected: "bg-green-600 text-white hover:bg-green-700 focus:bg-green-600 focus:text-white",
                   day_today: "bg-gray-100 text-gray-900",
                   day_outside: "text-muted-foreground opacity-50",
@@ -173,22 +171,22 @@ export function DateFilterModal({
             </div>
 
             {/* Calendário Fim */}
-            <div className="p-4">
-              <div className="text-center mb-3">
+            <div className="p-6">
+              <div className="text-left mb-4">
                 <div className="text-sm font-medium text-gray-600 mb-2">
                   Fim do período
                 </div>
-                <div className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-center">
+                <div className="bg-white border border-gray-300 rounded-xl px-4 py-3 text-center min-w-[160px]">
                   <input
                     type="text"
-                    placeholder="31/08/2025"
+                    placeholder="30/09/2025"
                     value={
                       customEndDate
                         ? format(customEndDate, "dd/MM/yyyy", { locale: pt })
                         : ""
                     }
                     readOnly
-                    className="w-full text-center bg-transparent border-none outline-none text-sm text-gray-700"
+                    className="w-full text-center bg-transparent border-none outline-none text-sm text-gray-700 font-medium"
                   />
                 </div>
               </div>
@@ -196,28 +194,30 @@ export function DateFilterModal({
                 mode="single"
                 selected={customEndDate}
                 onSelect={setCustomEndDate}
-                className="border-0 p-0"
+                className="border-0 p-0 pointer-events-auto"
                 locale={pt}
                 classNames={{
                   months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
                   month: "space-y-4",
                   caption: "flex justify-center pt-1 relative items-center",
-                  caption_label: "text-sm font-medium",
+                  caption_label: "text-sm font-medium text-gray-700",
                   nav: "space-x-1 flex items-center",
                   nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
                   nav_button_previous: "absolute left-1",
                   nav_button_next: "absolute right-1",
                   table: "w-full border-collapse space-y-1",
                   head_row: "flex",
-                  head_cell: "text-muted-foreground rounded-md w-8 font-normal text-[0.8rem]",
+                  head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
                   row: "flex w-full mt-2",
                   cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                  day: "h-8 w-8 p-0 font-normal aria-selected:opacity-100 hover:bg-gray-100 rounded-md",
+                  day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-gray-100 rounded-md",
                   day_selected: "bg-green-600 text-white hover:bg-green-700 focus:bg-green-600 focus:text-white",
                   day_today: "bg-gray-100 text-gray-900",
                   day_outside: "text-muted-foreground opacity-50",
                   day_disabled: "text-muted-foreground opacity-50",
-                  day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
+                  day_range_middle: "aria-selected:bg-green-100 aria-selected:text-green-900",
+                  day_range_start: "day-range-start bg-green-600 text-white",
+                  day_range_end: "day-range-end bg-green-600 text-white",
                   day_hidden: "invisible",
                 }}
               />
@@ -225,50 +225,48 @@ export function DateFilterModal({
           </div>
         ) : (
           // Um calendário para outros filtros
-          <div className="p-4">
-            {selectedFilter === "selectMonth" && (
-              <div className="text-center mb-3">
-                <div className="text-sm font-medium text-gray-600 mb-2">
-                  Início do período
-                </div>
-                <div className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-center">
-                  <input
-                    type="text"
-                    value={format(tempRange.from, "dd/MM/yyyy", { locale: pt })}
-                    readOnly
-                    className="w-full text-center bg-transparent border-none outline-none text-sm text-gray-700"
-                  />
-                </div>
+          <div className="p-6">
+            <div className="text-left mb-4">
+              <div className="text-sm font-medium text-gray-600 mb-2">
+                Início do período
               </div>
-            )}
+              <div className="bg-white border border-gray-300 rounded-xl px-4 py-3 text-center min-w-[160px]">
+                <input
+                  type="text"
+                  value={format(tempRange.from, "dd/MM/yyyy", { locale: pt })}
+                  readOnly
+                  className="w-full text-center bg-transparent border-none outline-none text-sm text-gray-700 font-medium"
+                />
+              </div>
+            </div>
             <CalendarComponent
-              mode="range"
-              selected={tempRange}
-              onSelect={(range) => {
-                if (range?.from) {
+              mode="single"
+              selected={tempRange.from}
+              onSelect={(date) => {
+                if (date) {
                   setTempRange({
-                    from: range.from,
-                    to: range.to || range.from,
+                    from: date,
+                    to: selectedFilter === "selectMonth" ? endOfMonth(date) : date,
                   });
                 }
               }}
-              className="border-0 p-0"
+              className="border-0 p-0 pointer-events-auto"
               locale={pt}
               classNames={{
                 months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
                 month: "space-y-4",
                 caption: "flex justify-center pt-1 relative items-center",
-                caption_label: "text-sm font-medium",
+                caption_label: "text-sm font-medium text-gray-700",
                 nav: "space-x-1 flex items-center",
                 nav_button: "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100",
                 nav_button_previous: "absolute left-1",
                 nav_button_next: "absolute right-1",
                 table: "w-full border-collapse space-y-1",
                 head_row: "flex",
-                head_cell: "text-muted-foreground rounded-md w-8 font-normal text-[0.8rem]",
+                head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
                 row: "flex w-full mt-2",
                 cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                day: "h-8 w-8 p-0 font-normal aria-selected:opacity-100 hover:bg-gray-100 rounded-md",
+                day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-gray-100 rounded-md",
                 day_selected: "bg-green-600 text-white hover:bg-green-700 focus:bg-green-600 focus:text-white",
                 day_today: "bg-gray-100 text-gray-900",
                 day_outside: "text-muted-foreground opacity-50",
@@ -284,15 +282,15 @@ export function DateFilterModal({
       </div>
 
       {/* Menu Lateral */}
-      <div className="w-48 bg-gray-50 border-l border-gray-200 flex flex-col">
+      <div className="w-56 bg-gray-50 border-l border-gray-200 flex flex-col">
         {/* Opções de Filtro */}
-        <div className="flex-1 p-3 space-y-1">
+        <div className="flex-1 p-4 space-y-2">
           {filterOptions.map((option) => (
             <Button
               key={option.key}
               variant="ghost"
               size="sm"
-              className={`w-full justify-start text-sm h-9 px-3 rounded-md ${
+              className={`w-full justify-start text-sm h-10 px-4 rounded-xl ${
                 selectedFilter === option.key
                   ? "bg-green-100 text-green-700 font-medium hover:bg-green-100"
                   : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
@@ -305,20 +303,20 @@ export function DateFilterModal({
         </div>
 
         {/* Botões de Ação */}
-        <div className="border-t border-gray-200 p-3">
-          <div className="flex gap-2">
+        <div className="border-t border-gray-200 p-4">
+          <div className="flex gap-3">
             <Button
               variant="outline"
               size="sm"
               onClick={onCancel}
-              className="flex-1 text-gray-600 border-gray-300 hover:bg-gray-100"
+              className="flex-1 text-gray-600 border-gray-300 hover:bg-gray-100 rounded-xl h-10"
             >
               Cancelar
             </Button>
             <Button
               size="sm"
               onClick={handleApply}
-              className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+              className="flex-1 bg-green-600 hover:bg-green-700 text-white rounded-xl h-10"
               disabled={
                 selectedFilter === "customPeriod" &&
                 (!customStartDate || !customEndDate)
