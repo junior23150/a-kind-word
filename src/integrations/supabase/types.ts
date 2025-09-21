@@ -300,7 +300,8 @@ export type Database = {
           source: string | null
           transaction_type: string
           updated_at: string
-          user_id: string
+          user_id: string | null
+          whatsapp_user_id: string | null
         }
         Insert: {
           amount: number
@@ -315,7 +316,8 @@ export type Database = {
           source?: string | null
           transaction_type: string
           updated_at?: string
-          user_id: string
+          user_id?: string | null
+          whatsapp_user_id?: string | null
         }
         Update: {
           amount?: number
@@ -330,7 +332,8 @@ export type Database = {
           source?: string | null
           transaction_type?: string
           updated_at?: string
-          user_id?: string
+          user_id?: string | null
+          whatsapp_user_id?: string | null
         }
         Relationships: [
           {
