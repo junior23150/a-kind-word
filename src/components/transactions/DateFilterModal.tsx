@@ -253,7 +253,7 @@ export function DateFilterModal({
                   });
                 }
               }}
-              defaultMonth={
+              month={
                 selectedFilter === "lastMonth" 
                   ? subMonths(new Date(), 1)
                   : selectedFilter === "nextMonth"
