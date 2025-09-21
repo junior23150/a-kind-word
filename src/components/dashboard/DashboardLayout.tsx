@@ -10,9 +10,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <ThemeProvider defaultTheme="light" storageKey="knumbers-theme">
       <WorkspaceProvider>
-        <div className="min-h-screen w-full bg-background">
+        <div className="min-h-screen w-full bg-background flex flex-col">
           <AppHeader />
-          <main className="flex-1 overflow-auto">
+          <main className="flex-1">
             {children}
           </main>
         </div>
