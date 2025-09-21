@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { 
+import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -35,7 +35,18 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, subDays, subWeeks, addMonths, subMonths } from "date-fns";
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  addDays,
+  subDays,
+  subWeeks,
+  addMonths,
+  subMonths,
+} from "date-fns";
 import { pt } from "date-fns/locale";
 import { TransferSlideIn } from "@/components/transactions/TransferSlideIn";
 import { DateFilterModal } from "@/components/transactions/DateFilterModal";
@@ -67,17 +78,21 @@ export function TransactionsPage() {
   const [showCalendar, setShowCalendar] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [selectedTransactions, setSelectedTransactions] = useState<string[]>([]);
+  const [selectedTransactions, setSelectedTransactions] = useState<string[]>(
+    []
+  );
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [activeFilter, setActiveFilter] = useState<"all" | "income" | "expense">("all");
+  const [activeFilter, setActiveFilter] = useState<
+    "all" | "income" | "expense"
+  >("all");
   const { toast } = useToast();
 
   // Categories list
   const categories = [
     "Alimentação",
-    "Transporte", 
+    "Transporte",
     "Saúde",
     "Educação",
     "Lazer",
@@ -85,7 +100,7 @@ export function TransactionsPage() {
     "Salário",
     "Freelance",
     "Investimentos",
-    "Outros"
+    "Outros",
   ];
 
   // Carregar transações do Supabase
@@ -123,18 +138,19 @@ export function TransactionsPage() {
       transaction.description
         .toLowerCase()
         .includes(searchTerm.toLowerCase()) ||
-      (transaction.category && 
+      (transaction.category &&
         transaction.category.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    const matchesDateRange = 
-      transactionDate >= dateRange.from && 
-      transactionDate <= dateRange.to;
-    
-    const matchesFilter = 
-      activeFilter === "all" || 
-      (activeFilter === "income" && transaction.transaction_type === "income") ||
-      (activeFilter === "expense" && transaction.transaction_type === "expense");
-    
+
+    const matchesDateRange =
+      transactionDate >= dateRange.from && transactionDate <= dateRange.to;
+
+    const matchesFilter =
+      activeFilter === "all" ||
+      (activeFilter === "income" &&
+        transaction.transaction_type === "income") ||
+      (activeFilter === "expense" &&
+        transaction.transaction_type === "expense");
+
     return matchesSearch && matchesDateRange && matchesFilter;
   });
 
@@ -150,9 +166,9 @@ export function TransactionsPage() {
 
   // Calcular valor das transações selecionadas corretamente (receitas - despesas)
   const selectedTransactionsValue = selectedTransactions.reduce((sum, id) => {
-    const transaction = filteredTransactions.find(t => t.id === id);
+    const transaction = filteredTransactions.find((t) => t.id === id);
     if (!transaction) return sum;
-    
+
     if (transaction.transaction_type === "income") {
       return sum + Math.abs(transaction.amount);
     } else {
@@ -171,7 +187,6 @@ export function TransactionsPage() {
     return new Date(dateString).toLocaleDateString("pt-BR");
   };
 
-
   // Clear selected transactions
   const clearSelectedTransactions = () => {
     setSelectedTransactions([]);
@@ -179,20 +194,25 @@ export function TransactionsPage() {
 
   // Handle transaction selection
   const handleTransactionSelect = (transactionId: string, checked: boolean) => {
-    setSelectedTransactions(prev => 
-      checked 
+    setSelectedTransactions((prev) =>
+      checked
         ? [...prev, transactionId]
-        : prev.filter(id => id !== transactionId)
+        : prev.filter((id) => id !== transactionId)
     );
   };
 
   // Handle select all
   const handleSelectAll = (checked: boolean) => {
-    setSelectedTransactions(checked ? filteredTransactions.map(t => t.id) : []);
+    setSelectedTransactions(
+      checked ? filteredTransactions.map((t) => t.id) : []
+    );
   };
 
   // Handle category update
-  const handleCategoryUpdate = async (transactionId: string, newCategory: string) => {
+  const handleCategoryUpdate = async (
+    transactionId: string,
+    newCategory: string
+  ) => {
     try {
       const { error } = await supabase
         .from("transactions")
@@ -201,12 +221,14 @@ export function TransactionsPage() {
 
       if (error) throw error;
 
-      setTransactions(prev => prev.map(t => 
-        t.id === transactionId ? { ...t, category: newCategory } : t
-      ));
-      
+      setTransactions((prev) =>
+        prev.map((t) =>
+          t.id === transactionId ? { ...t, category: newCategory } : t
+        )
+      );
+
       setEditingCategory(null);
-      
+
       toast({
         title: "Sucesso",
         description: "Categoria atualizada com sucesso",
@@ -232,9 +254,11 @@ export function TransactionsPage() {
 
       if (error) throw error;
 
-      setTransactions(prev => prev.filter(t => !selectedTransactions.includes(t.id)));
+      setTransactions((prev) =>
+        prev.filter((t) => !selectedTransactions.includes(t.id))
+      );
       setSelectedTransactions([]);
-      
+
       toast({
         title: "Sucesso",
         description: `${selectedTransactions.length} transação(ões) excluída(s) com sucesso`,
@@ -309,10 +333,13 @@ export function TransactionsPage() {
                   className="pl-10 rounded-xl"
                 />
               </div>
-              
+
               <Popover open={showCalendar} onOpenChange={setShowCalendar}>
                 <PopoverTrigger asChild>
-                  <Button variant="outline" className="flex items-center gap-2 min-w-fit rounded-xl">
+                  <Button
+                    variant="outline"
+                    className="flex items-center gap-2 min-w-fit rounded-xl"
+                  >
                     <Calendar className="w-4 h-4" />
                     {dateLabel}
                   </Button>
@@ -331,11 +358,15 @@ export function TransactionsPage() {
                 </PopoverContent>
               </Popover>
             </div>
-            
+
             {/* Action Buttons - Moved to right */}
-            <div className={`flex items-center gap-2 ${sidebarCollapsed ? 'mr-16' : 'mr-60'}`}>
-              <Button 
-                variant="outline" 
+            <div
+              className={`flex items-center gap-2 ${
+                sidebarCollapsed ? "mr-16" : "mr-60"
+              }`}
+            >
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={handleExportToExcel}
                 className="rounded-xl"
@@ -343,19 +374,19 @@ export function TransactionsPage() {
                 <Download className="w-4 h-4 mr-2" />
                 Exportar extrato
               </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                className="rounded-xl"
-              >
+              <Button variant="outline" size="sm" className="rounded-xl">
                 <Printer className="w-4 h-4" />
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={handleDeleteTransactions}
                 disabled={selectedTransactions.length === 0}
-                className={`rounded-xl ${selectedTransactions.length === 0 ? 'text-gray-400' : 'text-red-600 hover:text-red-700'}`}
+                className={`rounded-xl ${
+                  selectedTransactions.length === 0
+                    ? "text-gray-400"
+                    : "text-red-600 hover:text-red-700"
+                }`}
               >
                 <Trash2 className="w-4 h-4" />
               </Button>
@@ -368,8 +399,8 @@ export function TransactionsPage() {
               variant="ghost"
               onClick={() => setActiveFilter("all")}
               className={`relative px-4 py-2 text-sm font-medium transition-colors ${
-                activeFilter === "all" 
-                  ? "text-foreground" 
+                activeFilter === "all"
+                  ? "text-foreground"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -382,8 +413,8 @@ export function TransactionsPage() {
               variant="ghost"
               onClick={() => setActiveFilter("income")}
               className={`relative px-4 py-2 text-sm font-medium transition-colors ${
-                activeFilter === "income" 
-                  ? "text-foreground" 
+                activeFilter === "income"
+                  ? "text-foreground"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -396,8 +427,8 @@ export function TransactionsPage() {
               variant="ghost"
               onClick={() => setActiveFilter("expense")}
               className={`relative px-4 py-2 text-sm font-medium transition-colors ${
-                activeFilter === "expense" 
-                  ? "text-foreground" 
+                activeFilter === "expense"
+                  ? "text-foreground"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -411,10 +442,13 @@ export function TransactionsPage() {
           {/* Selected transactions indicator */}
           {selectedTransactions.length > 0 && (
             <div className="flex items-center gap-2 mb-4">
-              <Badge variant="secondary" className="flex items-center gap-2 bg-knumbers-purple/20 text-knumbers-purple border-knumbers-purple/30">
+              <Badge
+                variant="secondary"
+                className="flex items-center gap-2 bg-knumbers-purple/20 text-knumbers-purple border-knumbers-purple/30"
+              >
                 Selecionados: {selectedTransactions.length} cadastros
-                <X 
-                  className="w-3 h-3 cursor-pointer" 
+                <X
+                  className="w-3 h-3 cursor-pointer"
                   onClick={clearSelectedTransactions}
                 />
               </Badge>
@@ -425,7 +459,11 @@ export function TransactionsPage() {
         {/* Main Content Area */}
         <div className="flex flex-1 overflow-hidden relative">
           {/* Left Content - Table */}
-          <div className={`flex-1 p-4 lg:p-6 overflow-hidden transition-all duration-300 ${sidebarCollapsed ? 'mr-16' : 'mr-60'}`}>
+          <div
+            className={`flex-1 p-4 lg:p-6 overflow-hidden transition-all duration-300 ${
+              sidebarCollapsed ? "mr-16" : "mr-60"
+            }`}
+          >
             <div className="bg-white rounded-lg border border-border h-full flex flex-col">
               <div className="flex-1 overflow-auto scrollbar-hide">
                 <table className="w-full">
@@ -433,7 +471,11 @@ export function TransactionsPage() {
                     <tr>
                       <th className="text-left p-2 lg:p-4 font-medium text-muted-foreground text-sm w-8">
                         <Checkbox
-                          checked={selectedTransactions.length === filteredTransactions.length && filteredTransactions.length > 0}
+                          checked={
+                            selectedTransactions.length ===
+                              filteredTransactions.length &&
+                            filteredTransactions.length > 0
+                          }
                           onCheckedChange={handleSelectAll}
                         />
                       </th>
@@ -454,7 +496,10 @@ export function TransactionsPage() {
                   <tbody>
                     {filteredTransactions.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="p-8 text-center text-muted-foreground">
+                        <td
+                          colSpan={5}
+                          className="p-8 text-center text-muted-foreground"
+                        >
                           Nenhuma transação encontrada
                         </td>
                       </tr>
@@ -466,8 +511,15 @@ export function TransactionsPage() {
                         >
                           <td className="p-2 lg:p-4">
                             <Checkbox
-                              checked={selectedTransactions.includes(transaction.id)}
-                              onCheckedChange={(checked) => handleTransactionSelect(transaction.id, checked as boolean)}
+                              checked={selectedTransactions.includes(
+                                transaction.id
+                              )}
+                              onCheckedChange={(checked) =>
+                                handleTransactionSelect(
+                                  transaction.id,
+                                  checked as boolean
+                                )
+                              }
                             />
                           </td>
                           <td className="p-2 lg:p-4 text-sm">
@@ -477,7 +529,9 @@ export function TransactionsPage() {
                             {editingCategory === transaction.id ? (
                               <Select
                                 value={transaction.category || ""}
-                                onValueChange={(value) => handleCategoryUpdate(transaction.id, value)}
+                                onValueChange={(value) =>
+                                  handleCategoryUpdate(transaction.id, value)
+                                }
                               >
                                 <SelectTrigger className="w-full h-8">
                                   <SelectValue />
@@ -491,11 +545,15 @@ export function TransactionsPage() {
                                 </SelectContent>
                               </Select>
                             ) : (
-                              <div 
+                              <div
                                 className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 p-1 rounded"
-                                onClick={() => setEditingCategory(transaction.id)}
+                                onClick={() =>
+                                  setEditingCategory(transaction.id)
+                                }
                               >
-                                <span>{transaction.category || "Sem categoria"}</span>
+                                <span>
+                                  {transaction.category || "Sem categoria"}
+                                </span>
                                 <Edit className="w-3 h-3 text-muted-foreground" />
                               </div>
                             )}
@@ -510,7 +568,9 @@ export function TransactionsPage() {
                                 : "text-red-600"
                             }`}
                           >
-                            {transaction.transaction_type === "expense" ? "-" : "+"}
+                            {transaction.transaction_type === "expense"
+                              ? "-"
+                              : "+"}
                             {formatCurrency(Math.abs(transaction.amount))}
                           </td>
                         </tr>
@@ -526,16 +586,22 @@ export function TransactionsPage() {
           <div className="fixed top-20 right-4 bottom-0 flex flex-col z-10">
             {/* Add Transaction Button */}
             <div className="mb-2">
-              <Button className={`bg-gradient-to-r from-knumbers-green to-knumbers-purple text-white hover:opacity-90 rounded-xl shadow-lg transition-all duration-300 ${
-                sidebarCollapsed ? 'w-12 h-12 p-0' : 'w-56 px-4 py-2'
-              }`}>
-                <Plus className={`w-4 h-4 ${sidebarCollapsed ? '' : 'mr-2'}`} />
-                {!sidebarCollapsed && 'Incluir lançamento'}
+              <Button
+                className={`bg-gradient-to-r from-knumbers-green to-knumbers-purple text-white hover:opacity-90 rounded-xl shadow-lg transition-all duration-300 ${
+                  sidebarCollapsed ? "w-12 h-12 p-0" : "w-56 px-4 py-2"
+                }`}
+              >
+                <Plus className={`w-4 h-4 ${sidebarCollapsed ? "" : "mr-2"}`} />
+                {!sidebarCollapsed && "Incluir lançamento"}
               </Button>
             </div>
 
             {/* Sidebar */}
-            <div className={`${sidebarCollapsed ? 'w-12' : 'w-56'} bg-white border border-border transition-all duration-300 rounded-lg flex flex-col overflow-hidden shadow-lg flex-1`}>
+            <div
+              className={`${
+                sidebarCollapsed ? "w-12" : "w-56"
+              } bg-white border border-border transition-all duration-300 rounded-lg flex flex-col overflow-hidden shadow-lg flex-1`}
+            >
               {sidebarCollapsed ? (
                 /* Collapsed Sidebar */
                 <div className="p-2 space-y-2 flex flex-col items-center flex-1">
@@ -559,9 +625,11 @@ export function TransactionsPage() {
                       className="w-full justify-start p-2 h-auto text-left text-xs"
                     >
                       <ArrowLeftRight className="w-4 h-4 mr-2" />
-                       <span className="leading-tight">
-                         Transferência entre<br />Contas
-                       </span>
+                      <span className="leading-tight">
+                        Transferência entre
+                        <br />
+                        Contas
+                      </span>
                     </Button>
                     <Separator className="my-3" />
                   </div>
@@ -588,7 +656,13 @@ export function TransactionsPage() {
                       <div className="text-xs font-medium text-muted-foreground mb-1">
                         Valor:
                       </div>
-                      <div className={`text-sm font-bold ${selectedTransactionsValue >= 0 ? 'text-knumbers-green' : 'text-red-600'}`}>
+                      <div
+                        className={`text-sm font-bold ${
+                          selectedTransactionsValue >= 0
+                            ? "text-knumbers-green"
+                            : "text-red-600"
+                        }`}
+                      >
                         {formatCurrency(selectedTransactionsValue)}
                       </div>
                     </div>
@@ -609,41 +683,51 @@ export function TransactionsPage() {
                     <div className="text-xs font-medium text-foreground mb-2">
                       Informações
                     </div>
-                    
+
                     <div className="space-y-2">
                       <div>
                         <div className="flex justify-between items-center">
-                          <span className="text-xs text-muted-foreground">Entradas</span>
+                          <span className="text-xs text-muted-foreground">
+                            Entradas
+                          </span>
                           <span className="text-xs font-medium text-green-600">
                             {formatCurrency(totalIncome)}
                           </span>
                         </div>
                       </div>
-                      
+
                       <div>
                         <div className="flex justify-between items-center">
-                          <span className="text-xs text-muted-foreground">Saídas</span>
+                          <span className="text-xs text-muted-foreground">
+                            Saídas
+                          </span>
                           <span className="text-xs font-medium text-red-600">
                             {formatCurrency(totalExpense)}
                           </span>
                         </div>
                       </div>
-                      
-                       <div>
-                         <div className="flex justify-between items-center">
-                           <span className="text-xs text-muted-foreground">
-                             Saldo final
-                           </span>
-                           <span className={`text-xs font-medium ${(totalIncome - totalExpense) >= 0 ? 'text-knumbers-green' : 'text-red-600'}`}>
-                             {formatCurrency(totalIncome - totalExpense)}
-                           </span>
-                         </div>
-                       </div>
+
+                      <div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-xs text-muted-foreground">
+                            Saldo final
+                          </span>
+                          <span
+                            className={`text-xs font-medium ${
+                              totalIncome - totalExpense >= 0
+                                ? "text-knumbers-green"
+                                : "text-red-600"
+                            }`}
+                          >
+                            {formatCurrency(totalIncome - totalExpense)}
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
-              
+
               {/* Sidebar Toggle - Bottom */}
               <div className="p-2 border-t flex justify-center flex-shrink-0">
                 <Button
@@ -652,7 +736,11 @@ export function TransactionsPage() {
                   onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
                   className="h-6 w-6 p-0"
                 >
-                  {sidebarCollapsed ? <ChevronLeft className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+                  {sidebarCollapsed ? (
+                    <ChevronLeft className="w-3 h-3" />
+                  ) : (
+                    <ChevronRight className="w-3 h-3" />
+                  )}
                 </Button>
               </div>
             </div>
@@ -661,7 +749,9 @@ export function TransactionsPage() {
       </div>
 
       {/* Transfer Modal */}
-      {showTransferModal && <TransferSlideIn onClose={() => setShowTransferModal(false)} />}
+      {showTransferModal && (
+        <TransferSlideIn onClose={() => setShowTransferModal(false)} />
+      )}
     </div>
   );
 }
