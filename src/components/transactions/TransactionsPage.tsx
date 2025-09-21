@@ -618,7 +618,7 @@ export function TransactionsPage() {
                 /* Expanded Sidebar */
                 <div className="p-3 space-y-4 flex-1 overflow-auto scrollbar-hide">
                   {/* Transfer Section */}
-                  <div>
+                  <div className="py-1">
                     <Button
                       variant="ghost"
                       onClick={() => setShowTransferModal(true)}
