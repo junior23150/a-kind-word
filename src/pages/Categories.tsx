@@ -328,14 +328,44 @@ export default function CategoriesPage() {
 
   useEffect(() => {
     if (user) {
-      fetchCategories();
+      initializeCategories();
     }
   }, [user]);
+
+  const initializeCategories = async () => {
+    try {
+      // First check if user has any categories
+      const { data: existingCategories, error: checkError } = await supabase
+        .from("categories" as any)
+        .select("id")
+        .eq("user_id", user?.id)
+        .limit(1);
+
+      if (checkError) throw checkError;
+
+      // If no categories exist, create default ones
+      if (!existingCategories || existingCategories.length === 0) {
+        const { error: createError } = await supabase.rpc('create_default_categories_for_user', {
+          user_uuid: user?.id
+        });
+
+        if (createError) {
+          console.error("Error creating default categories:", createError);
+        }
+      }
+
+      // Then fetch all categories
+      fetchCategories();
+    } catch (error) {
+      console.error("Error initializing categories:", error);
+      fetchCategories(); // Fallback to just fetching existing categories
+    }
+  };
 
   const fetchCategories = async () => {
     try {
       const { data, error } = await supabase
-        .from("categories")
+        .from("categories" as any)
         .select("*")
         .eq("user_id", user?.id)
         .eq("is_active", showInactive ? false : true)
@@ -343,7 +373,14 @@ export default function CategoriesPage() {
         .order("name", { ascending: true });
 
       if (error) throw error;
-      setCategories(data || []);
+      
+      // Cast the data to match our Category interface
+      const typedCategories: Category[] = (data || []).map((item: any) => ({
+        ...item,
+        type: item.type as "income" | "expense"
+      }));
+      
+      setCategories(typedCategories);
     } catch (error) {
       console.error("Error fetching categories:", error);
       toast.error("Erro ao carregar categorias");
@@ -364,7 +401,7 @@ export default function CategoriesPage() {
       if (editingCategory) {
         // Update existing category
         const { error } = await supabase
-          .from("categories")
+          .from("categories" as any)
           .update({
             name: formData.name,
             type: formData.type,
@@ -377,7 +414,7 @@ export default function CategoriesPage() {
         toast.success("Categoria atualizada com sucesso!");
       } else {
         // Create new category
-        const { error } = await supabase.from("categories").insert({
+        const { error } = await supabase.from("categories" as any).insert({
           user_id: user?.id,
           name: formData.name,
           type: formData.type,
@@ -434,7 +471,7 @@ export default function CategoriesPage() {
 
     try {
       const { error } = await supabase
-        .from("categories")
+        .from("categories" as any)
         .update({ is_active: false })
         .eq("id", category.id);
 
