@@ -238,11 +238,11 @@ export function TransactionSlideIn({
                 </SelectTrigger>
                 <SelectContent>
                   {loadingData ? (
-                    <SelectItem value="" disabled>
+                    <SelectItem value="loading" disabled>
                       Carregando...
                     </SelectItem>
                   ) : filteredCategories.length === 0 ? (
-                    <SelectItem value="" disabled>
+                    <SelectItem value="no-categories" disabled>
                       Nenhuma categoria encontrada
                     </SelectItem>
                   ) : (
@@ -389,11 +389,11 @@ export function TransactionSlideIn({
                   </SelectTrigger>
                   <SelectContent>
                     {loadingData ? (
-                      <SelectItem value="" disabled>
+                      <SelectItem value="loading" disabled>
                         Carregando...
                       </SelectItem>
                     ) : bankAccounts.length === 0 ? (
-                      <SelectItem value="" disabled>
+                      <SelectItem value="no-accounts" disabled>
                         Nenhuma conta encontrada
                       </SelectItem>
                     ) : (
