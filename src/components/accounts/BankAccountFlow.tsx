@@ -122,7 +122,7 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-knumbers-green/10 via-background to-knumbers-purple/10">
+    <div className="h-screen bg-gradient-to-br from-knumbers-green/10 via-background to-knumbers-purple/10 flex flex-col">
       {/* Header */}
       <div className="bg-background/80 backdrop-blur-sm border-b sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-6 py-4">
@@ -182,7 +182,7 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 py-8">
+      <div className="flex-1 py-8 overflow-y-auto">
         <div className="max-w-7xl mx-auto px-6">
           {/* Step Header */}
           <div className="text-center mb-8">
@@ -405,7 +405,7 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
       </div>
 
       {/* Footer Navigation */}
-      <div className="bg-background/90 backdrop-blur-sm border-t sticky bottom-0">
+      <div className="bg-background/90 backdrop-blur-sm border-t">
         <div className="max-w-4xl mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
             <Button
