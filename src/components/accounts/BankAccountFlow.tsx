@@ -182,11 +182,11 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 py-4 overflow-y-auto">
+      <div className="flex-1 py-2 overflow-hidden">
         <div className="max-w-7xl mx-auto px-6">
           {/* Step Header */}
-          <div className="text-center mb-4">
-            <h2 className="text-3xl font-bold text-foreground mb-2">{getStepTitle()}</h2>
+          <div className="text-center mb-2">
+            <h2 className="text-2xl font-bold text-foreground mb-2">{getStepTitle()}</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{getStepDescription()}</p>
           </div>
 
@@ -194,7 +194,7 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
           <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             {step === 1 && (
               <div>
-                <div className="grid grid-cols-5 gap-8 mb-8 w-full">
+                <div className="grid grid-cols-5 gap-4 mb-4 w-full">
                   {banks.map((bank) => (
                     <Card
                       key={bank.name}
@@ -206,7 +206,7 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
                       }}
                       onClick={() => setFormData({ ...formData, bank_name: bank.name })}
                     >
-                      <CardContent className="p-8 text-center min-h-[180px] flex flex-col justify-center">
+                      <CardContent className="p-6 text-center min-h-[140px] flex flex-col justify-center">
                         <div className="flex justify-center mb-4">
                           <BankLogo bankName={bank.name} size="lg" />
                         </div>
