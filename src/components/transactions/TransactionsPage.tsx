@@ -38,6 +38,7 @@ import { useToast } from "@/hooks/use-toast";
 import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, subDays, subWeeks, addMonths, subMonths } from "date-fns";
 import { pt } from "date-fns/locale";
 import { TransferSlideIn } from "@/components/transactions/TransferSlideIn";
+import { DateFilterModal } from "@/components/transactions/DateFilterModal";
 
 interface Transaction {
   id: string;
@@ -70,14 +71,6 @@ export function TransactionsPage() {
   const [editingCategory, setEditingCategory] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [tempDateRange, setTempDateRange] = useState({
-    from: startOfMonth(new Date()),
-    to: endOfMonth(new Date()),
-  });
-  const [tempDateLabel, setTempDateLabel] = useState("Este mês");
-  const [showCustomRange, setShowCustomRange] = useState(false);
-  const [customRangeFrom, setCustomRangeFrom] = useState<Date | undefined>();
-  const [customRangeTo, setCustomRangeTo] = useState<Date | undefined>();
   const [activeFilter, setActiveFilter] = useState<"all" | "income" | "expense">("all");
   const { toast } = useToast();
 
@@ -178,80 +171,6 @@ export function TransactionsPage() {
     return new Date(dateString).toLocaleDateString("pt-BR");
   };
 
-  // Handle quick date selection
-  const handleQuickDateFilter = (type: string) => {
-    const today = new Date();
-    let from: Date, to: Date, label: string;
-
-    switch (type) {
-      case 'today':
-        from = to = today;
-        label = 'Hoje';
-        break;
-      case 'thisWeek':
-        from = startOfWeek(today, { weekStartsOn: 1 });
-        to = endOfWeek(today, { weekStartsOn: 1 });
-        label = 'Esta semana';
-        break;
-      case 'lastWeek':
-        const lastWeekStart = subWeeks(today, 1);
-        from = startOfWeek(lastWeekStart, { weekStartsOn: 1 });
-        to = endOfWeek(lastWeekStart, { weekStartsOn: 1 });
-        label = 'Semana passada';
-        break;
-      case 'thisMonth':
-        from = startOfMonth(today);
-        to = endOfMonth(today);
-        label = 'Este mês';
-        break;
-      case 'lastMonth':
-        const lastMonth = subMonths(today, 1);
-        from = startOfMonth(lastMonth);
-        to = endOfMonth(lastMonth);
-        label = 'Mês passado';
-        break;
-      case 'nextMonth':
-        const nextMonth = addMonths(today, 1);
-        from = startOfMonth(nextMonth);
-        to = endOfMonth(nextMonth);
-        label = 'Próximo mês';
-        break;
-      case 'customPeriod':
-        setShowCustomRange(true);
-        return;
-      default:
-        return;
-    }
-
-    setTempDateRange({ from, to });
-    setTempDateLabel(label);
-    setShowCustomRange(false);
-  };
-
-  // Apply date filter
-  const applyDateFilter = () => {
-    if (showCustomRange && customRangeFrom && customRangeTo) {
-      setDateRange({ from: customRangeFrom, to: customRangeTo });
-      setDateLabel(`${format(customRangeFrom, "dd/MM/yyyy", { locale: pt })} - ${format(customRangeTo, "dd/MM/yyyy", { locale: pt })}`);
-    } else {
-      setDateRange(tempDateRange);
-      setDateLabel(tempDateLabel);
-    }
-    setShowCalendar(false);
-    setShowCustomRange(false);
-    setCustomRangeFrom(undefined);
-    setCustomRangeTo(undefined);
-  };
-
-  // Cancel date filter
-  const cancelDateFilter = () => {
-    setTempDateRange(dateRange);
-    setTempDateLabel(dateLabel);
-    setShowCalendar(false);
-    setShowCustomRange(false);
-    setCustomRangeFrom(undefined);
-    setCustomRangeTo(undefined);
-  };
 
   // Clear selected transactions
   const clearSelectedTransactions = () => {
@@ -399,92 +318,16 @@ export function TransactionsPage() {
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
-                  <div className="flex">
-                    {showCustomRange ? (
-                      <div className="flex p-4 gap-6">
-                        <div className="space-y-3 text-center">
-                          <div className="text-sm font-medium text-knumbers-green">Data inicial</div>
-                          <CalendarComponent
-                            mode="single"
-                            selected={customRangeFrom}
-                            onSelect={setCustomRangeFrom}
-                            className="pointer-events-auto border border-knumbers-green/20 rounded-lg"
-                            locale={pt}
-                          />
-                        </div>
-                        <div className="space-y-3 text-center">
-                          <div className="text-sm font-medium text-knumbers-purple">Data final</div>
-                          <CalendarComponent
-                            mode="single"
-                            selected={customRangeTo}
-                            onSelect={setCustomRangeTo}
-                            className="pointer-events-auto border border-knumbers-purple/20 rounded-lg"
-                            locale={pt}
-                          />
-                        </div>
-                      </div>
-                    ) : (
-                      <CalendarComponent
-                        mode="range"
-                        selected={tempDateRange}
-                        onSelect={(range) => {
-                          if (range?.from) {
-                            setTempDateRange({
-                              from: range.from,
-                              to: range.to || range.from,
-                            });
-                          }
-                        }}
-                        className="p-3 pointer-events-auto"
-                        locale={pt}
-                      />
-                    )}
-                    
-                    <div className="w-36 p-2 border-l space-y-1">
-                      {['today', 'thisWeek', 'lastWeek', 'thisMonth', 'lastMonth', 'nextMonth'].map((filter) => (
-                        <Button 
-                          key={filter}
-                          variant="ghost" 
-                          size="sm" 
-                          className="w-full justify-start text-xs h-7 px-2 text-knumbers-green hover:bg-knumbers-green/10"
-                          onClick={() => handleQuickDateFilter(filter)}
-                        >
-                          {filter === 'today' && 'Hoje'}
-                          {filter === 'thisWeek' && 'Esta semana'}
-                          {filter === 'lastWeek' && 'Semana passada'}
-                          {filter === 'thisMonth' && 'Este mês'}
-                          {filter === 'lastMonth' && 'Mês passado'}
-                          {filter === 'nextMonth' && 'Próximo mês'}
-                        </Button>
-                      ))}
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="w-full justify-start text-xs h-7 px-2 text-knumbers-purple hover:bg-knumbers-purple/10"
-                        onClick={() => handleQuickDateFilter('customPeriod')}
-                      >
-                        Período customizado
-                      </Button>
-                    </div>
-                  </div>
-                  
-                  <div className="flex gap-2 p-3 border-t bg-muted/30">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={cancelDateFilter}
-                      className="flex-1 text-knumbers-green border-knumbers-green hover:bg-knumbers-green/10"
-                    >
-                      Cancelar
-                    </Button>
-                    <Button
-                      size="sm"
-                      onClick={applyDateFilter}
-                      className="flex-1 bg-knumbers-purple hover:bg-knumbers-purple/90 text-white"
-                    >
-                      Filtrar
-                    </Button>
-                  </div>
+                  <DateFilterModal
+                    onApply={(range, label) => {
+                      setDateRange(range);
+                      setDateLabel(label);
+                      setShowCalendar(false);
+                    }}
+                    onCancel={() => setShowCalendar(false)}
+                    initialRange={dateRange}
+                    initialLabel={dateLabel}
+                  />
                 </PopoverContent>
               </Popover>
             </div>

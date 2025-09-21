@@ -189,7 +189,12 @@ const iconMap = {
 
 const availableIcons = [
   // Trabalho e Negócios
-  { value: "briefcase", label: "Trabalho", icon: Briefcase, category: "Trabalho" },
+  {
+    value: "briefcase",
+    label: "Trabalho",
+    icon: Briefcase,
+    category: "Trabalho",
+  },
   { value: "laptop", label: "Freelance", icon: Laptop, category: "Trabalho" },
   { value: "users", label: "Consultoria", icon: Users, category: "Trabalho" },
   { value: "percent", label: "Comissões", icon: Percent, category: "Trabalho" },
@@ -199,13 +204,48 @@ const availableIcons = [
   { value: "crown", label: "Royalties", icon: Crown, category: "Trabalho" },
 
   // Financeiro
-  { value: "trending-up", label: "Investimentos", icon: TrendingUp, category: "Financeiro" },
-  { value: "piggy-bank", label: "Poupança", icon: PiggyBank, category: "Financeiro" },
-  { value: "bar-chart", label: "Rendimentos", icon: BarChart, category: "Financeiro" },
-  { value: "coins", label: "Criptomoedas", icon: Coins, category: "Financeiro" },
-  { value: "credit-card", label: "Cartão", icon: CreditCard, category: "Financeiro" },
-  { value: "banknote", label: "Dinheiro", icon: Banknote, category: "Financeiro" },
-  { value: "calculator", label: "Cálculos", icon: Calculator, category: "Financeiro" },
+  {
+    value: "trending-up",
+    label: "Investimentos",
+    icon: TrendingUp,
+    category: "Financeiro",
+  },
+  {
+    value: "piggy-bank",
+    label: "Poupança",
+    icon: PiggyBank,
+    category: "Financeiro",
+  },
+  {
+    value: "bar-chart",
+    label: "Rendimentos",
+    icon: BarChart,
+    category: "Financeiro",
+  },
+  {
+    value: "coins",
+    label: "Criptomoedas",
+    icon: Coins,
+    category: "Financeiro",
+  },
+  {
+    value: "credit-card",
+    label: "Cartão",
+    icon: CreditCard,
+    category: "Financeiro",
+  },
+  {
+    value: "banknote",
+    label: "Dinheiro",
+    icon: Banknote,
+    category: "Financeiro",
+  },
+  {
+    value: "calculator",
+    label: "Cálculos",
+    icon: Calculator,
+    category: "Financeiro",
+  },
 
   // Casa e Moradia
   { value: "home", label: "Casa", icon: Home, category: "Casa" },
@@ -219,93 +259,257 @@ const availableIcons = [
   { value: "phone", label: "Telefone", icon: Phone, category: "Casa" },
 
   // Alimentação
-  { value: "utensils", label: "Restaurante", icon: Utensils, category: "Alimentação" },
-  { value: "shopping-cart", label: "Supermercado", icon: ShoppingCart, category: "Alimentação" },
+  {
+    value: "utensils",
+    label: "Restaurante",
+    icon: Utensils,
+    category: "Alimentação",
+  },
+  {
+    value: "shopping-cart",
+    label: "Supermercado",
+    icon: ShoppingCart,
+    category: "Alimentação",
+  },
   { value: "truck", label: "Delivery", icon: Truck, category: "Alimentação" },
 
   // Transporte
   { value: "car", label: "Carro", icon: Car, category: "Transporte" },
   { value: "fuel", label: "Combustível", icon: Fuel, category: "Transporte" },
-  { value: "bus", label: "Transporte Público", icon: Bus, category: "Transporte" },
+  {
+    value: "bus",
+    label: "Transporte Público",
+    icon: Bus,
+    category: "Transporte",
+  },
   { value: "shield", label: "Seguro", icon: Shield, category: "Transporte" },
-  { value: "clipboard-check", label: "Documentos", icon: ClipboardCheck, category: "Transporte" },
+  {
+    value: "clipboard-check",
+    label: "Documentos",
+    icon: ClipboardCheck,
+    category: "Transporte",
+  },
 
   // Saúde
   { value: "heart", label: "Saúde", icon: Heart, category: "Saúde" },
   { value: "pill", label: "Medicamentos", icon: Pill, category: "Saúde" },
-  { value: "stethoscope", label: "Médico", icon: Stethoscope, category: "Saúde" },
+  {
+    value: "stethoscope",
+    label: "Médico",
+    icon: Stethoscope,
+    category: "Saúde",
+  },
   { value: "activity", label: "Exames", icon: Activity, category: "Saúde" },
   { value: "dumbbell", label: "Academia", icon: Dumbbell, category: "Saúde" },
 
   // Educação
-  { value: "graduation-cap", label: "Educação", icon: GraduationCap, category: "Educação" },
+  {
+    value: "graduation-cap",
+    label: "Educação",
+    icon: GraduationCap,
+    category: "Educação",
+  },
   { value: "book-open", label: "Cursos", icon: BookOpen, category: "Educação" },
   { value: "book", label: "Livros", icon: Book, category: "Educação" },
 
   // Lazer
   { value: "smile", label: "Lazer", icon: Smile, category: "Lazer" },
   { value: "film", label: "Cinema", icon: Film, category: "Lazer" },
-  { value: "play-circle", label: "Streaming", icon: PlayCircle, category: "Lazer" },
+  {
+    value: "play-circle",
+    label: "Streaming",
+    icon: PlayCircle,
+    category: "Lazer",
+  },
   { value: "plane", label: "Viagens", icon: Plane, category: "Lazer" },
   { value: "palette", label: "Hobbies", icon: Palette, category: "Lazer" },
   // Vestuário
   { value: "shirt", label: "Roupas", icon: Shirt, category: "Vestuário" },
-  { value: "scissors", label: "Cabeleireiro", icon: Scissors, category: "Vestuário" },
+  {
+    value: "scissors",
+    label: "Cabeleireiro",
+    icon: Scissors,
+    category: "Vestuário",
+  },
 
   // Compras
-  { value: "shopping-bag", label: "Compras", icon: ShoppingBag, category: "Compras" },
+  {
+    value: "shopping-bag",
+    label: "Compras",
+    icon: ShoppingBag,
+    category: "Compras",
+  },
   { value: "tag", label: "Vendas", icon: Tag, category: "Compras" },
   { value: "gift", label: "Presentes", icon: Gift, category: "Compras" },
 
   // Documentos
-  { value: "file-text", label: "Documentos", icon: FileText, category: "Documentos" },
-  { value: "receipt", label: "Impostos", icon: Receipt, category: "Documentos" },
+  {
+    value: "file-text",
+    label: "Documentos",
+    icon: FileText,
+    category: "Documentos",
+  },
+  {
+    value: "receipt",
+    label: "Impostos",
+    icon: Receipt,
+    category: "Documentos",
+  },
 
   // Benefícios
-  { value: "shield-check", label: "Benefícios", icon: ShieldCheck, category: "Benefícios" },
-  { value: "heart-handshake", label: "Doações", icon: HeartHandshake, category: "Benefícios" },
-  { value: "rotate-ccw", label: "Reembolsos", icon: RotateCcw, category: "Benefícios" },
+  {
+    value: "shield-check",
+    label: "Benefícios",
+    icon: ShieldCheck,
+    category: "Benefícios",
+  },
+  {
+    value: "heart-handshake",
+    label: "Doações",
+    icon: HeartHandshake,
+    category: "Benefícios",
+  },
+  {
+    value: "rotate-ccw",
+    label: "Reembolsos",
+    icon: RotateCcw,
+    category: "Benefícios",
+  },
   { value: "trophy", label: "Prêmios", icon: Trophy, category: "Benefícios" },
   { value: "sun", label: "Férias", icon: Sun, category: "Benefícios" },
 
   // Outros
-  { value: "alert-triangle", label: "Multas", icon: AlertTriangle, category: "Outros" },
-  { value: "more-horizontal", label: "Outros", icon: MoreHorizontal, category: "Outros" },
+  {
+    value: "alert-triangle",
+    label: "Multas",
+    icon: AlertTriangle,
+    category: "Outros",
+  },
+  {
+    value: "more-horizontal",
+    label: "Outros",
+    icon: MoreHorizontal,
+    category: "Outros",
+  },
   { value: "plus-circle", label: "Adicionar", icon: Plus, category: "Outros" },
   { value: "circle", label: "Padrão", icon: Circle, category: "Outros" },
 ];
 
 const availableColors = [
-  "#ef4444", "#f97316", "#f59e0b", "#eab308",
-  "#84cc16", "#22c55e", "#10b981", "#14b8a6",
-  "#06b6d4", "#0ea5e9", "#3b82f6", "#6366f1",
-  "#8b5cf6", "#a855f7", "#d946ef", "#ec4899",
-  "#f43f5e", "#6b7280", "#64748b", "#475569"
+  "#ef4444",
+  "#f97316",
+  "#f59e0b",
+  "#eab308",
+  "#84cc16",
+  "#22c55e",
+  "#10b981",
+  "#14b8a6",
+  "#06b6d4",
+  "#0ea5e9",
+  "#3b82f6",
+  "#6366f1",
+  "#8b5cf6",
+  "#a855f7",
+  "#d946ef",
+  "#ec4899",
+  "#f43f5e",
+  "#6b7280",
+  "#64748b",
+  "#475569",
 ];
 
 // Grupos de categorias para melhor organização
 const categoryGroups = {
   income: {
-    "Trabalho e Renda": ["Salário", "Freelance", "Consultoria", "Comissões", "Horas Extras", "13º Salário", "Férias", "PLR/Bônus"],
-    "Investimentos": ["Dividendos", "Juros/Rendimentos", "Venda de Investimentos", "Criptomoedas"],
-    "Negócios": ["Vendas de Produtos", "Prestação de Serviços", "Royalties"],
-    "Patrimônio": ["Aluguel Recebido", "Venda de Bens"],
-    "Benefícios": ["Pensão/Aposentadoria", "Auxílio/Benefício", "Reembolsos", "Prêmios/Sorteios", "Outros Rendimentos"]
+    "Trabalho e Renda": [
+      "Salário",
+      "Freelance",
+      "Consultoria",
+      "Comissões",
+      "Horas Extras",
+      "13º Salário",
+      "Férias",
+      "PLR/Bônus",
+    ],
+    Investimentos: [
+      "Dividendos",
+      "Juros/Rendimentos",
+      "Venda de Investimentos",
+      "Criptomoedas",
+    ],
+    Negócios: ["Vendas de Produtos", "Prestação de Serviços", "Royalties"],
+    Patrimônio: ["Aluguel Recebido", "Venda de Bens"],
+    Benefícios: [
+      "Pensão/Aposentadoria",
+      "Auxílio/Benefício",
+      "Reembolsos",
+      "Prêmios/Sorteios",
+      "Outros Rendimentos",
+    ],
   },
   expense: {
-    "Moradia": ["Aluguel/Financiamento", "Condomínio", "IPTU", "Manutenção Casa", "Móveis/Decoração"],
-    "Utilidades": ["Energia Elétrica", "Água/Esgoto", "Gás", "Internet/TV", "Telefone"],
-    "Alimentação": ["Supermercado", "Restaurantes", "Delivery/Lanches", "Padaria/Açougue"],
-    "Transporte": ["Combustível", "Transporte Público", "Uber/Taxi", "Manutenção Veículo", "Seguro Veículo", "IPVA/Licenciamento", "Estacionamento"],
-    "Saúde": ["Plano de Saúde", "Medicamentos", "Consultas Médicas", "Exames", "Dentista", "Academia/Esportes"],
-    "Educação": ["Mensalidade Escolar", "Cursos/Capacitação", "Livros/Material"],
-    "Lazer": ["Cinema/Teatro", "Streaming/Assinaturas", "Viagens", "Hobbies", "Festas/Eventos"],
-    "Vestuário": ["Roupas/Calçados", "Cabeleireiro/Estética", "Produtos de Higiene"],
-    "Financeiro": ["Poupança", "Investimentos", "Previdência Privada", "Cartão de Crédito", "Empréstimos", "Financiamentos"],
-    "Impostos": ["Imposto de Renda", "Taxas Bancárias", "Cartório/Documentos"],
-    "Família": ["Cuidados com Pets", "Presentes", "Pensão Alimentícia"],
-    "Outros": ["Doações", "Multas", "Outros Gastos"]
-  }
+    Moradia: [
+      "Aluguel/Financiamento",
+      "Condomínio",
+      "IPTU",
+      "Manutenção Casa",
+      "Móveis/Decoração",
+    ],
+    Utilidades: [
+      "Energia Elétrica",
+      "Água/Esgoto",
+      "Gás",
+      "Internet/TV",
+      "Telefone",
+    ],
+    Alimentação: [
+      "Supermercado",
+      "Restaurantes",
+      "Delivery/Lanches",
+      "Padaria/Açougue",
+    ],
+    Transporte: [
+      "Combustível",
+      "Transporte Público",
+      "Uber/Taxi",
+      "Manutenção Veículo",
+      "Seguro Veículo",
+      "IPVA/Licenciamento",
+      "Estacionamento",
+    ],
+    Saúde: [
+      "Plano de Saúde",
+      "Medicamentos",
+      "Consultas Médicas",
+      "Exames",
+      "Dentista",
+      "Academia/Esportes",
+    ],
+    Educação: ["Mensalidade Escolar", "Cursos/Capacitação", "Livros/Material"],
+    Lazer: [
+      "Cinema/Teatro",
+      "Streaming/Assinaturas",
+      "Viagens",
+      "Hobbies",
+      "Festas/Eventos",
+    ],
+    Vestuário: [
+      "Roupas/Calçados",
+      "Cabeleireiro/Estética",
+      "Produtos de Higiene",
+    ],
+    Financeiro: [
+      "Poupança",
+      "Investimentos",
+      "Previdência Privada",
+      "Cartão de Crédito",
+      "Empréstimos",
+      "Financiamentos",
+    ],
+    Impostos: ["Imposto de Renda", "Taxas Bancárias", "Cartório/Documentos"],
+    Família: ["Cuidados com Pets", "Presentes", "Pensão Alimentícia"],
+    Outros: ["Doações", "Multas", "Outros Gastos"],
+  },
 };
 
 export default function CategoriesPage() {
@@ -457,49 +661,63 @@ export default function CategoriesPage() {
     setEditingCategory(null);
   };
 
+
   // Filtros e agrupamentos
   const filteredCategories = useMemo(() => {
     let filtered = categories;
 
     // Filtro por busca
     if (searchTerm) {
-      filtered = filtered.filter(cat =>
+      filtered = filtered.filter((cat) =>
         cat.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Filtro por tipo
     if (activeTab !== "all") {
-      filtered = filtered.filter(cat => cat.type === activeTab);
+      filtered = filtered.filter((cat) => cat.type === activeTab);
     }
 
     // Filtro por grupo
     if (selectedGroup !== "all") {
-      const groupCategories = categoryGroups[activeTab as keyof typeof categoryGroups]?.[selectedGroup] || [];
-      filtered = filtered.filter(cat => groupCategories.includes(cat.name));
+      const groupCategories =
+        categoryGroups[activeTab as keyof typeof categoryGroups]?.[
+          selectedGroup
+        ] || [];
+      filtered = filtered.filter((cat) => groupCategories.includes(cat.name));
     }
 
     return filtered;
   }, [categories, searchTerm, activeTab, selectedGroup]);
 
-  const incomeCategories = filteredCategories.filter((cat) => cat.type === "income");
-  const expenseCategories = filteredCategories.filter((cat) => cat.type === "expense");
-  const allCategories = activeTab === "all" ? filteredCategories : activeTab === "income" ? incomeCategories : expenseCategories;
+  const incomeCategories = filteredCategories.filter(
+    (cat) => cat.type === "income"
+  );
+  const expenseCategories = filteredCategories.filter(
+    (cat) => cat.type === "expense"
+  );
+  const allCategories =
+    activeTab === "all"
+      ? filteredCategories
+      : activeTab === "income"
+      ? incomeCategories
+      : expenseCategories;
 
   // Estatísticas
   const stats = useMemo(() => {
     const total = categories.length;
-    const income = categories.filter(cat => cat.type === "income").length;
-    const expense = categories.filter(cat => cat.type === "expense").length;
-    const custom = categories.filter(cat => !cat.is_default).length;
-    const defaultCount = categories.filter(cat => cat.is_default).length;
+    const income = categories.filter((cat) => cat.type === "income").length;
+    const expense = categories.filter((cat) => cat.type === "expense").length;
+    const custom = categories.filter((cat) => !cat.is_default).length;
+    const defaultCount = categories.filter((cat) => cat.is_default).length;
 
     return { total, income, expense, custom, default: defaultCount };
   }, [categories]);
 
   const CategoryCard = ({ category }: { category: Category }) => {
-    const IconComponent = iconMap[category.icon as keyof typeof iconMap] || Circle;
-    
+    const IconComponent =
+      iconMap[category.icon as keyof typeof iconMap] || Circle;
+
     return (
       <Card className="group hover:shadow-lg transition-all duration-200 border-2 hover:border-knumbers-green/30">
         <CardContent className="p-4">
@@ -535,10 +753,12 @@ export default function CategoriesPage() {
             </div>
           </div>
           <div>
-            <h3 className="font-semibold text-sm mb-1 line-clamp-2">{category.name}</h3>
+            <h3 className="font-semibold text-sm mb-1 line-clamp-2">
+              {category.name}
+            </h3>
             <div className="flex items-center justify-between">
-              <Badge 
-                variant={category.type === "income" ? "default" : "destructive"} 
+              <Badge
+                variant={category.type === "income" ? "default" : "destructive"}
                 className="text-xs"
               >
                 {category.type === "income" ? "Receita" : "Despesa"}
@@ -556,8 +776,9 @@ export default function CategoriesPage() {
   };
 
   const CategoryListItem = ({ category }: { category: Category }) => {
-    const IconComponent = iconMap[category.icon as keyof typeof iconMap] || Circle;
-    
+    const IconComponent =
+      iconMap[category.icon as keyof typeof iconMap] || Circle;
+
     return (
       <div className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
         <div className="flex items-center space-x-4">
@@ -573,8 +794,8 @@ export default function CategoriesPage() {
           <div>
             <h3 className="font-medium">{category.name}</h3>
             <div className="flex items-center space-x-2 mt-1">
-              <Badge 
-                variant={category.type === "income" ? "default" : "destructive"} 
+              <Badge
+                variant={category.type === "income" ? "default" : "destructive"}
                 className="text-xs"
               >
                 {category.type === "income" ? "Receita" : "Despesa"}
@@ -617,12 +838,14 @@ export default function CategoriesPage() {
           {/* Header */}
           <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-foreground">Categorias Financeiras</h1>
+              <h1 className="text-3xl font-bold text-foreground">
+                Categorias Financeiras
+              </h1>
               <p className="text-muted-foreground mt-1">
                 Organize suas receitas e despesas com categorias personalizadas
               </p>
             </div>
-            
+
             <Dialog
               open={dialogOpen}
               onOpenChange={(open) => {
@@ -751,7 +974,9 @@ export default function CategoriesPage() {
                                   : "border-border hover:border-foreground"
                               }`}
                               style={{ backgroundColor: color }}
-                              onClick={() => setFormData({ ...formData, color })}
+                              onClick={() =>
+                                setFormData({ ...formData, color })
+                              }
                             />
                           ))}
                         </div>
@@ -772,31 +997,43 @@ export default function CategoriesPage() {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-knumbers-green">{stats.total}</div>
+                <div className="text-2xl font-bold text-knumbers-green">
+                  {stats.total}
+                </div>
                 <div className="text-sm text-muted-foreground">Total</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-green-600">{stats.income}</div>
+                <div className="text-2xl font-bold text-green-600">
+                  {stats.income}
+                </div>
                 <div className="text-sm text-muted-foreground">Receitas</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-red-600">{stats.expense}</div>
+                <div className="text-2xl font-bold text-red-600">
+                  {stats.expense}
+                </div>
                 <div className="text-sm text-muted-foreground">Despesas</div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-blue-600">{stats.custom}</div>
-                <div className="text-sm text-muted-foreground">Personalizadas</div>
+                <div className="text-2xl font-bold text-blue-600">
+                  {stats.custom}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  Personalizadas
+                </div>
               </CardContent>
             </Card>
             <Card>
               <CardContent className="p-4 text-center">
-                <div className="text-2xl font-bold text-purple-600">{stats.default}</div>
+                <div className="text-2xl font-bold text-purple-600">
+                  {stats.default}
+                </div>
                 <div className="text-sm text-muted-foreground">Padrão</div>
               </CardContent>
             </Card>
@@ -814,12 +1051,14 @@ export default function CategoriesPage() {
                   className="pl-10 w-full sm:w-64"
                 />
               </div>
-              
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" className="justify-start">
                     <Filter className="w-4 h-4 mr-2" />
-                    {selectedGroup === "all" ? "Todos os Grupos" : selectedGroup}
+                    {selectedGroup === "all"
+                      ? "Todos os Grupos"
+                      : selectedGroup}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-56">
@@ -827,13 +1066,18 @@ export default function CategoriesPage() {
                     Todos os Grupos
                   </DropdownMenuItem>
                   <Separator />
-                  {activeTab !== "all" && categoryGroups[activeTab as keyof typeof categoryGroups] && 
-                    Object.keys(categoryGroups[activeTab as keyof typeof categoryGroups]).map(group => (
-                      <DropdownMenuItem key={group} onClick={() => setSelectedGroup(group)}>
+                  {activeTab !== "all" &&
+                    categoryGroups[activeTab as keyof typeof categoryGroups] &&
+                    Object.keys(
+                      categoryGroups[activeTab as keyof typeof categoryGroups]
+                    ).map((group) => (
+                      <DropdownMenuItem
+                        key={group}
+                        onClick={() => setSelectedGroup(group)}
+                      >
                         {group}
                       </DropdownMenuItem>
-                    ))
-                  }
+                    ))}
                 </DropdownMenuContent>
               </DropdownMenu>
 
@@ -842,7 +1086,11 @@ export default function CategoriesPage() {
                 onClick={() => setShowInactive(!showInactive)}
                 className="justify-start"
               >
-                {showInactive ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
+                {showInactive ? (
+                  <EyeOff className="w-4 h-4 mr-2" />
+                ) : (
+                  <Eye className="w-4 h-4 mr-2" />
+                )}
                 {showInactive ? "Inativas" : "Ativas"}
               </Button>
             </div>
@@ -866,11 +1114,13 @@ export default function CategoriesPage() {
           </div>
 
           {/* Tabs */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <Tabs
+            value={activeTab}
+            onValueChange={setActiveTab}
+            className="w-full"
+          >
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="all">
-                Todas ({stats.total})
-              </TabsTrigger>
+              <TabsTrigger value="all">Todas ({stats.total})</TabsTrigger>
               <TabsTrigger value="income" className="text-green-600">
                 <TrendingUp className="w-4 h-4 mr-2" />
                 Receitas ({stats.income})
@@ -890,22 +1140,29 @@ export default function CategoriesPage() {
                 <Card>
                   <CardContent className="text-center py-12">
                     <Circle className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">Nenhuma categoria encontrada</h3>
-                    <p className="text-muted-foreground mb-4">
-                      {searchTerm ? "Tente ajustar os filtros de busca" : "Comece criando sua primeira categoria"}
-                    </p>
-                    <Button onClick={() => setDialogOpen(true)}>
-                      <Plus className="w-4 h-4 mr-2" />
-                      Criar Categoria
-                    </Button>
+                    <h3 className="text-lg font-semibold mb-2">
+                       Nenhuma categoria encontrada
+                     </h3>
+                     <p className="text-muted-foreground mb-4">
+                       {searchTerm
+                         ? "Tente ajustar os filtros de busca"
+                         : "Comece criando categorias para organizar suas finanças"}
+                     </p>
+                     <Button onClick={() => setDialogOpen(true)}>
+                       <Plus className="w-4 h-4 mr-2" />
+                       Criar Categoria
+                     </Button>
                   </CardContent>
                 </Card>
               ) : (
-                <div className={viewMode === "cards" 
-                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" 
-                  : "space-y-2"
-                }>
-                  {allCategories.map((category) => 
+                <div
+                  className={
+                    viewMode === "cards"
+                      ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+                      : "space-y-2"
+                  }
+                >
+                  {allCategories.map((category) =>
                     viewMode === "cards" ? (
                       <CategoryCard key={category.id} category={category} />
                     ) : (
@@ -925,25 +1182,32 @@ export default function CategoriesPage() {
                 <Card>
                   <CardContent className="text-center py-12">
                     <TrendingUp className="w-12 h-12 mx-auto text-green-600 mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">Nenhuma categoria de receita encontrada</h3>
+                    <h3 className="text-lg font-semibold mb-2">
+                      Nenhuma categoria de receita encontrada
+                    </h3>
                     <p className="text-muted-foreground mb-4">
                       Crie categorias para organizar suas entradas de dinheiro
                     </p>
-                    <Button onClick={() => {
-                      setFormData({...formData, type: "income"});
-                      setDialogOpen(true);
-                    }}>
-                      <Plus className="w-4 h-4 mr-2" />
-                      Criar Categoria de Receita
-                    </Button>
+                     <Button
+                       onClick={() => {
+                         setFormData({ ...formData, type: "income" });
+                         setDialogOpen(true);
+                       }}
+                     >
+                       <Plus className="w-4 h-4 mr-2" />
+                       Criar Categoria de Receita
+                     </Button>
                   </CardContent>
                 </Card>
               ) : (
-                <div className={viewMode === "cards" 
-                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" 
-                  : "space-y-2"
-                }>
-                  {incomeCategories.map((category) => 
+                <div
+                  className={
+                    viewMode === "cards"
+                      ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+                      : "space-y-2"
+                  }
+                >
+                  {incomeCategories.map((category) =>
                     viewMode === "cards" ? (
                       <CategoryCard key={category.id} category={category} />
                     ) : (
@@ -963,25 +1227,32 @@ export default function CategoriesPage() {
                 <Card>
                   <CardContent className="text-center py-12">
                     <TrendingDown className="w-12 h-12 mx-auto text-red-600 mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">Nenhuma categoria de despesa encontrada</h3>
+                    <h3 className="text-lg font-semibold mb-2">
+                      Nenhuma categoria de despesa encontrada
+                    </h3>
                     <p className="text-muted-foreground mb-4">
                       Crie categorias para organizar seus gastos
                     </p>
-                    <Button onClick={() => {
-                      setFormData({...formData, type: "expense"});
-                      setDialogOpen(true);
-                    }}>
-                      <Plus className="w-4 h-4 mr-2" />
-                      Criar Categoria de Despesa
-                    </Button>
+                     <Button
+                       onClick={() => {
+                         setFormData({ ...formData, type: "expense" });
+                         setDialogOpen(true);
+                       }}
+                     >
+                       <Plus className="w-4 h-4 mr-2" />
+                       Criar Categoria de Despesa
+                     </Button>
                   </CardContent>
                 </Card>
               ) : (
-                <div className={viewMode === "cards" 
-                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" 
-                  : "space-y-2"
-                }>
-                  {expenseCategories.map((category) => 
+                <div
+                  className={
+                    viewMode === "cards"
+                      ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
+                      : "space-y-2"
+                  }
+                >
+                  {expenseCategories.map((category) =>
                     viewMode === "cards" ? (
                       <CategoryCard key={category.id} category={category} />
                     ) : (
