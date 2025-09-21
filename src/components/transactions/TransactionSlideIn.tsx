@@ -198,7 +198,7 @@ export function TransactionSlideIn({
       />
 
       {/* Slide In Panel */}
-      <div className="fixed top-0 right-0 h-full w-[40%] bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out">
+      <div className="fixed top-0 right-0 h-full w-[40%] bg-white shadow-2xl z-50 animate-slide-in-right">
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-200">
@@ -232,8 +232,8 @@ export function TransactionSlideIn({
               >
                 Categoria
               </Label>
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger className="w-full">
+               <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger className="w-full rounded-lg">
                   <SelectValue placeholder="Sem categoria" />
                 </SelectTrigger>
                 <SelectContent>
@@ -267,7 +267,7 @@ export function TransactionSlideIn({
                   <Input
                     value={format(date, "dd/MM/yyyy", { locale: pt })}
                     readOnly
-                    className="pr-10 cursor-pointer"
+                    className="pr-10 cursor-pointer rounded-lg"
                     onClick={() => setShowDateCalendar(true)}
                   />
                   <Popover
@@ -311,6 +311,7 @@ export function TransactionSlideIn({
                   placeholder="0,00"
                   value={value}
                   onChange={(e) => setValue(e.target.value)}
+                  className="rounded-lg"
                 />
               </div>
 
@@ -326,7 +327,7 @@ export function TransactionSlideIn({
                     setCategory(""); // Reset category when type changes
                   }}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="rounded-lg">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -348,7 +349,7 @@ export function TransactionSlideIn({
                   <Input
                     value={format(competenceDate, "dd/MM/yyyy", { locale: pt })}
                     readOnly
-                    className="pr-10 cursor-pointer"
+                    className="pr-10 cursor-pointer rounded-lg"
                     onClick={() => setShowCompetenceCalendar(true)}
                   />
                   <Popover
@@ -384,7 +385,7 @@ export function TransactionSlideIn({
                   Conta financeira
                 </Label>
                 <Select value={account} onValueChange={setAccount}>
-                  <SelectTrigger>
+                  <SelectTrigger className="rounded-lg">
                     <SelectValue placeholder="Selecione a conta" />
                   </SelectTrigger>
                   <SelectContent>
@@ -421,7 +422,7 @@ export function TransactionSlideIn({
                 placeholder="Descreva o lançamento..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="min-h-[120px] resize-none"
+                className="min-h-[120px] resize-none rounded-lg"
               />
             </div>
           </div>
@@ -440,7 +441,7 @@ export function TransactionSlideIn({
               <Button
                 onClick={handleSubmit}
                 disabled={loading}
-                className="px-6 bg-green-600 hover:bg-green-700 text-white"
+                className="px-6 bg-gradient-to-r from-knumbers-green to-knumbers-purple hover:from-knumbers-green/90 hover:to-knumbers-purple/90 text-white border-none"
               >
                 {loading ? "Salvando..." : "Salvar"}
               </Button>
