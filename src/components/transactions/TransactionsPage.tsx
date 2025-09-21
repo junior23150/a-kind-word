@@ -49,6 +49,7 @@ import {
 } from "date-fns";
 import { pt } from "date-fns/locale";
 import { TransferSlideIn } from "@/components/transactions/TransferSlideIn";
+import { TransactionSlideIn } from "@/components/transactions/TransactionSlideIn";
 import { DateFilterModal } from "@/components/transactions/DateFilterModal";
 
 interface Transaction {
@@ -77,6 +78,7 @@ export function TransactionsPage() {
   const [dateLabel, setDateLabel] = useState("Este mês");
   const [showCalendar, setShowCalendar] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
+  const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [selectedTransactions, setSelectedTransactions] = useState<string[]>(
     []
@@ -104,30 +106,30 @@ export function TransactionsPage() {
   ];
 
   // Carregar transações do Supabase
-  useEffect(() => {
-    async function fetchTransactions() {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from("transactions")
-          .select("*")
-          .order("date", { ascending: false });
+  const fetchTransactions = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("transactions")
+        .select("*")
+        .order("date", { ascending: false });
 
-        if (error) throw error;
+      if (error) throw error;
 
-        setTransactions((data || []) as Transaction[]);
-      } catch (error) {
-        console.error("Erro ao carregar transações:", error);
-        toast({
-          title: "Erro",
-          description: "Erro ao carregar transações",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
+      setTransactions((data || []) as Transaction[]);
+    } catch (error) {
+      console.error("Erro ao carregar transações:", error);
+      toast({
+        title: "Erro",
+        description: "Erro ao carregar transações",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
+  };
 
+  useEffect(() => {
     fetchTransactions();
   }, [toast]);
 
@@ -587,6 +589,7 @@ export function TransactionsPage() {
             {/* Add Transaction Button */}
             <div className="mb-2">
               <Button
+                onClick={() => setShowTransactionModal(true)}
                 className={`bg-gradient-to-r from-knumbers-green to-knumbers-purple text-white hover:opacity-90 rounded-xl shadow-lg transition-all duration-300 ${
                   sidebarCollapsed ? "w-12 h-12 p-0" : "w-56 px-4 py-2"
                 }`}
@@ -748,10 +751,18 @@ export function TransactionsPage() {
         </div>
       </div>
 
-      {/* Transfer Modal */}
-      {showTransferModal && (
-        <TransferSlideIn onClose={() => setShowTransferModal(false)} />
-      )}
-    </div>
-  );
-}
+        {/* Transfer Modal */}
+        {showTransferModal && (
+          <TransferSlideIn onClose={() => setShowTransferModal(false)} />
+        )}
+
+        {/* Transaction Modal */}
+        {showTransactionModal && (
+          <TransactionSlideIn 
+            onClose={() => setShowTransactionModal(false)}
+            onTransactionAdded={fetchTransactions}
+          />
+        )}
+      </div>
+    );
+  }
