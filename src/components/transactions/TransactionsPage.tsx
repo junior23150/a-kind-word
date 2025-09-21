@@ -20,6 +20,12 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
   Search,
   Calendar,
   Download,
@@ -32,6 +38,9 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  MoreVertical,
+  CheckCircle,
+  DollarSign,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -195,16 +204,16 @@ export function TransactionsPage() {
     if (transaction.transaction_type === "income") {
       return "Recebido";
     }
-    
+
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Zerar horas para comparação apenas de data
-    
+
     const transactionDate = new Date(transaction.date);
     transactionDate.setHours(0, 0, 0, 0);
-    
+
     // Se a transação já foi paga (podemos usar um campo 'paid' no futuro)
     // Por enquanto, vamos assumir que todas estão em aberto ou em atraso
-    
+
     if (transactionDate < today) {
       return "Em Atraso";
     } else {
@@ -231,6 +240,75 @@ export function TransactionsPage() {
   // Clear selected transactions
   const clearSelectedTransactions = () => {
     setSelectedTransactions([]);
+  };
+
+  // Handle payment actions
+  const handleFullPayment = async (transactionId: string) => {
+    try {
+      // Aqui você pode implementar a lógica para marcar como pago
+      // Por exemplo, atualizar um campo 'paid' na tabela de transações
+      console.log("Baixa total do pagamento para:", transactionId);
+      
+      toast({
+        title: "Sucesso",
+        description: "Pagamento baixado com sucesso!",
+      });
+      
+      // Recarregar transações para atualizar status
+      fetchTransactions();
+    } catch (error) {
+      console.error("Erro ao baixar pagamento:", error);
+      toast({
+        title: "Erro",
+        description: "Erro ao baixar pagamento",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePartialPayment = async (transactionId: string) => {
+    try {
+      // Aqui você pode implementar a lógica para pagamento parcial
+      // Por exemplo, abrir um modal para informar o valor parcial
+      console.log("Baixa parcial do pagamento para:", transactionId);
+      
+      toast({
+        title: "Funcionalidade em desenvolvimento",
+        description: "Baixa parcial será implementada em breve",
+      });
+    } catch (error) {
+      console.error("Erro ao processar pagamento parcial:", error);
+      toast({
+        title: "Erro",
+        description: "Erro ao processar pagamento parcial",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteTransaction = async (transactionId: string) => {
+    try {
+      const { error } = await supabase
+        .from("transactions")
+        .delete()
+        .eq("id", transactionId);
+
+      if (error) throw error;
+
+      setTransactions(prev => prev.filter(t => t.id !== transactionId));
+      
+      toast({
+        title: "Sucesso",
+        description: "Transação excluída com sucesso!",
+      });
+    } catch (error) {
+      console.error("Erro ao excluir transação:", error);
+      toast({
+        title: "Erro",
+        description: "Erro ao excluir transação",
+        variant: "destructive",
+      });
+    }
   };
 
   // Handle transaction selection
@@ -617,19 +695,56 @@ export function TransactionsPage() {
                               : "+"}
                             {formatCurrency(Math.abs(transaction.amount))}
                           </td>
-                          <td className="p-2 lg:p-4 text-center">
-                            {(() => {
-                              const status = getTransactionStatus(transaction);
-                              return (
-                                <span
-                                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(
-                                    status
-                                  )}`}
-                                >
-                                  {status}
-                                </span>
-                              );
-                            })()}
+                          <td className="p-2 lg:p-4">
+                            <div className="flex items-center justify-center gap-2">
+                              {(() => {
+                                const status = getTransactionStatus(transaction);
+                                return (
+                                  <span
+                                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(
+                                      status
+                                    )}`}
+                                  >
+                                    {status}
+                                  </span>
+                                );
+                              })()}
+                              
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 hover:bg-gray-100"
+                                  >
+                                    <MoreVertical className="h-4 w-4 text-gray-500" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="end" className="w-48">
+                                  <DropdownMenuItem
+                                    onClick={() => handleFullPayment(transaction.id)}
+                                    className="flex items-center gap-2 cursor-pointer"
+                                  >
+                                    <CheckCircle className="h-4 w-4 text-green-600" />
+                                    Baixa total do pagamento
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handlePartialPayment(transaction.id)}
+                                    className="flex items-center gap-2 cursor-pointer"
+                                  >
+                                    <DollarSign className="h-4 w-4 text-blue-600" />
+                                    Baixa parcial do pagamento
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => handleDeleteTransaction(transaction.id)}
+                                    className="flex items-center gap-2 cursor-pointer text-red-600 hover:text-red-700 hover:bg-red-50"
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                    Excluir
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+                            </div>
                           </td>
                         </tr>
                       ))
