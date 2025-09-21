@@ -140,12 +140,19 @@ export function DateFilterModal({
                   />
                 </div>
               </div>
-            <CalendarComponent
-              mode="single"
-              selected={customStartDate}
-              onSelect={setCustomStartDate}
-              className="border-0 p-0 pointer-events-auto"
-              locale={pt}
+              <CalendarComponent
+                mode="range"
+                selected={customStartDate && customEndDate ? { from: customStartDate, to: customEndDate } : undefined}
+                onSelect={(range) => {
+                  if (range?.from) {
+                    setCustomStartDate(range.from);
+                    if (range.to) {
+                      setCustomEndDate(range.to);
+                    }
+                  }
+                }}
+                className="border-0 p-0 pointer-events-auto"
+                locale={pt}
                 classNames={{
                   months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
                   month: "space-y-4",
@@ -161,13 +168,13 @@ export function DateFilterModal({
                   row: "flex w-full mt-2",
                   cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
                   day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-gray-100 rounded-md",
-                  day_selected: "bg-green-600 text-white hover:bg-green-700 focus:bg-green-600 focus:text-white",
+                  day_selected: "bg-green-500 text-white hover:bg-green-600 focus:bg-green-500 focus:text-white",
                   day_today: "bg-gray-100 text-gray-900",
                   day_outside: "text-muted-foreground opacity-50",
                   day_disabled: "text-muted-foreground opacity-50",
-                  day_range_middle: "aria-selected:bg-green-100/50 aria-selected:text-green-800",
-                  day_range_start: "day-range-start bg-green-700 text-white hover:bg-green-800",
-                  day_range_end: "day-range-end bg-green-700 text-white hover:bg-green-800",
+                  day_range_middle: "aria-selected:bg-green-100 aria-selected:text-green-700",
+                  day_range_start: "day-range-start bg-green-500 text-white hover:bg-green-600",
+                  day_range_end: "day-range-end bg-green-500 text-white hover:bg-green-600",
                   day_hidden: "invisible",
                 }}
               />
@@ -193,12 +200,19 @@ export function DateFilterModal({
                   />
                 </div>
               </div>
-            <CalendarComponent
-              mode="single"
-              selected={customEndDate}
-              onSelect={setCustomEndDate}
-              className="border-0 p-0 pointer-events-auto"
-              locale={pt}
+              <CalendarComponent
+                mode="range"
+                selected={customStartDate && customEndDate ? { from: customStartDate, to: customEndDate } : undefined}
+                onSelect={(range) => {
+                  if (range?.from) {
+                    setCustomStartDate(range.from);
+                    if (range.to) {
+                      setCustomEndDate(range.to);
+                    }
+                  }
+                }}
+                className="border-0 p-0 pointer-events-auto"
+                locale={pt}
                 classNames={{
                   months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
                   month: "space-y-4",
@@ -214,13 +228,13 @@ export function DateFilterModal({
                   row: "flex w-full mt-2",
                   cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
                   day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-gray-100 rounded-md",
-                  day_selected: "bg-green-600 text-white hover:bg-green-700 focus:bg-green-600 focus:text-white",
+                  day_selected: "bg-green-500 text-white hover:bg-green-600 focus:bg-green-500 focus:text-white",
                   day_today: "bg-gray-100 text-gray-900",
                   day_outside: "text-muted-foreground opacity-50",
                   day_disabled: "text-muted-foreground opacity-50",
-                  day_range_middle: "aria-selected:bg-green-100/50 aria-selected:text-green-800",
-                  day_range_start: "day-range-start bg-green-700 text-white hover:bg-green-800",
-                  day_range_end: "day-range-end bg-green-700 text-white hover:bg-green-800",
+                  day_range_middle: "aria-selected:bg-green-100 aria-selected:text-green-700",
+                  day_range_start: "day-range-start bg-green-500 text-white hover:bg-green-600",
+                  day_range_end: "day-range-end bg-green-500 text-white hover:bg-green-600",
                   day_hidden: "invisible",
                 }}
               />
@@ -277,13 +291,13 @@ export function DateFilterModal({
                 row: "flex w-full mt-2",
                 cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
                 day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-gray-100 rounded-md",
-                day_selected: "bg-green-600 text-white hover:bg-green-700 focus:bg-green-600 focus:text-white",
+                day_selected: "bg-green-500 text-white hover:bg-green-600 focus:bg-green-500 focus:text-white",
                 day_today: "bg-gray-100 text-gray-900",
                 day_outside: "text-muted-foreground opacity-50",
                 day_disabled: "text-muted-foreground opacity-50",
-                day_range_middle: "aria-selected:bg-green-100/50 aria-selected:text-green-800",
-                day_range_start: "day-range-start bg-green-700 text-white hover:bg-green-800",
-                day_range_end: "day-range-end bg-green-700 text-white hover:bg-green-800",
+                day_range_middle: "aria-selected:bg-green-100 aria-selected:text-green-700",
+                day_range_start: "day-range-start bg-green-500 text-white hover:bg-green-600",
+                day_range_end: "day-range-end bg-green-500 text-white hover:bg-green-600",
                 day_hidden: "invisible",
               }}
             />
