@@ -43,6 +43,8 @@ export function DateFilterModal({
   const [tempRange, setTempRange] = useState<DateRange>(initialRange);
   const [customStartDate, setCustomStartDate] = useState<Date | undefined>();
   const [customEndDate, setCustomEndDate] = useState<Date | undefined>();
+  const [startInputValue, setStartInputValue] = useState<string>("");
+  const [endInputValue, setEndInputValue] = useState<string>("");
 
   // Função para determinar as classes do dia baseado no range customizado
   const getCustomDayClasses = (date: Date) => {
@@ -147,11 +149,7 @@ export function DateFilterModal({
                   <input
                     type="text"
                     placeholder="01/09/2025"
-                    value={
-                      customStartDate
-                        ? format(customStartDate, "dd/MM/yyyy", { locale: pt })
-                        : ""
-                    }
+                    value={startInputValue || (customStartDate ? format(customStartDate, "dd/MM/yyyy", { locale: pt }) : "")}
                     onChange={(e) => {
                       const value = e.target.value.replace(/\D/g, '');
                       let formattedValue = value;
@@ -163,6 +161,8 @@ export function DateFilterModal({
                         formattedValue = value.slice(0, 2) + '/' + value.slice(2, 4) + '/' + value.slice(4, 8);
                       }
                       
+                      setStartInputValue(formattedValue);
+                      
                       // Tenta criar uma data válida quando tiver 8 dígitos
                       if (value.length === 8) {
                         const day = parseInt(value.slice(0, 2));
@@ -173,14 +173,14 @@ export function DateFilterModal({
                           const newDate = new Date(year, month - 1, day);
                           if (newDate.getDate() === day && newDate.getMonth() === month - 1) {
                             setCustomStartDate(newDate);
+                            setStartInputValue("");
                             if (customEndDate && newDate > customEndDate) {
                               setCustomEndDate(undefined);
+                              setEndInputValue("");
                             }
                           }
                         }
                       }
-                      
-                      e.target.value = formattedValue;
                     }}
                     maxLength={10}
                     className="w-full text-center bg-transparent border-none outline-none text-sm text-gray-700 font-medium"
@@ -193,9 +193,10 @@ export function DateFilterModal({
                 onSelect={(date) => {
                   if (date) {
                     setCustomStartDate(date);
-                    // Se a data de fim já existe e é anterior à nova data de início, limpa a data de fim
+                    setStartInputValue("");
                     if (customEndDate && date > customEndDate) {
                       setCustomEndDate(undefined);
+                      setEndInputValue("");
                     }
                   }
                 }}
@@ -250,11 +251,7 @@ export function DateFilterModal({
                   <input
                     type="text"
                     placeholder="30/09/2025"
-                    value={
-                      customEndDate
-                        ? format(customEndDate, "dd/MM/yyyy", { locale: pt })
-                        : ""
-                    }
+                    value={endInputValue || (customEndDate ? format(customEndDate, "dd/MM/yyyy", { locale: pt }) : "")}
                     onChange={(e) => {
                       const value = e.target.value.replace(/\D/g, '');
                       let formattedValue = value;
@@ -265,6 +262,8 @@ export function DateFilterModal({
                       if (value.length >= 4) {
                         formattedValue = value.slice(0, 2) + '/' + value.slice(2, 4) + '/' + value.slice(4, 8);
                       }
+                      
+                      setEndInputValue(formattedValue);
                       
                       // Tenta criar uma data válida quando tiver 8 dígitos
                       if (value.length === 8) {
@@ -277,17 +276,19 @@ export function DateFilterModal({
                           if (newDate.getDate() === day && newDate.getMonth() === month - 1) {
                             if (!customStartDate) {
                               setCustomStartDate(newDate);
+                              setEndInputValue("");
                             } else if (newDate >= customStartDate) {
                               setCustomEndDate(newDate);
+                              setEndInputValue("");
                             } else {
                               setCustomStartDate(newDate);
                               setCustomEndDate(undefined);
+                              setStartInputValue("");
+                              setEndInputValue("");
                             }
                           }
                         }
                       }
-                      
-                      e.target.value = formattedValue;
                     }}
                     maxLength={10}
                     className="w-full text-center bg-transparent border-none outline-none text-sm text-gray-700 font-medium"
@@ -299,16 +300,17 @@ export function DateFilterModal({
                 selected={customEndDate}
                 onSelect={(date) => {
                   if (date) {
-                    // Se não há data de início, define esta data como início
                     if (!customStartDate) {
                       setCustomStartDate(date);
+                      setStartInputValue("");
                     } else if (date >= customStartDate) {
-                      // Se a data é posterior ou igual à de início, define como fim
                       setCustomEndDate(date);
+                      setEndInputValue("");
                     } else {
-                      // Se a data é anterior à de início, redefine o início e limpa o fim
                       setCustomStartDate(date);
                       setCustomEndDate(undefined);
+                      setStartInputValue("");
+                      setEndInputValue("");
                     }
                   }
                 }}
