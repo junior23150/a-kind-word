@@ -155,13 +155,19 @@ export function AppHeader() {
 
   // Handle workspace toggle and navigation
   const handleWorkspaceToggle = () => {
-    toggleWorkspace();
-    // Navigate to appropriate dashboard
-    if (workspace === "personal") {
-      navigate("/dashboard-business");
-    } else {
-      navigate("/dashboard");
+    // Only navigate if we're currently on dashboard pages
+    const currentPath = location.pathname;
+    if (currentPath === "/dashboard" || currentPath === "/dashboard-business") {
+      // Use the opposite of current workspace since toggle will flip it
+      if (workspace === "personal") {
+        navigate("/dashboard-business");
+      } else {
+        navigate("/dashboard");
+      }
     }
+    
+    // Toggle workspace after navigation logic
+    toggleWorkspace();
   };
 
   // Close dropdown when clicking outside

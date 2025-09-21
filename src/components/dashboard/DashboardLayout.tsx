@@ -12,7 +12,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
       <WorkspaceProvider>
         <div className="min-h-screen w-full bg-background flex flex-col">
           <AppHeader />
-          <main className="flex-1">{children}</main>
+          <main className="flex-1 w-full">
+            {children}
+          </main>
         </div>
       </WorkspaceProvider>
     </ThemeProvider>

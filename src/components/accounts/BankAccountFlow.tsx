@@ -122,7 +122,7 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-knumbers-green/10 via-background to-knumbers-purple/10">
+    <div className="h-screen bg-gradient-to-br from-knumbers-green/10 via-background to-knumbers-purple/10 flex flex-col">
       {/* Header */}
       <div className="bg-background/80 backdrop-blur-sm border-b sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-6 py-4">
@@ -182,38 +182,38 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 py-8">
-        <div className="max-w-4xl mx-auto px-6">
+      <div className="flex-1 py-2 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6">
           {/* Step Header */}
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-foreground mb-2">{getStepTitle()}</h2>
+          <div className="text-center mb-2">
+            <h2 className="text-2xl font-bold text-foreground mb-2">{getStepTitle()}</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{getStepDescription()}</p>
           </div>
 
           {/* Step Content */}
-          <div className="w-full px-12">
+          <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             {step === 1 && (
               <div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-12 mb-8 w-full">
+                <div className="grid grid-cols-5 gap-4 mb-4 w-full">
                   {banks.map((bank) => (
                     <Card
                       key={bank.name}
-                      className={`cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-105 ${
-                        formData.bank_name === bank.name ? "ring-2 shadow-lg scale-105" : ""
+                      className={`cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-105 hover:-translate-y-1 ${
+                        formData.bank_name === bank.name ? "ring-2 shadow-xl scale-105" : ""
                       }`}
                       style={{
                         borderColor: formData.bank_name === bank.name ? bank.color : undefined,
                       }}
                       onClick={() => setFormData({ ...formData, bank_name: bank.name })}
                     >
-                      <CardContent className="p-12 text-center min-h-[200px] flex flex-col justify-center">
+                      <CardContent className="p-6 text-center min-h-[140px] flex flex-col justify-center">
                         <div className="flex justify-center mb-4">
                           <BankLogo bankName={bank.name} size="lg" />
                         </div>
-                        <h3 className="font-semibold text-foreground mb-1">{bank.name}</h3>
-                        <p className="text-xs text-muted-foreground mb-3">{bank.description}</p>
+                        <h3 className="font-semibold text-foreground mb-2 text-sm">{bank.name}</h3>
+                        <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{bank.description}</p>
                         {formData.bank_name === bank.name && (
-                          <div className="flex items-center justify-center space-x-1 text-knumbers-green">
+                          <div className="flex items-center justify-center space-x-1 text-knumbers-green animate-fade-in">
                             <Check className="h-4 w-4" />
                             <span className="text-sm font-medium">Selecionado</span>
                           </div>
@@ -405,7 +405,7 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
       </div>
 
       {/* Footer Navigation */}
-      <div className="bg-background/90 backdrop-blur-sm border-t sticky bottom-0">
+      <div className="bg-background/90 backdrop-blur-sm border-t">
         <div className="max-w-4xl mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
             <Button
