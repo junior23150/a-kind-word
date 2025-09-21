@@ -191,7 +191,7 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-knumbers-green/10 via-background to-knumbers-purple/10 flex flex-col">
+    <div className="h-[90vh] bg-gradient-to-br from-knumbers-green/10 via-background to-knumbers-purple/10 flex flex-col">
       {/* Header */}
       <div className="bg-background/80 backdrop-blur-sm border-b sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-6 py-4">
