@@ -44,6 +44,23 @@ export function DateFilterModal({
   const [customStartDate, setCustomStartDate] = useState<Date | undefined>();
   const [customEndDate, setCustomEndDate] = useState<Date | undefined>();
 
+  // Função para determinar as classes do dia baseado no range customizado
+  const getCustomDayClasses = (date: Date) => {
+    if (!customStartDate) return {};
+    
+    const isStart = customStartDate && date.toDateString() === customStartDate.toDateString();
+    const isEnd = customEndDate && date.toDateString() === customEndDate.toDateString();
+    const isInRange = customStartDate && customEndDate && date > customStartDate && date < customEndDate;
+    
+    if (isStart || isEnd) {
+      return { "bg-green-500 text-white hover:bg-green-600": true };
+    }
+    if (isInRange) {
+      return { "bg-green-100 text-green-700": true };
+    }
+    return {};
+  };
+
   const filterOptions = [
     { key: "today", label: "Hoje" },
     { key: "thisWeek", label: "Esta semana" },
@@ -141,13 +158,14 @@ export function DateFilterModal({
                 </div>
               </div>
               <CalendarComponent
-                mode="range"
-                selected={customStartDate && customEndDate ? { from: customStartDate, to: customEndDate } : undefined}
-                onSelect={(range) => {
-                  if (range?.from) {
-                    setCustomStartDate(range.from);
-                    if (range.to) {
-                      setCustomEndDate(range.to);
+                mode="single"
+                selected={customStartDate}
+                onSelect={(date) => {
+                  if (date) {
+                    setCustomStartDate(date);
+                    // Se a data de fim já existe e é anterior à nova data de início, limpa a data de fim
+                    if (customEndDate && date > customEndDate) {
+                      setCustomEndDate(undefined);
                     }
                   }
                 }}
@@ -166,16 +184,28 @@ export function DateFilterModal({
                   head_row: "flex",
                   head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
                   row: "flex w-full mt-2",
-                  cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                  day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-gray-100 rounded-md",
+                  cell: "text-center text-sm p-0 relative focus-within:relative focus-within:z-20",
+                  day: "h-9 w-9 p-0 font-normal hover:bg-gray-100 rounded-md",
                   day_selected: "bg-green-500 text-white hover:bg-green-600 focus:bg-green-500 focus:text-white",
                   day_today: "bg-gray-100 text-gray-900",
                   day_outside: "text-muted-foreground opacity-50",
                   day_disabled: "text-muted-foreground opacity-50",
-                  day_range_middle: "aria-selected:bg-green-100 aria-selected:text-green-700",
-                  day_range_start: "day-range-start bg-green-500 text-white hover:bg-green-600",
-                  day_range_end: "day-range-end bg-green-500 text-white hover:bg-green-600",
                   day_hidden: "invisible",
+                }}
+                modifiers={{
+                  range_start: customStartDate ? [customStartDate] : [],
+                  range_end: customEndDate ? [customEndDate] : [],
+                  range_middle: customStartDate && customEndDate ? 
+                    Array.from({ length: Math.floor((customEndDate.getTime() - customStartDate.getTime()) / (1000 * 60 * 60 * 24)) - 1 }, (_, i) => {
+                      const date = new Date(customStartDate);
+                      date.setDate(date.getDate() + i + 1);
+                      return date;
+                    }) : [],
+                }}
+                modifiersClassNames={{
+                  range_start: "bg-green-500 text-white hover:bg-green-600",
+                  range_end: "bg-green-500 text-white hover:bg-green-600", 
+                  range_middle: "bg-green-100 text-green-700",
                 }}
               />
             </div>
@@ -201,13 +231,20 @@ export function DateFilterModal({
                 </div>
               </div>
               <CalendarComponent
-                mode="range"
-                selected={customStartDate && customEndDate ? { from: customStartDate, to: customEndDate } : undefined}
-                onSelect={(range) => {
-                  if (range?.from) {
-                    setCustomStartDate(range.from);
-                    if (range.to) {
-                      setCustomEndDate(range.to);
+                mode="single"
+                selected={customEndDate}
+                onSelect={(date) => {
+                  if (date) {
+                    // Se não há data de início, define esta data como início
+                    if (!customStartDate) {
+                      setCustomStartDate(date);
+                    } else if (date >= customStartDate) {
+                      // Se a data é posterior ou igual à de início, define como fim
+                      setCustomEndDate(date);
+                    } else {
+                      // Se a data é anterior à de início, redefine o início e limpa o fim
+                      setCustomStartDate(date);
+                      setCustomEndDate(undefined);
                     }
                   }
                 }}
@@ -226,16 +263,28 @@ export function DateFilterModal({
                   head_row: "flex",
                   head_cell: "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
                   row: "flex w-full mt-2",
-                  cell: "text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
-                  day: "h-9 w-9 p-0 font-normal aria-selected:opacity-100 hover:bg-gray-100 rounded-md",
+                  cell: "text-center text-sm p-0 relative focus-within:relative focus-within:z-20",
+                  day: "h-9 w-9 p-0 font-normal hover:bg-gray-100 rounded-md",
                   day_selected: "bg-green-500 text-white hover:bg-green-600 focus:bg-green-500 focus:text-white",
                   day_today: "bg-gray-100 text-gray-900",
                   day_outside: "text-muted-foreground opacity-50",
                   day_disabled: "text-muted-foreground opacity-50",
-                  day_range_middle: "aria-selected:bg-green-100 aria-selected:text-green-700",
-                  day_range_start: "day-range-start bg-green-500 text-white hover:bg-green-600",
-                  day_range_end: "day-range-end bg-green-500 text-white hover:bg-green-600",
                   day_hidden: "invisible",
+                }}
+                modifiers={{
+                  range_start: customStartDate ? [customStartDate] : [],
+                  range_end: customEndDate ? [customEndDate] : [],
+                  range_middle: customStartDate && customEndDate ? 
+                    Array.from({ length: Math.floor((customEndDate.getTime() - customStartDate.getTime()) / (1000 * 60 * 60 * 24)) - 1 }, (_, i) => {
+                      const date = new Date(customStartDate);
+                      date.setDate(date.getDate() + i + 1);
+                      return date;
+                    }) : [],
+                }}
+                modifiersClassNames={{
+                  range_start: "bg-green-500 text-white hover:bg-green-600",
+                  range_end: "bg-green-500 text-white hover:bg-green-600", 
+                  range_middle: "bg-green-100 text-green-700",
                 }}
               />
             </div>
