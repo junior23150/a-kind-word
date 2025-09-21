@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,6 +23,20 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
+interface Category {
+  id: string;
+  name: string;
+  type: "income" | "expense";
+  color: string;
+  icon: string;
+}
+
+interface BankAccount {
+  id: string;
+  bank_name: string;
+  account_type: string;
+}
+
 interface TransactionSlideInProps {
   onClose: () => void;
   onTransactionAdded?: () => void;
@@ -42,32 +56,60 @@ export function TransactionSlideIn({
   const [showDateCalendar, setShowDateCalendar] = useState(false);
   const [showCompetenceCalendar, setShowCompetenceCalendar] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [bankAccounts, setBankAccounts] = useState<BankAccount[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
 
   const { toast } = useToast();
   const { user } = useAuth();
 
-  // Lista de categorias (pode ser expandida ou vir do banco de dados)
-  const categories = [
-    "Alimentação",
-    "Transporte",
-    "Saúde",
-    "Educação",
-    "Lazer",
-    "Moradia",
-    "Salário",
-    "Freelance",
-    "Investimentos",
-    "Outros",
-  ];
+  // Carregar categorias e contas do Supabase
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!user?.id) return;
 
-  // Lista de contas (mockada - pode vir do banco de dados)
-  const accounts = [
-    "Caixa",
-    "Banco do Brasil",
-    "Itaú",
-    "Nubank",
-    "Cartão de Crédito",
-  ];
+      try {
+        setLoadingData(true);
+        
+        // Carregar categorias
+        const { data: categoriesData, error: categoriesError } = await supabase
+          .from("categories")
+          .select("*")
+          .eq("user_id", user.id)
+          .eq("is_active", true)
+          .order("name");
+
+        if (categoriesError) throw categoriesError;
+
+        // Carregar contas bancárias
+        const { data: accountsData, error: accountsError } = await supabase
+          .from("bank_accounts")
+          .select("*")
+          .eq("user_id", user.id)
+          .eq("is_active", true)
+          .order("bank_name");
+
+        if (accountsError) throw accountsError;
+
+        setCategories((categoriesData || []) as Category[]);
+        setBankAccounts(accountsData || []);
+      } catch (error) {
+        console.error("Erro ao carregar dados:", error);
+        toast({
+          title: "Erro",
+          description: "Erro ao carregar categorias e contas",
+          variant: "destructive",
+        });
+      } finally {
+        setLoadingData(false);
+      }
+    };
+
+    fetchData();
+  }, [user?.id, toast]);
+
+  // Filtrar categorias por tipo
+  const filteredCategories = categories.filter((cat) => cat.type === type);
 
   const handleDateSelect = (selectedDate: Date | undefined) => {
     if (selectedDate) {
@@ -84,7 +126,7 @@ export function TransactionSlideIn({
   };
 
   const handleSubmit = async () => {
-    if (!category || !value || !account || !description) {
+    if (!category || !value || !description) {
       toast({
         title: "Erro",
         description: "Preencha todos os campos obrigatórios",
@@ -114,6 +156,7 @@ export function TransactionSlideIn({
         date: format(date, "yyyy-MM-dd"),
         source: "manual",
         original_message: `Lançamento manual - ${description}`,
+        bank_account_id: account || null,
       });
 
       if (error) throw error;
@@ -194,11 +237,21 @@ export function TransactionSlideIn({
                   <SelectValue placeholder="Sem categoria" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
-                      {cat}
+                  {loadingData ? (
+                    <SelectItem value="" disabled>
+                      Carregando...
                     </SelectItem>
-                  ))}
+                  ) : filteredCategories.length === 0 ? (
+                    <SelectItem value="" disabled>
+                      Nenhuma categoria encontrada
+                    </SelectItem>
+                  ) : (
+                    filteredCategories.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.name}>
+                        {cat.name}
+                      </SelectItem>
+                    ))
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -268,9 +321,10 @@ export function TransactionSlideIn({
                 </Label>
                 <Select
                   value={type}
-                  onValueChange={(value: "income" | "expense") =>
-                    setType(value)
-                  }
+                  onValueChange={(value: "income" | "expense") => {
+                    setType(value);
+                    setCategory(""); // Reset category when type changes
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -331,14 +385,24 @@ export function TransactionSlideIn({
                 </Label>
                 <Select value={account} onValueChange={setAccount}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Caixa" />
+                    <SelectValue placeholder="Selecione a conta" />
                   </SelectTrigger>
                   <SelectContent>
-                    {accounts.map((acc) => (
-                      <SelectItem key={acc} value={acc}>
-                        {acc}
+                    {loadingData ? (
+                      <SelectItem value="" disabled>
+                        Carregando...
                       </SelectItem>
-                    ))}
+                    ) : bankAccounts.length === 0 ? (
+                      <SelectItem value="" disabled>
+                        Nenhuma conta encontrada
+                      </SelectItem>
+                    ) : (
+                      bankAccounts.map((acc) => (
+                        <SelectItem key={acc.id} value={acc.id}>
+                          {acc.bank_name} - {acc.account_type}
+                        </SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
               </div>
