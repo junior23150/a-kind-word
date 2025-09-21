@@ -156,16 +156,17 @@ export function AppHeader() {
   // Handle workspace toggle and navigation
   const handleWorkspaceToggle = () => {
     toggleWorkspace();
-  };
-
-  // Navigate when workspace changes
-  useEffect(() => {
-    if (workspace === "business") {
-      navigate("/dashboard-business");
-    } else {
-      navigate("/dashboard");
+    
+    // Only navigate if we're currently on dashboard pages
+    const currentPath = location.pathname;
+    if (currentPath === "/dashboard" || currentPath === "/dashboard-business") {
+      if (workspace === "personal") {
+        navigate("/dashboard-business");
+      } else {
+        navigate("/dashboard");
+      }
     }
-  }, [workspace, navigate]);
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
