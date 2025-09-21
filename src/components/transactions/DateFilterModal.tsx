@@ -140,7 +140,7 @@ export function DateFilterModal({
             {/* Calendário Início */}
             <div className="p-6 border-r border-gray-200">
               <div className="text-left mb-4">
-                <div className="text-sm font-medium text-gray-600 mb-2">
+                <div className="text-sm font-medium text-gray-600 mb-2 text-center">
                   Início do período
                 </div>
                 <div className="bg-white border border-gray-300 rounded-xl px-4 py-3 text-center min-w-[160px]">
@@ -213,7 +213,7 @@ export function DateFilterModal({
             {/* Calendário Fim */}
             <div className="p-6">
               <div className="text-left mb-4">
-                <div className="text-sm font-medium text-gray-600 mb-2">
+                <div className="text-sm font-medium text-gray-600 mb-2 text-center">
                   Fim do período
                 </div>
                 <div className="bg-white border border-gray-300 rounded-xl px-4 py-3 text-center min-w-[160px]">
@@ -293,7 +293,7 @@ export function DateFilterModal({
           // Um calendário para outros filtros
           <div className="p-6">
             <div className="text-left mb-4">
-              <div className="text-sm font-medium text-gray-600 mb-2">
+              <div className="text-sm font-medium text-gray-600 mb-2 text-center">
                 Início do período
               </div>
               <div className="bg-white border border-gray-300 rounded-xl px-4 py-3 text-center min-w-[160px]">
