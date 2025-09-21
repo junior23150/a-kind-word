@@ -52,7 +52,6 @@ export function TransactionSlideIn({
   const [value, setValue] = useState("");
   const [type, setType] = useState<"income" | "expense">("expense");
   const [competenceDate, setCompetenceDate] = useState<Date>(new Date());
-  const [account, setAccount] = useState("");
   const [description, setDescription] = useState("");
   const [showDateCalendar, setShowDateCalendar] = useState(false);
   const [showCompetenceCalendar, setShowCompetenceCalendar] = useState(false);
@@ -174,7 +173,7 @@ export function TransactionSlideIn({
         date: format(date, "yyyy-MM-dd"),
         source: "manual",
         original_message: `Lançamento manual - ${description}`,
-        bank_account_id: account || null,
+        bank_account_id: financialAccount || null,
       });
 
       if (error) throw error;
@@ -188,7 +187,6 @@ export function TransactionSlideIn({
       setCategory("");
       setValue("");
       setDescription("");
-      setAccount("");
       setDate(new Date());
       setCompetenceDate(new Date());
       setType("expense");
@@ -243,7 +241,7 @@ export function TransactionSlideIn({
         date: format(date, "yyyy-MM-dd"),
         source: "manual",
         original_message: `Lançamento manual - ${description}`,
-        bank_account_id: account || null,
+        bank_account_id: financialAccount || null,
       });
 
       if (error) throw error;
@@ -257,7 +255,6 @@ export function TransactionSlideIn({
       setCategory("");
       setValue("");
       setDescription("");
-      setAccount("");
       setDate(new Date());
       setCompetenceDate(new Date());
       setType("expense");
@@ -430,74 +427,42 @@ export function TransactionSlideIn({
               </div>
             </div>
 
-            {/* Row: Competência, Conta Financeira */}
-            <div className="grid grid-cols-2 gap-4">
-              {/* Competência */}
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700">
-                  Competência <span className="text-red-500">*</span>
-                </Label>
-                <div className="relative">
-                  <Input
-                    value={format(competenceDate, "dd/MM/yyyy", { locale: pt })}
-                    readOnly
-                    className="pr-10 cursor-pointer rounded-xl"
-                    onClick={() => setShowCompetenceCalendar(true)}
-                  />
-                  <Popover
-                    open={showCompetenceCalendar}
-                    onOpenChange={setShowCompetenceCalendar}
-                  >
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
-                      >
-                        <Calendar className="h-4 w-4 text-green-600" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="end">
-                      <CalendarComponent
-                        mode="single"
-                        selected={competenceDate}
-                        onSelect={handleCompetenceDateSelect}
-                        initialFocus
-                        className="p-3"
-                        locale={pt}
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </div>
-
-              {/* Conta Financeira */}
-              <div className="space-y-2">
-                <Label className="text-sm font-medium text-gray-700">
-                  Conta financeira
-                </Label>
-                <Select value={account} onValueChange={setAccount}>
-                  <SelectTrigger className="rounded-xl">
-                    <SelectValue placeholder="Selecione a conta" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {loadingData ? (
-                      <SelectItem value="loading" disabled>
-                        Carregando...
-                      </SelectItem>
-                    ) : bankAccounts.length === 0 ? (
-                      <SelectItem value="no-accounts" disabled>
-                        Nenhuma conta encontrada
-                      </SelectItem>
-                    ) : (
-                      bankAccounts.map((acc) => (
-                        <SelectItem key={acc.id} value={acc.id}>
-                          {acc.bank_name} - {acc.account_type}
-                        </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
+            {/* Competência */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium text-gray-700">
+                Competência <span className="text-red-500">*</span>
+              </Label>
+              <div className="relative">
+                <Input
+                  value={format(competenceDate, "dd/MM/yyyy", { locale: pt })}
+                  readOnly
+                  className="pr-10 cursor-pointer rounded-xl"
+                  onClick={() => setShowCompetenceCalendar(true)}
+                />
+                <Popover
+                  open={showCompetenceCalendar}
+                  onOpenChange={setShowCompetenceCalendar}
+                >
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+                    >
+                      <Calendar className="h-4 w-4 text-green-600" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="end">
+                    <CalendarComponent
+                      mode="single"
+                      selected={competenceDate}
+                      onSelect={handleCompetenceDateSelect}
+                      initialFocus
+                      className="p-3"
+                      locale={pt}
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
             </div>
 
