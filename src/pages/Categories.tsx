@@ -341,16 +341,24 @@ export default function CategoriesPage() {
         .eq("user_id", user?.id)
         .limit(1);
 
-      if (checkError) throw checkError;
+      if (checkError) {
+        console.error("Error checking existing categories:", checkError);
+        throw checkError;
+      }
+
+      console.log("Existing categories check:", existingCategories);
 
       // If no categories exist, create default ones
       if (!existingCategories || existingCategories.length === 0) {
+        console.log("Creating default categories for user:", user?.id);
         const { error: createError } = await supabase.rpc('create_default_categories_for_user', {
           user_uuid: user?.id
         });
 
         if (createError) {
           console.error("Error creating default categories:", createError);
+        } else {
+          console.log("Default categories created successfully");
         }
       }
 
