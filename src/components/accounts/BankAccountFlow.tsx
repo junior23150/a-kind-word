@@ -212,11 +212,8 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
 
             {selectedBank && (
               <div className="flex items-center space-x-3">
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg"
-                  style={{ backgroundColor: selectedBank.color }}
-                >
-                  {selectedBank.logo}
+                <div className="w-10 h-10 flex items-center justify-center">
+                  <BankLogo bankName={selectedBank.name} size="md" />
                 </div>
                 <div className="text-right">
                   <p className="font-medium text-foreground">
@@ -262,7 +259,7 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
       </div>
 
       {/* Main Content */}
-      <div className="flex-none h-[calc(100vh-320px)] py-2">
+      <div className="flex-none h-[calc(100vh-200px)] py-8">
         <div className="max-w-7xl mx-auto px-6">
           {/* Step Header */}
           <div className="text-center mb-4">
@@ -275,10 +272,10 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
           </div>
 
           {/* Step Content */}
-          <div className="w-full max-w-[120rem] mx-auto px-16 sm:px-20 lg:px-24 py-12 mb-12">
+          <div className="w-full max-w-[140rem] mx-auto px-16 sm:px-20 lg:px-24 py-6 mb-6">
             {step === 1 && (
               <div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4 w-full">
+                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-4 w-full">
                   {banks.map((bank) => (
                     <Card
                       key={bank.name}
@@ -297,7 +294,7 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
                         setFormData({ ...formData, bank_name: bank.name })
                       }
                     >
-                      <CardContent className="px-16 py-12 text-center min-h-[240px] flex flex-col justify-center">
+                      <CardContent className="px-6 py-12 text-center min-h-[240px] flex flex-col justify-center">
                         <div className="flex justify-center mb-4">
                           <BankLogo bankName={bank.name} size="lg" />
                         </div>
