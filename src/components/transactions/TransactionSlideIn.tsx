@@ -28,7 +28,10 @@ interface TransactionSlideInProps {
   onTransactionAdded?: () => void;
 }
 
-export function TransactionSlideIn({ onClose, onTransactionAdded }: TransactionSlideInProps) {
+export function TransactionSlideIn({
+  onClose,
+  onTransactionAdded,
+}: TransactionSlideInProps) {
   const [category, setCategory] = useState("");
   const [date, setDate] = useState<Date>(new Date());
   const [value, setValue] = useState("");
@@ -39,14 +42,14 @@ export function TransactionSlideIn({ onClose, onTransactionAdded }: TransactionS
   const [showDateCalendar, setShowDateCalendar] = useState(false);
   const [showCompetenceCalendar, setShowCompetenceCalendar] = useState(false);
   const [loading, setLoading] = useState(false);
-  
+
   const { toast } = useToast();
   const { user } = useAuth();
 
   // Lista de categorias (pode ser expandida ou vir do banco de dados)
   const categories = [
     "Alimentação",
-    "Transporte", 
+    "Transporte",
     "Saúde",
     "Educação",
     "Lazer",
@@ -54,7 +57,7 @@ export function TransactionSlideIn({ onClose, onTransactionAdded }: TransactionS
     "Salário",
     "Freelance",
     "Investimentos",
-    "Outros"
+    "Outros",
   ];
 
   // Lista de contas (mockada - pode vir do banco de dados)
@@ -63,7 +66,7 @@ export function TransactionSlideIn({ onClose, onTransactionAdded }: TransactionS
     "Banco do Brasil",
     "Itaú",
     "Nubank",
-    "Cartão de Crédito"
+    "Cartão de Crédito",
   ];
 
   const handleDateSelect = (selectedDate: Date | undefined) => {
@@ -102,18 +105,16 @@ export function TransactionSlideIn({ onClose, onTransactionAdded }: TransactionS
     setLoading(true);
 
     try {
-      const { error } = await supabase
-        .from("transactions")
-        .insert({
-          user_id: user.id,
-          amount: parseFloat(value.replace(",", ".")),
-          description,
-          category,
-          transaction_type: type,
-          date: format(date, "yyyy-MM-dd"),
-          source: "manual",
-          original_message: `Lançamento manual - ${description}`,
-        });
+      const { error } = await supabase.from("transactions").insert({
+        user_id: user.id,
+        amount: parseFloat(value.replace(",", ".")),
+        description,
+        category,
+        transaction_type: type,
+        date: format(date, "yyyy-MM-dd"),
+        source: "manual",
+        original_message: `Lançamento manual - ${description}`,
+      });
 
       if (error) throw error;
 
@@ -148,7 +149,7 @@ export function TransactionSlideIn({ onClose, onTransactionAdded }: TransactionS
   return (
     <>
       {/* Overlay */}
-      <div 
+      <div
         className="fixed inset-0 bg-black/50 z-40 transition-opacity duration-300"
         onClick={onClose}
       />
@@ -182,7 +183,10 @@ export function TransactionSlideIn({ onClose, onTransactionAdded }: TransactionS
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {/* Categoria */}
             <div className="space-y-2">
-              <Label htmlFor="category" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="category"
+                className="text-sm font-medium text-gray-700"
+              >
                 Categoria
               </Label>
               <Select value={category} onValueChange={setCategory}>
@@ -213,7 +217,10 @@ export function TransactionSlideIn({ onClose, onTransactionAdded }: TransactionS
                     className="pr-10 cursor-pointer"
                     onClick={() => setShowDateCalendar(true)}
                   />
-                  <Popover open={showDateCalendar} onOpenChange={setShowDateCalendar}>
+                  <Popover
+                    open={showDateCalendar}
+                    onOpenChange={setShowDateCalendar}
+                  >
                     <PopoverTrigger asChild>
                       <Button
                         variant="ghost"
@@ -239,7 +246,10 @@ export function TransactionSlideIn({ onClose, onTransactionAdded }: TransactionS
 
               {/* Valor */}
               <div className="space-y-2">
-                <Label htmlFor="value" className="text-sm font-medium text-gray-700">
+                <Label
+                  htmlFor="value"
+                  className="text-sm font-medium text-gray-700"
+                >
                   Valor (R$) <span className="text-red-500">*</span>
                 </Label>
                 <Input
@@ -256,7 +266,12 @@ export function TransactionSlideIn({ onClose, onTransactionAdded }: TransactionS
                 <Label className="text-sm font-medium text-gray-700">
                   Tipo
                 </Label>
-                <Select value={type} onValueChange={(value: "income" | "expense") => setType(value)}>
+                <Select
+                  value={type}
+                  onValueChange={(value: "income" | "expense") =>
+                    setType(value)
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -282,7 +297,10 @@ export function TransactionSlideIn({ onClose, onTransactionAdded }: TransactionS
                     className="pr-10 cursor-pointer"
                     onClick={() => setShowCompetenceCalendar(true)}
                   />
-                  <Popover open={showCompetenceCalendar} onOpenChange={setShowCompetenceCalendar}>
+                  <Popover
+                    open={showCompetenceCalendar}
+                    onOpenChange={setShowCompetenceCalendar}
+                  >
                     <PopoverTrigger asChild>
                       <Button
                         variant="ghost"
@@ -328,7 +346,10 @@ export function TransactionSlideIn({ onClose, onTransactionAdded }: TransactionS
 
             {/* Histórico */}
             <div className="space-y-2">
-              <Label htmlFor="description" className="text-sm font-medium text-gray-700">
+              <Label
+                htmlFor="description"
+                className="text-sm font-medium text-gray-700"
+              >
                 Histórico <span className="text-red-500">*</span>
               </Label>
               <Textarea

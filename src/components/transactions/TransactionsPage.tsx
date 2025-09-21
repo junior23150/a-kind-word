@@ -589,7 +589,10 @@ export function TransactionsPage() {
             {/* Add Transaction Button */}
             <div className="mb-2">
               <Button
-                onClick={() => setShowTransactionModal(true)}
+                onClick={() => {
+                  console.log("Botão clicado! Abrindo modal de transação...");
+                  setShowTransactionModal(true);
+                }}
                 className={`bg-gradient-to-r from-knumbers-green to-knumbers-purple text-white hover:opacity-90 rounded-xl shadow-lg transition-all duration-300 ${
                   sidebarCollapsed ? "w-12 h-12 p-0" : "w-56 px-4 py-2"
                 }`}
@@ -751,18 +754,21 @@ export function TransactionsPage() {
         </div>
       </div>
 
-        {/* Transfer Modal */}
-        {showTransferModal && (
-          <TransferSlideIn onClose={() => setShowTransferModal(false)} />
-        )}
+      {/* Transfer Modal */}
+      {showTransferModal && (
+        <TransferSlideIn onClose={() => setShowTransferModal(false)} />
+      )}
 
-        {/* Transaction Modal */}
-        {showTransactionModal && (
-          <TransactionSlideIn 
+      {/* Transaction Modal */}
+      {showTransactionModal && (
+        <>
+          {console.log("Renderizando TransactionSlideIn...")}
+          <TransactionSlideIn
             onClose={() => setShowTransactionModal(false)}
             onTransactionAdded={fetchTransactions}
           />
-        )}
-      </div>
-    );
-  }
+        </>
+      )}
+    </div>
+  );
+}
