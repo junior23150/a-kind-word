@@ -189,6 +189,45 @@ export function TransactionsPage() {
     return new Date(dateString).toLocaleDateString("pt-BR");
   };
 
+  // Função para calcular o status da transação
+  const getTransactionStatus = (transaction: Transaction) => {
+    // Apenas transações de saída (despesas) têm status de pagamento
+    if (transaction.transaction_type === "income") {
+      return "Recebido";
+    }
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Zerar horas para comparação apenas de data
+    
+    const transactionDate = new Date(transaction.date);
+    transactionDate.setHours(0, 0, 0, 0);
+    
+    // Se a transação já foi paga (podemos usar um campo 'paid' no futuro)
+    // Por enquanto, vamos assumir que todas estão em aberto ou em atraso
+    
+    if (transactionDate < today) {
+      return "Em Atraso";
+    } else {
+      return "Em Aberto";
+    }
+  };
+
+  // Função para obter a cor do status
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Pago":
+        return "bg-green-100 text-green-700 border-green-200";
+      case "Recebido":
+        return "bg-green-100 text-green-700 border-green-200";
+      case "Em Aberto":
+        return "bg-blue-100 text-blue-700 border-blue-200";
+      case "Em Atraso":
+        return "bg-red-100 text-red-700 border-red-200";
+      default:
+        return "bg-gray-100 text-gray-700 border-gray-200";
+    }
+  };
+
   // Clear selected transactions
   const clearSelectedTransactions = () => {
     setSelectedTransactions([]);
@@ -493,13 +532,16 @@ export function TransactionsPage() {
                       <th className="text-right p-2 lg:p-4 font-medium text-muted-foreground text-sm">
                         Valor
                       </th>
+                      <th className="text-center p-2 lg:p-4 font-medium text-muted-foreground text-sm">
+                        Status
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredTransactions.length === 0 ? (
                       <tr>
                         <td
-                          colSpan={5}
+                          colSpan={6}
                           className="p-8 text-center text-muted-foreground"
                         >
                           Nenhuma transação encontrada
@@ -575,6 +617,20 @@ export function TransactionsPage() {
                               : "+"}
                             {formatCurrency(Math.abs(transaction.amount))}
                           </td>
+                          <td className="p-2 lg:p-4 text-center">
+                            {(() => {
+                              const status = getTransactionStatus(transaction);
+                              return (
+                                <span
+                                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(
+                                    status
+                                  )}`}
+                                >
+                                  {status}
+                                </span>
+                              );
+                            })()}
+                          </td>
                         </tr>
                       ))
                     )}
@@ -589,10 +645,7 @@ export function TransactionsPage() {
             {/* Add Transaction Button */}
             <div className="mb-2">
               <Button
-                onClick={() => {
-                  console.log("Botão clicado! Abrindo modal de transação...");
-                  setShowTransactionModal(true);
-                }}
+                onClick={() => setShowTransactionModal(true)}
                 className={`bg-gradient-to-r from-knumbers-green to-knumbers-purple text-white hover:opacity-90 rounded-xl shadow-lg transition-all duration-300 ${
                   sidebarCollapsed ? "w-12 h-12 p-0" : "w-56 px-4 py-2"
                 }`}
@@ -761,13 +814,10 @@ export function TransactionsPage() {
 
       {/* Transaction Modal */}
       {showTransactionModal && (
-        <>
-          {console.log("Renderizando TransactionSlideIn...")}
-          <TransactionSlideIn
-            onClose={() => setShowTransactionModal(false)}
-            onTransactionAdded={fetchTransactions}
-          />
-        </>
+        <TransactionSlideIn
+          onClose={() => setShowTransactionModal(false)}
+          onTransactionAdded={fetchTransactions}
+        />
       )}
     </div>
   );
