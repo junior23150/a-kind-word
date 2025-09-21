@@ -17,6 +17,7 @@ import Patients from "./pages/Patients";
 import PatientRegistration from "./pages/PatientRegistration";
 import PatientDetails from "./pages/PatientDetails";
 import DashboardBusiness from "./pages/DashboardBusiness";
+import Categories from "./pages/Categories";
 
 const queryClient = new QueryClient();
 
@@ -64,6 +65,14 @@ const App = () => {
                   element={
                     <ProtectedRoute>
                       <Accounts />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/categorias"
+                  element={
+                    <ProtectedRoute>
+                      <Categories />
                     </ProtectedRoute>
                   }
                 />

@@ -94,6 +94,45 @@ export type Database = {
           },
         ]
       }
+      categories: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          type: string
+          color: string
+          icon: string
+          is_default: boolean
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          type: string
+          color?: string
+          icon?: string
+          is_default?: boolean
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          type?: string
+          color?: string
+          icon?: string
+          is_default?: boolean
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       category_goals: {
         Row: {
           category: string
