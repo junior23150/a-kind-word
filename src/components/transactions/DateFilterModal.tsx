@@ -140,12 +140,12 @@ export function DateFilterModal({
                   />
                 </div>
               </div>
-              <CalendarComponent
-                mode="single"
-                selected={customStartDate}
-                onSelect={setCustomStartDate}
-                className="border-0 p-0 pointer-events-auto"
-                locale={pt}
+            <CalendarComponent
+              mode="single"
+              selected={customStartDate}
+              onSelect={setCustomStartDate}
+              className="border-0 p-0 pointer-events-auto"
+              locale={pt}
                 classNames={{
                   months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
                   month: "space-y-4",
@@ -193,12 +193,12 @@ export function DateFilterModal({
                   />
                 </div>
               </div>
-              <CalendarComponent
-                mode="single"
-                selected={customEndDate}
-                onSelect={setCustomEndDate}
-                className="border-0 p-0 pointer-events-auto"
-                locale={pt}
+            <CalendarComponent
+              mode="single"
+              selected={customEndDate}
+              onSelect={setCustomEndDate}
+              className="border-0 p-0 pointer-events-auto"
+              locale={pt}
                 classNames={{
                   months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
                   month: "space-y-4",
@@ -243,16 +243,23 @@ export function DateFilterModal({
               </div>
             </div>
             <CalendarComponent
-              mode="single"
-              selected={tempRange.from}
-              onSelect={(date) => {
-                if (date) {
+              mode="range"
+              selected={{ from: tempRange.from, to: tempRange.to }}
+              onSelect={(range) => {
+                if (range?.from) {
                   setTempRange({
-                    from: date,
-                    to: selectedFilter === "nextMonth" ? endOfMonth(date) : date,
+                    from: range.from,
+                    to: range.to || range.from,
                   });
                 }
               }}
+              defaultMonth={
+                selectedFilter === "lastMonth" 
+                  ? subMonths(new Date(), 1)
+                  : selectedFilter === "nextMonth"
+                  ? new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1)
+                  : tempRange.from
+              }
               className="border-0 p-0 pointer-events-auto"
               locale={pt}
               classNames={{
