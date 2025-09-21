@@ -191,7 +191,7 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-knumbers-green/10 via-background to-knumbers-purple/10 flex flex-col">
+    <div className="h-[90vh] bg-gradient-to-br from-knumbers-green/10 via-background to-knumbers-purple/10 flex flex-col">
       {/* Header */}
       <div className="bg-background/80 backdrop-blur-sm border-b sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-6 py-4">
@@ -262,7 +262,7 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 py-4">
+      <div className="flex-none h-[calc(100vh-320px)] py-2">
         <div className="max-w-7xl mx-auto px-6">
           {/* Step Header */}
           <div className="text-center mb-4">
@@ -275,7 +275,7 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
           </div>
 
           {/* Step Content */}
-          <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+          <div className="w-full max-w-[120rem] mx-auto px-16 sm:px-20 lg:px-24 py-12 mb-12">
             {step === 1 && (
               <div>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4 w-full">
@@ -297,7 +297,7 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
                         setFormData({ ...formData, bank_name: bank.name })
                       }
                     >
-                      <CardContent className="p-4 text-center min-h-[120px] flex flex-col justify-center">
+                      <CardContent className="px-16 py-12 text-center min-h-[240px] flex flex-col justify-center">
                         <div className="flex justify-center mb-4">
                           <BankLogo bankName={bank.name} size="lg" />
                         </div>
