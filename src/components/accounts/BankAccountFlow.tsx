@@ -262,7 +262,7 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 py-4">
+      <div className="flex-none h-[calc(100vh-280px)] py-2">
         <div className="max-w-7xl mx-auto px-6">
           {/* Step Header */}
           <div className="text-center mb-4">
