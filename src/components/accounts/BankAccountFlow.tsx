@@ -122,7 +122,7 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
   }
 
   return (
-    <div className="h-screen bg-gradient-to-br from-knumbers-green/10 via-background to-knumbers-purple/10 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-knumbers-green/10 via-background to-knumbers-purple/10 flex flex-col">
       {/* Header */}
       <div className="bg-background/80 backdrop-blur-sm border-b sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-6 py-4">
@@ -182,10 +182,10 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 py-2 overflow-hidden">
+      <div className="flex-1 py-6">
         <div className="max-w-7xl mx-auto px-6">
           {/* Step Header */}
-          <div className="text-center mb-2">
+          <div className="text-center mb-6">
             <h2 className="text-2xl font-bold text-foreground mb-2">{getStepTitle()}</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{getStepDescription()}</p>
           </div>
