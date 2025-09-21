@@ -275,7 +275,7 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
           </div>
 
           {/* Step Content */}
-          <div className="w-full max-w-[90rem] mx-auto px-8 sm:px-12 lg:px-16 py-6 mb-8">
+          <div className="w-full max-w-[120rem] mx-auto px-16 sm:px-20 lg:px-24 py-12 mb-12">
             {step === 1 && (
               <div>
                 <div className="grid grid-cols-5 gap-4 mb-4 w-full">
