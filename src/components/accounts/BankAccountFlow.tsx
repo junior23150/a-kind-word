@@ -297,7 +297,7 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
                         setFormData({ ...formData, bank_name: bank.name })
                       }
                     >
-                      <CardContent className="p-16 text-center min-h-[320px] flex flex-col justify-center">
+                      <CardContent className="px-20 py-8 text-center min-h-[160px] flex flex-col justify-center">
                         <div className="flex justify-center mb-4">
                           <BankLogo bankName={bank.name} size="lg" />
                         </div>
