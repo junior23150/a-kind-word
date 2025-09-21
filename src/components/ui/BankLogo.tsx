@@ -50,9 +50,9 @@ const bankInitials: Record<string, string> = {
 };
 
 const sizeClasses = {
-  sm: "w-6 h-6",
-  md: "w-10 h-10",
-  lg: "w-16 h-16",
+  sm: "w-8 h-6",
+  md: "w-12 h-9",
+  lg: "w-20 h-12",
 };
 
 export function BankLogo({
@@ -69,7 +69,7 @@ export function BankLogo({
   if (!logoSrc || imageError) {
     return (
       <div
-        className={`${sizeClasses[size]} rounded-full flex items-center justify-center ${className}`}
+        className={`${sizeClasses[size]} rounded-lg flex items-center justify-center ${className}`}
         style={{ backgroundColor: fallbackColor }}
       >
         {bankName === "Outros" ? (
@@ -94,12 +94,12 @@ export function BankLogo({
   // Mostra a imagem importada
   return (
     <div
-      className={`${sizeClasses[size]} rounded-full overflow-hidden ${className}`}
+      className={`${sizeClasses[size]} rounded-lg overflow-hidden ${className}`}
     >
       <img
         src={logoSrc}
         alt={`Logo ${bankName}`}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-contain"
         onError={() => setImageError(true)}
         onLoad={() => setImageError(false)}
       />
