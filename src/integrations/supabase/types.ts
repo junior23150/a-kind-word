@@ -357,6 +357,13 @@ export type Database = {
             referencedRelation: "whatsapp_users"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "transactions_whatsapp_user_id_fkey"
+            columns: ["whatsapp_user_id"]
+            isOneToOne: false
+            referencedRelation: "whatsapp_users"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_profiles: {
