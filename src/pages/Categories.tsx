@@ -372,15 +372,21 @@ export default function CategoriesPage() {
 
   const fetchCategories = async () => {
     try {
+      console.log("Fetching categories for user:", user?.id);
       const { data, error } = await supabase
         .from("categories" as any)
         .select("*")
         .eq("user_id", user?.id)
-        .eq("is_active", showInactive ? false : true)
+        .eq("is_active", true) // Always show active categories
         .order("type", { ascending: true })
         .order("name", { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase error:", error);
+        throw error;
+      }
+      
+      console.log("Fetched categories data:", data);
       
       // Cast the data to match our Category interface
       const typedCategories: Category[] = (data || []).map((item: any) => ({
@@ -388,6 +394,7 @@ export default function CategoriesPage() {
         type: item.type as "income" | "expense"
       }));
       
+      console.log("Typed categories:", typedCategories);
       setCategories(typedCategories);
     } catch (error) {
       console.error("Error fetching categories:", error);
