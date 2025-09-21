@@ -212,11 +212,8 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
 
             {selectedBank && (
               <div className="flex items-center space-x-3">
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg"
-                  style={{ backgroundColor: selectedBank.color }}
-                >
-                  {selectedBank.logo}
+                <div className="w-10 h-10 flex items-center justify-center">
+                  <BankLogo bankName={selectedBank.name} size="md" />
                 </div>
                 <div className="text-right">
                   <p className="font-medium text-foreground">
