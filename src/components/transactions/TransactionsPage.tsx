@@ -39,7 +39,7 @@ import {
   ChevronRight,
   X,
   MoreVertical,
-  CheckCircle,
+  Check,
   DollarSign,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -119,13 +119,13 @@ export function TransactionsPage() {
   // Carregar transações do Supabase
   const fetchTransactions = async () => {
     if (!user) return;
-    
+
     try {
       setLoading(true);
       const { data, error } = await supabase
         .from("transactions")
         .select("*")
-        .eq('user_id', user.id)
+        .eq("user_id", user.id)
         .order("date", { ascending: false });
 
       if (error) throw error;
@@ -203,7 +203,7 @@ export function TransactionsPage() {
 
   const formatDate = (dateString: string) => {
     // Parse the date as local time to avoid timezone issues
-    const [year, month, day] = dateString.split('-');
+    const [year, month, day] = dateString.split("-");
     const date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
     return date.toLocaleDateString("pt-BR");
   };
@@ -258,12 +258,12 @@ export function TransactionsPage() {
       // Aqui você pode implementar a lógica para marcar como pago
       // Por exemplo, atualizar um campo 'paid' na tabela de transações
       console.log("Baixa total do pagamento para:", transactionId);
-      
+
       toast({
         title: "Sucesso",
         description: "Pagamento baixado com sucesso!",
       });
-      
+
       // Recarregar transações para atualizar status
       fetchTransactions();
     } catch (error) {
@@ -281,7 +281,7 @@ export function TransactionsPage() {
       // Aqui você pode implementar a lógica para pagamento parcial
       // Por exemplo, abrir um modal para informar o valor parcial
       console.log("Baixa parcial do pagamento para:", transactionId);
-      
+
       toast({
         title: "Funcionalidade em desenvolvimento",
         description: "Baixa parcial será implementada em breve",
@@ -305,8 +305,8 @@ export function TransactionsPage() {
 
       if (error) throw error;
 
-      setTransactions(prev => prev.filter(t => t.id !== transactionId));
-      
+      setTransactions((prev) => prev.filter((t) => t.id !== transactionId));
+
       toast({
         title: "Sucesso",
         description: "Transação excluída com sucesso!",
@@ -343,13 +343,13 @@ export function TransactionsPage() {
     newCategory: string
   ) => {
     if (!user) return;
-    
+
     try {
       const { error } = await supabase
         .from("transactions")
         .update({ category: newCategory })
         .eq("id", transactionId)
-        .eq('user_id', user.id);
+        .eq("user_id", user.id);
 
       if (error) throw error;
 
@@ -383,7 +383,7 @@ export function TransactionsPage() {
         .from("transactions")
         .delete()
         .in("id", selectedTransactions)
-        .eq('user_id', user.id);
+        .eq("user_id", user.id);
 
       if (error) throw error;
 
@@ -712,7 +712,8 @@ export function TransactionsPage() {
                           <td className="p-2 lg:p-4">
                             <div className="flex items-center justify-center gap-2">
                               {(() => {
-                                const status = getTransactionStatus(transaction);
+                                const status =
+                                  getTransactionStatus(transaction);
                                 return (
                                   <span
                                     className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(
@@ -723,41 +724,51 @@ export function TransactionsPage() {
                                   </span>
                                 );
                               })()}
-                              
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    className="h-8 w-8 p-0 hover:bg-gray-100"
+
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      className="h-6 w-6 p-0 hover:bg-gray-100 rounded-sm"
+                                    >
+                                      <MoreVertical className="h-3 w-3 text-gray-600" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent
+                                    align="end"
+                                    className="w-56 py-1"
+                                    sideOffset={5}
                                   >
-                                    <MoreVertical className="h-4 w-4 text-gray-500" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end" className="w-48">
-                                  <DropdownMenuItem
-                                    onClick={() => handleFullPayment(transaction.id)}
-                                    className="flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <CheckCircle className="h-4 w-4 text-green-600" />
-                                    Baixa total do pagamento
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    onClick={() => handlePartialPayment(transaction.id)}
-                                    className="flex items-center gap-2 cursor-pointer"
-                                  >
-                                    <DollarSign className="h-4 w-4 text-blue-600" />
-                                    Baixa parcial do pagamento
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem
-                                    onClick={() => handleDeleteTransaction(transaction.id)}
-                                    className="flex items-center gap-2 cursor-pointer text-red-600 hover:text-red-700 hover:bg-red-50"
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                    Excluir
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        handleFullPayment(transaction.id)
+                                      }
+                                      className="flex items-center gap-3 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50"
+                                    >
+                                      <Check className="h-4 w-4 text-green-600" />
+                                      Baixa total do pagamento
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        handlePartialPayment(transaction.id)
+                                      }
+                                      className="flex items-center gap-3 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50"
+                                    >
+                                      <Check className="h-4 w-4 text-green-600" />
+                                      Baixa parcial do pagamento
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={() =>
+                                        handleDeleteTransaction(transaction.id)
+                                      }
+                                      className="flex items-center gap-3 px-3 py-2 text-sm cursor-pointer hover:bg-red-50 text-red-600"
+                                    >
+                                      <Trash2 className="h-4 w-4 text-red-600" />
+                                      Excluir
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
                             </div>
                           </td>
                         </tr>
