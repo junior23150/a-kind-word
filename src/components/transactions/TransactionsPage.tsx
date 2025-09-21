@@ -631,7 +631,7 @@ export function TransactionsPage() {
                         Contas
                       </span>
                     </Button>
-                    <Separator className="my-3" />
+                    <Separator className="mt-4 mb-3" />
                   </div>
 
                   {/* Register Count */}
