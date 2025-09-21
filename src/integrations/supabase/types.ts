@@ -211,6 +211,7 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          inactive_since: string | null
           is_active: boolean
           phone_number: string | null
           plan_type: string
@@ -222,6 +223,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id: string
+          inactive_since?: string | null
           is_active?: boolean
           phone_number?: string | null
           plan_type?: string
@@ -233,6 +235,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          inactive_since?: string | null
           is_active?: boolean
           phone_number?: string | null
           plan_type?: string
@@ -373,6 +376,7 @@ export type Database = {
           email: string | null
           full_name: string | null
           id: string
+          inactive_since: string | null
           is_active: boolean | null
           registration_date: string
           subscription_plan: string | null
@@ -385,6 +389,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          inactive_since?: string | null
           is_active?: boolean | null
           registration_date?: string
           subscription_plan?: string | null
@@ -397,6 +402,7 @@ export type Database = {
           email?: string | null
           full_name?: string | null
           id?: string
+          inactive_since?: string | null
           is_active?: boolean | null
           registration_date?: string
           subscription_plan?: string | null
@@ -479,6 +485,7 @@ export type Database = {
           client_id: string | null
           created_at: string
           id: string
+          inactive_since: string | null
           is_registered: boolean | null
           name: string | null
           phone_number: string
@@ -488,6 +495,7 @@ export type Database = {
           client_id?: string | null
           created_at?: string
           id?: string
+          inactive_since?: string | null
           is_registered?: boolean | null
           name?: string | null
           phone_number: string
@@ -497,6 +505,7 @@ export type Database = {
           client_id?: string | null
           created_at?: string
           id?: string
+          inactive_since?: string | null
           is_registered?: boolean | null
           name?: string | null
           phone_number?: string
@@ -517,6 +526,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cleanup_inactive_users: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       create_default_categories_for_user: {
         Args: { user_uuid: string }
         Returns: undefined
@@ -532,9 +545,17 @@ export type Database = {
         }
         Returns: boolean
       }
+      inactivate_user: {
+        Args: { user_uuid: string }
+        Returns: undefined
+      }
       is_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
+      }
+      reactivate_user: {
+        Args: { user_uuid: string }
+        Returns: undefined
       }
     }
     Enums: {
