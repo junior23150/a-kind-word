@@ -110,11 +110,7 @@ function AccountsContent({
   handleAddAccount: (account: Omit<BankAccount, "id">) => void
 }) {
   if (showFlow) {
-    return (
-      <div className="fixed inset-0 z-50 bg-background">
-        <BankAccountFlow onClose={() => setShowFlow(false)} onSubmit={handleAddAccount} />
-      </div>
-    )
+    return <BankAccountFlow onClose={() => setShowFlow(false)} onSubmit={handleAddAccount} />
   }
 
   return (
