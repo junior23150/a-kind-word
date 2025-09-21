@@ -16,7 +16,7 @@ const bankLogos: Record<string, string> = {
   Caixa: "/bank-logos/caixa.png",
   Sicredi: "/bank-logos/sicredi.png",
   Sicoob: "/bank-logos/sicoob.png",
-  Bradesco: "/bank-logos/bradesco.jpg",
+  Bradesco: "/bank-logos/bradesco.png",
   Inter: "/bank-logos/inter.png",
   // "Outros": não há arquivo, usará fallback
 };
