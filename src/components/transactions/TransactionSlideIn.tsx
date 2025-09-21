@@ -153,6 +153,7 @@ export function TransactionSlideIn({
     }
 
     if (!user?.id) {
+      console.log("Usuário não autenticado - user object:", user);
       toast({
         title: "Erro",
         description: "Usuário não autenticado",
@@ -161,9 +162,33 @@ export function TransactionSlideIn({
       return;
     }
 
+    console.log("User autenticado:", user.id, "Email:", user.email);
+
+    // Verificar se o usuário existe na tabela profiles
+    const { data: profileData, error: profileError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    console.log("Perfil do usuário:", profileData, "Erro:", profileError);
+
     setLoading(true);
 
     try {
+      console.log("Tentando criar transação com user_id:", user.id);
+      console.log("Dados da transação:", {
+        user_id: user.id,
+        amount: parseFloat(value.replace(",", ".")),
+        description,
+        category,
+        transaction_type: type,
+        date: format(date, "yyyy-MM-dd"),
+        source: "manual",
+        original_message: `Lançamento manual - ${description}`,
+        bank_account_id: financialAccount || null,
+      });
+
       const { error } = await supabase.from("transactions").insert({
         user_id: user.id,
         amount: parseFloat(value.replace(",", ".")),
@@ -176,7 +201,10 @@ export function TransactionSlideIn({
         bank_account_id: financialAccount || null,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Erro detalhado ao inserir transação:", error);
+        throw error;
+      }
 
       toast({
         title: "Sucesso",
@@ -221,6 +249,7 @@ export function TransactionSlideIn({
     }
 
     if (!user?.id) {
+      console.log("Usuário não autenticado (salvar e dar baixa) - user object:", user);
       toast({
         title: "Erro",
         description: "Usuário não autenticado",
@@ -229,9 +258,33 @@ export function TransactionSlideIn({
       return;
     }
 
+    console.log("User autenticado (salvar e dar baixa):", user.id, "Email:", user.email);
+
+    // Verificar se o usuário existe na tabela profiles
+    const { data: profileData, error: profileError } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    console.log("Perfil do usuário (salvar e dar baixa):", profileData, "Erro:", profileError);
+
     setLoading(true);
 
     try {
+      console.log("Tentando criar transação (salvar e dar baixa) com user_id:", user.id);
+      console.log("Dados da transação:", {
+        user_id: user.id,
+        amount: parseFloat(value.replace(",", ".")),
+        description,
+        category,
+        transaction_type: type,
+        date: format(date, "yyyy-MM-dd"),
+        source: "manual",
+        original_message: `Lançamento manual - ${description}`,
+        bank_account_id: financialAccount || null,
+      });
+
       const { error } = await supabase.from("transactions").insert({
         user_id: user.id,
         amount: parseFloat(value.replace(",", ".")),
@@ -244,7 +297,10 @@ export function TransactionSlideIn({
         bank_account_id: financialAccount || null,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Erro detalhado ao inserir transação (salvar e dar baixa):", error);
+        throw error;
+      }
 
       toast({
         title: "Sucesso",
