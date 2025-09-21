@@ -354,13 +354,12 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
                 ) : (
                   <Card className="p-4 text-center">
                     <CardContent>
-                      <div
-                        className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg"
-                        style={{ backgroundColor: selectedBank?.color }}
-                      >
-                        <span className="text-3xl text-white">
-                          {selectedBank?.logo}
-                        </span>
+                      <div className="w-20 h-20 mx-auto mb-6">
+                        <BankLogo 
+                          bankName={selectedBank?.name || ''} 
+                          size="lg" 
+                          className="w-full h-full shadow-lg"
+                        />
                       </div>
                       <div className="space-y-4">
                         <div className="flex items-center justify-center space-x-2 text-knumbers-green mb-4">
