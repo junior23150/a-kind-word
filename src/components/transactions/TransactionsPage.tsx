@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   format,
   startOfMonth,
@@ -69,6 +70,7 @@ interface Transaction {
 // Dados mockados removidos - usando apenas dados reais do Supabase
 
 export function TransactionsPage() {
+  const { user } = useAuth();
   const [selectedAccount, setSelectedAccount] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [dateRange, setDateRange] = useState({
@@ -107,11 +109,14 @@ export function TransactionsPage() {
 
   // Carregar transações do Supabase
   const fetchTransactions = async () => {
+    if (!user) return;
+    
     try {
       setLoading(true);
       const { data, error } = await supabase
         .from("transactions")
         .select("*")
+        .eq('user_id', user.id)
         .order("date", { ascending: false });
 
       if (error) throw error;
@@ -130,8 +135,10 @@ export function TransactionsPage() {
   };
 
   useEffect(() => {
-    fetchTransactions();
-  }, [toast]);
+    if (user) {
+      fetchTransactions();
+    }
+  }, [user, toast]);
 
   // Filtrar transações
   const filteredTransactions = transactions.filter((transaction) => {
@@ -254,11 +261,14 @@ export function TransactionsPage() {
     transactionId: string,
     newCategory: string
   ) => {
+    if (!user) return;
+    
     try {
       const { error } = await supabase
         .from("transactions")
         .update({ category: newCategory })
-        .eq("id", transactionId);
+        .eq("id", transactionId)
+        .eq('user_id', user.id);
 
       if (error) throw error;
 
@@ -285,13 +295,14 @@ export function TransactionsPage() {
 
   // Handle delete transactions
   const handleDeleteTransactions = async () => {
-    if (selectedTransactions.length === 0) return;
+    if (selectedTransactions.length === 0 || !user) return;
 
     try {
       const { error } = await supabase
         .from("transactions")
         .delete()
-        .in("id", selectedTransactions);
+        .in("id", selectedTransactions)
+        .eq('user_id', user.id);
 
       if (error) throw error;
 
