@@ -152,7 +152,37 @@ export function DateFilterModal({
                         ? format(customStartDate, "dd/MM/yyyy", { locale: pt })
                         : ""
                     }
-                    readOnly
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '');
+                      let formattedValue = value;
+                      
+                      if (value.length >= 2) {
+                        formattedValue = value.slice(0, 2) + '/' + value.slice(2);
+                      }
+                      if (value.length >= 4) {
+                        formattedValue = value.slice(0, 2) + '/' + value.slice(2, 4) + '/' + value.slice(4, 8);
+                      }
+                      
+                      // Tenta criar uma data válida quando tiver 8 dígitos
+                      if (value.length === 8) {
+                        const day = parseInt(value.slice(0, 2));
+                        const month = parseInt(value.slice(2, 4));
+                        const year = parseInt(value.slice(4, 8));
+                        
+                        if (day >= 1 && day <= 31 && month >= 1 && month <= 12 && year >= 1900) {
+                          const newDate = new Date(year, month - 1, day);
+                          if (newDate.getDate() === day && newDate.getMonth() === month - 1) {
+                            setCustomStartDate(newDate);
+                            if (customEndDate && newDate > customEndDate) {
+                              setCustomEndDate(undefined);
+                            }
+                          }
+                        }
+                      }
+                      
+                      e.target.value = formattedValue;
+                    }}
+                    maxLength={10}
                     className="w-full text-center bg-transparent border-none outline-none text-sm text-gray-700 font-medium"
                   />
                 </div>
@@ -225,7 +255,41 @@ export function DateFilterModal({
                         ? format(customEndDate, "dd/MM/yyyy", { locale: pt })
                         : ""
                     }
-                    readOnly
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '');
+                      let formattedValue = value;
+                      
+                      if (value.length >= 2) {
+                        formattedValue = value.slice(0, 2) + '/' + value.slice(2);
+                      }
+                      if (value.length >= 4) {
+                        formattedValue = value.slice(0, 2) + '/' + value.slice(2, 4) + '/' + value.slice(4, 8);
+                      }
+                      
+                      // Tenta criar uma data válida quando tiver 8 dígitos
+                      if (value.length === 8) {
+                        const day = parseInt(value.slice(0, 2));
+                        const month = parseInt(value.slice(2, 4));
+                        const year = parseInt(value.slice(4, 8));
+                        
+                        if (day >= 1 && day <= 31 && month >= 1 && month <= 12 && year >= 1900) {
+                          const newDate = new Date(year, month - 1, day);
+                          if (newDate.getDate() === day && newDate.getMonth() === month - 1) {
+                            if (!customStartDate) {
+                              setCustomStartDate(newDate);
+                            } else if (newDate >= customStartDate) {
+                              setCustomEndDate(newDate);
+                            } else {
+                              setCustomStartDate(newDate);
+                              setCustomEndDate(undefined);
+                            }
+                          }
+                        }
+                      }
+                      
+                      e.target.value = formattedValue;
+                    }}
+                    maxLength={10}
                     className="w-full text-center bg-transparent border-none outline-none text-sm text-gray-700 font-medium"
                   />
                 </div>
