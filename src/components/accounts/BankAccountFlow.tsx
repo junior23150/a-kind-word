@@ -278,7 +278,7 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
           <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
             {step === 1 && (
               <div>
-                <div className="grid grid-cols-5 gap-4 mb-4 w-full">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4 w-full">
                   {banks.map((bank) => (
                     <Card
                       key={bank.name}
