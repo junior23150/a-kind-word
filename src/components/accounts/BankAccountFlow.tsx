@@ -191,29 +191,29 @@ export function BankAccountFlow({ onClose, onSubmit }: BankAccountFlowProps) {
           </div>
 
           {/* Step Content */}
-          <div className="w-full px-12">
+          <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             {step === 1 && (
               <div>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-12 mb-8 w-full">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8 w-full">
                   {banks.map((bank) => (
                     <Card
                       key={bank.name}
-                      className={`cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-105 ${
-                        formData.bank_name === bank.name ? "ring-2 shadow-lg scale-105" : ""
+                      className={`cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-105 hover:-translate-y-1 ${
+                        formData.bank_name === bank.name ? "ring-2 shadow-xl scale-105" : ""
                       }`}
                       style={{
                         borderColor: formData.bank_name === bank.name ? bank.color : undefined,
                       }}
                       onClick={() => setFormData({ ...formData, bank_name: bank.name })}
                     >
-                      <CardContent className="p-12 text-center min-h-[200px] flex flex-col justify-center">
+                      <CardContent className="p-6 text-center min-h-[140px] flex flex-col justify-center">
                         <div className="flex justify-center mb-4">
                           <BankLogo bankName={bank.name} size="lg" />
                         </div>
-                        <h3 className="font-semibold text-foreground mb-1">{bank.name}</h3>
-                        <p className="text-xs text-muted-foreground mb-3">{bank.description}</p>
+                        <h3 className="font-semibold text-foreground mb-2 text-sm">{bank.name}</h3>
+                        <p className="text-xs text-muted-foreground mb-3 line-clamp-2">{bank.description}</p>
                         {formData.bank_name === bank.name && (
-                          <div className="flex items-center justify-center space-x-1 text-knumbers-green">
+                          <div className="flex items-center justify-center space-x-1 text-knumbers-green animate-fade-in">
                             <Check className="h-4 w-4" />
                             <span className="text-sm font-medium">Selecionado</span>
                           </div>

@@ -156,13 +156,16 @@ export function AppHeader() {
   // Handle workspace toggle and navigation
   const handleWorkspaceToggle = () => {
     toggleWorkspace();
-    // Navigate to appropriate dashboard
-    if (workspace === "personal") {
+  };
+
+  // Navigate when workspace changes
+  useEffect(() => {
+    if (workspace === "business") {
       navigate("/dashboard-business");
     } else {
       navigate("/dashboard");
     }
-  };
+  }, [workspace, navigate]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
