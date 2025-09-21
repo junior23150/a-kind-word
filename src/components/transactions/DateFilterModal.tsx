@@ -30,7 +30,7 @@ type FilterType =
   | "lastWeek"
   | "thisMonth"
   | "lastMonth"
-  | "selectMonth"
+  | "nextMonth"
   | "customPeriod";
 
 export function DateFilterModal({
@@ -50,7 +50,7 @@ export function DateFilterModal({
     { key: "lastWeek", label: "Semana passada" },
     { key: "thisMonth", label: "Este mês" },
     { key: "lastMonth", label: "Mês passado" },
-    { key: "selectMonth", label: "Selecionar mês" },
+    { key: "nextMonth", label: "Mês seguinte" },
     { key: "customPeriod", label: "Período customizado" },
   ];
 
@@ -81,9 +81,10 @@ export function DateFilterModal({
         from = startOfMonth(lastMonth);
         to = endOfMonth(lastMonth);
         break;
-      case "selectMonth":
-        from = startOfMonth(today);
-        to = endOfMonth(today);
+      case "nextMonth":
+        const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+        from = startOfMonth(nextMonth);
+        to = endOfMonth(nextMonth);
         break;
       case "customPeriod":
         // Para período customizado, não definimos range aqui
@@ -164,7 +165,9 @@ export function DateFilterModal({
                   day_today: "bg-gray-100 text-gray-900",
                   day_outside: "text-muted-foreground opacity-50",
                   day_disabled: "text-muted-foreground opacity-50",
-                  day_range_middle: "aria-selected:bg-accent aria-selected:text-accent-foreground",
+                  day_range_middle: "aria-selected:bg-green-100/50 aria-selected:text-green-800",
+                  day_range_start: "day-range-start bg-green-700 text-white hover:bg-green-800",
+                  day_range_end: "day-range-end bg-green-700 text-white hover:bg-green-800",
                   day_hidden: "invisible",
                 }}
               />
@@ -215,9 +218,9 @@ export function DateFilterModal({
                   day_today: "bg-gray-100 text-gray-900",
                   day_outside: "text-muted-foreground opacity-50",
                   day_disabled: "text-muted-foreground opacity-50",
-                  day_range_middle: "aria-selected:bg-green-100 aria-selected:text-green-900",
-                  day_range_start: "day-range-start bg-green-600 text-white",
-                  day_range_end: "day-range-end bg-green-600 text-white",
+                  day_range_middle: "aria-selected:bg-green-100/50 aria-selected:text-green-800",
+                  day_range_start: "day-range-start bg-green-700 text-white hover:bg-green-800",
+                  day_range_end: "day-range-end bg-green-700 text-white hover:bg-green-800",
                   day_hidden: "invisible",
                 }}
               />
@@ -246,7 +249,7 @@ export function DateFilterModal({
                 if (date) {
                   setTempRange({
                     from: date,
-                    to: selectedFilter === "selectMonth" ? endOfMonth(date) : date,
+                    to: selectedFilter === "nextMonth" ? endOfMonth(date) : date,
                   });
                 }
               }}
@@ -271,9 +274,9 @@ export function DateFilterModal({
                 day_today: "bg-gray-100 text-gray-900",
                 day_outside: "text-muted-foreground opacity-50",
                 day_disabled: "text-muted-foreground opacity-50",
-                day_range_middle: "aria-selected:bg-green-100 aria-selected:text-green-900",
-                day_range_start: "day-range-start bg-green-600 text-white",
-                day_range_end: "day-range-end bg-green-600 text-white",
+                day_range_middle: "aria-selected:bg-green-100/50 aria-selected:text-green-800",
+                day_range_start: "day-range-start bg-green-700 text-white hover:bg-green-800",
+                day_range_end: "day-range-end bg-green-700 text-white hover:bg-green-800",
                 day_hidden: "invisible",
               }}
             />
