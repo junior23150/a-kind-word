@@ -439,56 +439,238 @@ export function TransactionsPage() {
   return (
     <div className="min-h-screen bg-background">
       <div className="flex flex-col h-screen">
-          {/* Header */}
-          <div className="bg-white border-b border-border p-4 lg:p-6 flex-shrink-0">
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-4 gap-4">
-              <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+        {/* Header */}
+        <div className="bg-white border-b border-border p-4 lg:p-6 flex-shrink-0">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-4 gap-4">
+            <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl lg:text-2xl font-bold text-foreground">
+                  Transações
+                </h1>
+                <div className="text-muted-foreground text-xl">|</div>
+                <Select
+                  value={selectedAccount}
+                  onValueChange={setSelectedAccount}
+                >
+                  <SelectTrigger className="border-0 shadow-none p-0 h-auto font-normal text-sm text-muted-foreground hover:text-foreground">
+                    <SelectValue placeholder="Todas as contas" />
+                    <ChevronDown className="h-4 w-4 ml-1" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todas as contas</SelectItem>
+                    {/* TODO: Carregar contas reais do Supabase */}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Main Content with Sidebar */}
+        <div className="flex gap-4 flex-1 overflow-hidden">
+          {/* Filter Sidebar */}
+          {showFilterSidebar && (
+            <div className="w-80 bg-white border border-gray-200 rounded-lg shadow-lg flex flex-col">
+              {/* Filter Header */}
+              <div className="flex items-center justify-between p-4 border-b border-border rounded-t-lg">
                 <div className="flex items-center gap-2">
-                  <h1 className="text-xl lg:text-2xl font-bold text-foreground">
-                    Transações
-                  </h1>
-                  <div className="text-muted-foreground text-xl">|</div>
-                  <Select
-                    value={selectedAccount}
-                    onValueChange={setSelectedAccount}
-                  >
-                    <SelectTrigger className="border-0 shadow-none p-0 h-auto font-normal text-sm text-muted-foreground hover:text-foreground">
-                      <SelectValue placeholder="Todas as contas" />
-                      <ChevronDown className="h-4 w-4 ml-1" />
+                  <Filter className="h-4 w-4 text-gray-600" />
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Filtrar
+                  </h3>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowFilterSidebar(false)}
+                  className="h-6 w-6 p-0 hover:bg-gray-100"
+                >
+                  <X className="h-4 w-4 text-gray-500" />
+                </Button>
+              </div>
+
+              {/* Filter Content */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                {/* Opção */}
+                <div>
+                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Opção
+                  </Label>
+                  <Select value={filterStatus} onValueChange={setFilterStatus}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                      <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Todas as contas</SelectItem>
-                      {/* TODO: Carregar contas reais do Supabase */}
+                      <SelectItem value="Em aberto">Em aberto</SelectItem>
+                      <SelectItem value="Em Atraso">Em Atraso</SelectItem>
+                      <SelectItem value="Pago">Pago</SelectItem>
+                      <SelectItem value="Recebido">Recebido</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
+
+                {/* Categoria */}
+                <div>
+                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Categoria
+                  </Label>
+                  <Select
+                    value={filterCategory}
+                    onValueChange={setFilterCategory}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                      <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Todas categorias">
+                        Todas categorias
+                      </SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Tipo de pagamento */}
+                <div>
+                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Tipo de pagamento
+                  </Label>
+                  <Select
+                    value={filterPaymentType}
+                    onValueChange={setFilterPaymentType}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                      <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Todas">Todas</SelectItem>
+                      <SelectItem value="Entrada">Entrada</SelectItem>
+                      <SelectItem value="Saída">Saída</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Forma de pagamento */}
+                <div>
+                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Forma de pagamento
+                  </Label>
+                  <Select
+                    value={filterPaymentMethod}
+                    onValueChange={setFilterPaymentMethod}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                      <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Todas">Todas</SelectItem>
+                      <SelectItem value="Dinheiro">Dinheiro</SelectItem>
+                      <SelectItem value="Cartão de Crédito">
+                        Cartão de Crédito
+                      </SelectItem>
+                      <SelectItem value="Cartão de Débito">
+                        Cartão de Débito
+                      </SelectItem>
+                      <SelectItem value="PIX">PIX</SelectItem>
+                      <SelectItem value="Transferência">
+                        Transferência
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Valor e Nº documento */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                      Valor
+                    </Label>
+                    <Input
+                      placeholder=""
+                      value={filterValue}
+                      onChange={(e) => setFilterValue(e.target.value)}
+                      className="w-full"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                      Nº documento
+                    </Label>
+                    <Input
+                      placeholder=""
+                      value={filterDocumentNumber}
+                      onChange={(e) => setFilterDocumentNumber(e.target.value)}
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Filter Actions */}
+              <div className="p-4 border-t border-border space-y-3 rounded-b-lg">
+                <Button
+                  className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg"
+                  onClick={() => {
+                    // Apply filters logic here
+                    console.log("Applying filters...");
+                  }}
+                >
+                  Filtrar
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full text-green-600 hover:text-green-700 hover:bg-green-50"
+                  onClick={() => {
+                    // Clear filters logic here
+                    setFilterStatus("Em aberto");
+                    setFilterCategory("Todas categorias");
+                    setFilterPaymentType("Todas");
+                    setFilterPaymentMethod("Todas");
+                    setFilterValue("");
+                    setFilterDocumentNumber("");
+                  }}
+                >
+                  Limpar filtros
+                </Button>
               </div>
             </div>
+          )}
 
-             {/* Search and Date Filter */}
-             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
-               <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-                 <div className="flex items-center gap-3 relative">
-                   {!showFilterSidebar && (
-                     <Button
-                       variant="outline"
-                       size="sm"
-                       onClick={() => setShowFilterSidebar(true)}
-                       className="h-10 w-12 px-0 rounded-xl border-gray-300 hover:bg-gray-50"
-                     >
-                       <Filter className="h-4 w-4 text-green-600" />
-                     </Button>
-                   )}
-                   <div className="relative w-full lg:w-96">
-                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                     <Input
-                       placeholder="Pesquisa por nome ou histórico"
-                       value={searchTerm}
-                       onChange={(e) => setSearchTerm(e.target.value)}
-                       className="pl-10 rounded-xl"
-                     />
-                   </div>
-                 </div>
+          {/* Main Content Area */}
+          <div className="flex-1 flex flex-col">
+            {/* Search and Date Filter */}
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4 p-4 lg:p-6 bg-white border-b border-border">
+              <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                <div className="flex items-center gap-3 relative">
+                  {!showFilterSidebar && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setShowFilterSidebar(true)}
+                      className="h-10 w-12 px-0 rounded-xl border-gray-300 hover:bg-gray-50"
+                    >
+                      <Filter className="h-4 w-4 text-green-600" />
+                    </Button>
+                  )}
+                  <div className="relative w-full lg:w-96">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                    <Input
+                      placeholder="Pesquisa por nome ou histórico"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10 rounded-xl"
+                    />
+                  </div>
+                </div>
 
                 <Popover open={showCalendar} onOpenChange={setShowCalendar}>
                   <PopoverTrigger asChild>
@@ -550,7 +732,7 @@ export function TransactionsPage() {
             </div>
 
             {/* Filter Buttons */}
-            <div className="flex items-center gap-0 mb-4">
+            <div className="flex items-center gap-0 mb-4 px-4 lg:px-6 bg-white">
               <Button
                 variant="ghost"
                 onClick={() => setActiveFilter("all")}
@@ -597,7 +779,7 @@ export function TransactionsPage() {
 
             {/* Selected transactions indicator */}
             {selectedTransactions.length > 0 && (
-              <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-2 mb-4 px-4 lg:px-6 bg-white">
                 <Badge
                   variant="secondary"
                   className="flex items-center gap-2 bg-knumbers-purple/20 text-knumbers-purple border-knumbers-purple/30"
@@ -610,189 +792,14 @@ export function TransactionsPage() {
                 </Badge>
               </div>
             )}
-           </div>
 
-           {/* Content Area with Filter Sidebar */}
-           <div className="flex flex-1 overflow-hidden relative">
-             {/* Filter Sidebar */}
-             {showFilterSidebar && (
-               <div className="w-80 bg-white border border-gray-200 rounded-lg shadow-lg flex flex-col m-4 mr-2">
-                 {/* Filter Header */}
-                 <div className="flex items-center justify-between p-4 border-b border-border rounded-t-lg">
-                   <div className="flex items-center gap-2">
-                     <Filter className="h-4 w-4 text-gray-600" />
-                     <h3 className="text-lg font-semibold text-gray-800">Filtrar</h3>
-                   </div>
-                   <Button
-                     variant="ghost"
-                     size="sm"
-                     onClick={() => setShowFilterSidebar(false)}
-                     className="h-6 w-6 p-0 hover:bg-gray-100"
-                   >
-                     <X className="h-4 w-4 text-gray-500" />
-                   </Button>
-                 </div>
-
-                 {/* Filter Content */}
-                 <div className="flex-1 overflow-y-auto p-4 space-y-6">
-                   {/* Opção */}
-                   <div>
-                     <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                       Opção
-                     </Label>
-                     <Select value={filterStatus} onValueChange={setFilterStatus}>
-                       <SelectTrigger className="w-full">
-                         <SelectValue />
-                         <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
-                       </SelectTrigger>
-                       <SelectContent>
-                         <SelectItem value="Em aberto">Em aberto</SelectItem>
-                         <SelectItem value="Em Atraso">Em Atraso</SelectItem>
-                         <SelectItem value="Pago">Pago</SelectItem>
-                         <SelectItem value="Recebido">Recebido</SelectItem>
-                       </SelectContent>
-                     </Select>
-                   </div>
-
-                   {/* Categoria */}
-                   <div>
-                     <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                       Categoria
-                     </Label>
-                     <Select
-                       value={filterCategory}
-                       onValueChange={setFilterCategory}
-                     >
-                       <SelectTrigger className="w-full">
-                         <SelectValue />
-                         <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
-                       </SelectTrigger>
-                       <SelectContent>
-                         <SelectItem value="Todas categorias">
-                           Todas categorias
-                         </SelectItem>
-                         {categories.map((category) => (
-                           <SelectItem key={category} value={category}>
-                             {category}
-                           </SelectItem>
-                         ))}
-                       </SelectContent>
-                     </Select>
-                   </div>
-
-                   {/* Tipo de pagamento */}
-                   <div>
-                     <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                       Tipo de pagamento
-                     </Label>
-                     <Select
-                       value={filterPaymentType}
-                       onValueChange={setFilterPaymentType}
-                     >
-                       <SelectTrigger className="w-full">
-                         <SelectValue />
-                         <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
-                       </SelectTrigger>
-                       <SelectContent>
-                         <SelectItem value="Todas">Todas</SelectItem>
-                         <SelectItem value="Entrada">Entrada</SelectItem>
-                         <SelectItem value="Saída">Saída</SelectItem>
-                       </SelectContent>
-                     </Select>
-                   </div>
-
-                   {/* Forma de pagamento */}
-                   <div>
-                     <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                       Forma de pagamento
-                     </Label>
-                     <Select
-                       value={filterPaymentMethod}
-                       onValueChange={setFilterPaymentMethod}
-                     >
-                       <SelectTrigger className="w-full">
-                         <SelectValue />
-                         <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
-                       </SelectTrigger>
-                       <SelectContent>
-                         <SelectItem value="Todas">Todas</SelectItem>
-                         <SelectItem value="Dinheiro">Dinheiro</SelectItem>
-                         <SelectItem value="Cartão de Crédito">
-                           Cartão de Crédito
-                         </SelectItem>
-                         <SelectItem value="Cartão de Débito">
-                           Cartão de Débito
-                         </SelectItem>
-                         <SelectItem value="PIX">PIX</SelectItem>
-                         <SelectItem value="Transferência">Transferência</SelectItem>
-                       </SelectContent>
-                     </Select>
-                   </div>
-
-                   {/* Valor e Nº documento */}
-                   <div className="grid grid-cols-2 gap-3">
-                     <div>
-                       <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                         Valor
-                       </Label>
-                       <Input
-                         placeholder=""
-                         value={filterValue}
-                         onChange={(e) => setFilterValue(e.target.value)}
-                         className="w-full"
-                       />
-                     </div>
-                     <div>
-                       <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                         Nº documento
-                       </Label>
-                       <Input
-                         placeholder=""
-                         value={filterDocumentNumber}
-                         onChange={(e) => setFilterDocumentNumber(e.target.value)}
-                         className="w-full"
-                       />
-                     </div>
-                   </div>
-                 </div>
-
-                 {/* Filter Actions */}
-                 <div className="p-4 border-t border-border space-y-3 rounded-b-lg">
-                   <Button
-                     className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg"
-                     onClick={() => {
-                       // Apply filters logic here
-                       console.log("Applying filters...");
-                     }}
-                   >
-                     Filtrar
-                   </Button>
-                   <Button
-                     variant="ghost"
-                     className="w-full text-green-600 hover:text-green-700 hover:bg-green-50"
-                     onClick={() => {
-                       // Clear filters logic here
-                       setFilterStatus("Em aberto");
-                       setFilterCategory("Todas categorias");
-                       setFilterPaymentType("Todas");
-                       setFilterPaymentMethod("Todas");
-                       setFilterValue("");
-                       setFilterDocumentNumber("");
-                     }}
-                   >
-                     Limpar filtros
-                   </Button>
-                 </div>
-               </div>
-             )}
-
-           {/* Main Content Area */}
+           {/* Table Content Area */}
            <div className="flex flex-1 overflow-hidden relative">
             {/* Left Content - Table */}
             <div
               className={`flex-1 p-4 lg:p-6 overflow-hidden transition-all duration-300 ${
-                showFilterSidebar ? "ml-4" : ""
-              } ${sidebarCollapsed ? "mr-16" : "mr-60"}`}
+                sidebarCollapsed ? "mr-16" : "mr-60"
+              }`}
             >
               <div className="bg-white rounded-lg border border-border h-full flex flex-col">
                 <div className="flex-1 overflow-auto scrollbar-hide">
@@ -1147,8 +1154,9 @@ export function TransactionsPage() {
               </div>
             </div>
           </div>
+           </div>
+          </div>
         </div>
-      </div>
 
       {/* Transfer Modal */}
       {showTransferModal && (
