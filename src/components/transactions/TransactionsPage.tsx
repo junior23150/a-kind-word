@@ -648,7 +648,7 @@ export function TransactionsPage() {
           {/* Main Content Area */}
           <div className="flex-1 flex flex-col">
             {/* Search and Date Filter */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-2 p-4 lg:p-6 bg-white">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-2 lg:p-4 bg-white">
               <div className="flex flex-col lg:flex-row lg:items-center gap-4">
                 <div className="flex items-center gap-3 relative">
                   {!showFilterSidebar && (
