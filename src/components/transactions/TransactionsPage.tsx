@@ -697,9 +697,9 @@ export function TransactionsPage() {
                 </Popover>
               </div>
 
-              {/* Action Buttons - Positioned at top right */}
+              {/* Action Buttons - Moved to right */}
               <div
-                className={`absolute top-4 right-4 flex items-center gap-2 z-10 ${
+                className={`flex items-center gap-2 ${
                   sidebarCollapsed ? "mr-16" : "mr-60"
                 }`}
               >
