@@ -92,7 +92,7 @@ export function TransactionsPage() {
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [showFilterSidebar, setShowFilterSidebar] = useState(false);
-  
+
   // Filter states
   const [filterStatus, setFilterStatus] = useState("Em aberto");
   const [filterCategory, setFilterCategory] = useState("Todas categorias");
@@ -437,9 +437,168 @@ export function TransactionsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="flex flex-col h-screen">
-        {/* Header */}
-        <div className="bg-white border-b border-border p-4 lg:p-6 flex-shrink-0">
+      <div className="flex h-screen">
+        {/* Filter Sidebar */}
+        {showFilterSidebar && (
+          <div className="w-80 bg-white border-r border-border flex flex-col shadow-lg">
+            {/* Filter Header */}
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4 text-gray-600" />
+                <h3 className="text-lg font-semibold text-gray-800">Filtrar</h3>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowFilterSidebar(false)}
+                className="h-6 w-6 p-0 hover:bg-gray-100"
+              >
+                <X className="h-4 w-4 text-gray-500" />
+              </Button>
+            </div>
+
+            {/* Filter Content */}
+            <div className="flex-1 overflow-y-auto p-4 space-y-6">
+              {/* Opção */}
+              <div>
+                <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                  Opção
+                </Label>
+                <Select value={filterStatus} onValueChange={setFilterStatus}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                    <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Em aberto">Em aberto</SelectItem>
+                    <SelectItem value="Em Atraso">Em Atraso</SelectItem>
+                    <SelectItem value="Pago">Pago</SelectItem>
+                    <SelectItem value="Recebido">Recebido</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Categoria */}
+              <div>
+                <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                  Categoria
+                </Label>
+                <Select value={filterCategory} onValueChange={setFilterCategory}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                    <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Todas categorias">Todas categorias</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Tipo de pagamento */}
+              <div>
+                <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                  Tipo de pagamento
+                </Label>
+                <Select value={filterPaymentType} onValueChange={setFilterPaymentType}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                    <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Todas">Todas</SelectItem>
+                    <SelectItem value="Entrada">Entrada</SelectItem>
+                    <SelectItem value="Saída">Saída</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Forma de pagamento */}
+              <div>
+                <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                  Forma de pagamento
+                </Label>
+                <Select value={filterPaymentMethod} onValueChange={setFilterPaymentMethod}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                    <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Todas">Todas</SelectItem>
+                    <SelectItem value="Dinheiro">Dinheiro</SelectItem>
+                    <SelectItem value="Cartão de Crédito">Cartão de Crédito</SelectItem>
+                    <SelectItem value="Cartão de Débito">Cartão de Débito</SelectItem>
+                    <SelectItem value="PIX">PIX</SelectItem>
+                    <SelectItem value="Transferência">Transferência</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Valor e Nº documento */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Valor
+                  </Label>
+                  <Input
+                    placeholder=""
+                    value={filterValue}
+                    onChange={(e) => setFilterValue(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Nº documento
+                  </Label>
+                  <Input
+                    placeholder=""
+                    value={filterDocumentNumber}
+                    onChange={(e) => setFilterDocumentNumber(e.target.value)}
+                    className="w-full"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Filter Actions */}
+            <div className="p-4 border-t border-border space-y-3">
+              <Button
+                className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg"
+                onClick={() => {
+                  // Apply filters logic here
+                  console.log("Applying filters...");
+                }}
+              >
+                Filtrar
+              </Button>
+              <Button
+                variant="ghost"
+                className="w-full text-green-600 hover:text-green-700 hover:bg-green-50"
+                onClick={() => {
+                  // Clear filters logic here
+                  setFilterStatus("Em aberto");
+                  setFilterCategory("Todas categorias");
+                  setFilterPaymentType("Todas");
+                  setFilterPaymentMethod("Todas");
+                  setFilterValue("");
+                  setFilterDocumentNumber("");
+                }}
+              >
+                Limpar filtros
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Main Content */}
+        <div className="flex flex-col flex-1 h-screen">
+          {/* Header */}
+          <div className="bg-white border-b border-border p-4 lg:p-6 flex-shrink-0">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-4 gap-4">
             <div className="flex flex-col lg:flex-row lg:items-center gap-4">
               <div className="flex items-center gap-2">
@@ -611,162 +770,6 @@ export function TransactionsPage() {
 
         {/* Main Content Area */}
         <div className="flex flex-1 overflow-hidden relative">
-          {/* Filter Sidebar */}
-          {showFilterSidebar && (
-            <div className="w-80 bg-white border-r border-border flex flex-col shadow-lg">
-              {/* Filter Header */}
-              <div className="flex items-center justify-between p-4 border-b border-border">
-                <div className="flex items-center gap-2">
-                  <Filter className="h-4 w-4 text-gray-600" />
-                  <h3 className="text-lg font-semibold text-gray-800">Filtrar</h3>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowFilterSidebar(false)}
-                  className="h-6 w-6 p-0 hover:bg-gray-100"
-                >
-                  <X className="h-4 w-4 text-gray-500" />
-                </Button>
-              </div>
-
-              {/* Filter Content */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-6">
-                {/* Opção */}
-                <div>
-                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                    Opção
-                  </Label>
-                  <Select value={filterStatus} onValueChange={setFilterStatus}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                      <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Em aberto">Em aberto</SelectItem>
-                      <SelectItem value="Em Atraso">Em Atraso</SelectItem>
-                      <SelectItem value="Pago">Pago</SelectItem>
-                      <SelectItem value="Recebido">Recebido</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Categoria */}
-                <div>
-                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                    Categoria
-                  </Label>
-                  <Select value={filterCategory} onValueChange={setFilterCategory}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                      <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Todas categorias">Todas categorias</SelectItem>
-                      {categories.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Tipo de pagamento */}
-                <div>
-                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                    Tipo de pagamento
-                  </Label>
-                  <Select value={filterPaymentType} onValueChange={setFilterPaymentType}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                      <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Todas">Todas</SelectItem>
-                      <SelectItem value="Entrada">Entrada</SelectItem>
-                      <SelectItem value="Saída">Saída</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Forma de pagamento */}
-                <div>
-                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                    Forma de pagamento
-                  </Label>
-                  <Select value={filterPaymentMethod} onValueChange={setFilterPaymentMethod}>
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                      <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Todas">Todas</SelectItem>
-                      <SelectItem value="Dinheiro">Dinheiro</SelectItem>
-                      <SelectItem value="Cartão de Crédito">Cartão de Crédito</SelectItem>
-                      <SelectItem value="Cartão de Débito">Cartão de Débito</SelectItem>
-                      <SelectItem value="PIX">PIX</SelectItem>
-                      <SelectItem value="Transferência">Transferência</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Valor e Nº documento */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                      Valor
-                    </Label>
-                    <Input
-                      placeholder=""
-                      value={filterValue}
-                      onChange={(e) => setFilterValue(e.target.value)}
-                      className="w-full"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                      Nº documento
-                    </Label>
-                    <Input
-                      placeholder=""
-                      value={filterDocumentNumber}
-                      onChange={(e) => setFilterDocumentNumber(e.target.value)}
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Filter Actions */}
-              <div className="p-4 border-t border-border space-y-3">
-                <Button
-                  className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg"
-                  onClick={() => {
-                    // Apply filters logic here
-                    console.log("Applying filters...");
-                  }}
-                >
-                  Filtrar
-                </Button>
-                <Button
-                  variant="ghost"
-                  className="w-full text-green-600 hover:text-green-700 hover:bg-green-50"
-                  onClick={() => {
-                    // Clear filters logic here
-                    setFilterStatus("Em aberto");
-                    setFilterCategory("Todas categorias");
-                    setFilterPaymentType("Todas");
-                    setFilterPaymentMethod("Todas");
-                    setFilterValue("");
-                    setFilterDocumentNumber("");
-                  }}
-                >
-                  Limpar filtros
-                </Button>
-              </div>
-            </div>
-          )}
           {/* Left Content - Table */}
           <div
             className={`flex-1 p-4 lg:p-6 overflow-hidden transition-all duration-300 ${
@@ -1121,6 +1124,7 @@ export function TransactionsPage() {
             </div>
           </div>
         </div>
+      </div>
       </div>
 
       {/* Transfer Modal */}
