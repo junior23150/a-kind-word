@@ -74,6 +74,7 @@ interface Transaction {
   source: string;
   original_message: string;
   user_id: string;
+  bank_account_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -102,6 +103,7 @@ export function TransactionsPage() {
   const [filterValue, setFilterValue] = useState("");
   const [filterDocumentNumber, setFilterDocumentNumber] = useState("");
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [bankAccounts, setBankAccounts] = useState<any[]>([]);
   const [selectedTransactions, setSelectedTransactions] = useState<string[]>(
     []
   );
@@ -154,9 +156,30 @@ export function TransactionsPage() {
     }
   };
 
+  // Carregar contas bancárias do Supabase
+  const fetchBankAccounts = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("bank_accounts")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("is_active", true)
+        .order("bank_name", { ascending: true });
+
+      if (error) throw error;
+
+      setBankAccounts(data || []);
+    } catch (error) {
+      console.error("Erro ao carregar contas bancárias:", error);
+    }
+  };
+
   useEffect(() => {
     if (user) {
       fetchTransactions();
+      fetchBankAccounts();
     }
   }, [user, toast]);
 
@@ -180,7 +203,11 @@ export function TransactionsPage() {
       (activeFilter === "expense" &&
         transaction.transaction_type === "expense");
 
-    return matchesSearch && matchesDateRange && matchesFilter;
+    const matchesAccount =
+      selectedAccount === "all" ||
+      transaction.bank_account_id === selectedAccount;
+
+    return matchesSearch && matchesDateRange && matchesFilter && matchesAccount;
   });
 
   const totalIncome = filteredTransactions
@@ -454,11 +481,14 @@ export function TransactionsPage() {
                 >
                   <SelectTrigger className="border-0 shadow-none p-0 h-auto font-normal text-sm text-muted-foreground hover:text-foreground">
                     <SelectValue placeholder="Todas as contas" />
-                    <ChevronDown className="h-4 w-4 ml-1" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Todas as contas</SelectItem>
-                    {/* TODO: Carregar contas reais do Supabase */}
+                    {bankAccounts.map((account) => (
+                      <SelectItem key={account.id} value={account.id}>
+                        {account.bank_name} - {account.account_type}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
