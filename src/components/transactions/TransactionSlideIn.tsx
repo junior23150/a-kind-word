@@ -41,11 +41,21 @@ interface BankAccount {
 interface TransactionSlideInProps {
   onClose: () => void;
   onTransactionAdded?: () => void;
+  existingTransaction?: {
+    id: string;
+    amount: number;
+    description: string;
+    category: string | null;
+    transaction_type: "income" | "expense";
+    date: string;
+    bank_account_id: string | null;
+  } | null;
 }
 
 export function TransactionSlideIn({
   onClose,
   onTransactionAdded,
+  existingTransaction,
 }: TransactionSlideInProps) {
   const [category, setCategory] = useState("");
   const [date, setDate] = useState<Date>(new Date());
@@ -116,6 +126,18 @@ export function TransactionSlideIn({
 
     fetchData();
   }, [user?.id, toast]);
+
+  // Preencher campos quando há transação existente para edição
+  useEffect(() => {
+    if (existingTransaction) {
+      setDescription(existingTransaction.description);
+      setValue(existingTransaction.amount.toString());
+      setType(existingTransaction.transaction_type);
+      setCategory(existingTransaction.category || "");
+      setDate(new Date(existingTransaction.date));
+      setFinancialAccount(existingTransaction.bank_account_id || "");
+    }
+  }, [existingTransaction]);
 
   // Filtrar categorias por tipo
   const filteredCategories = categories.filter((cat) => cat.type === type);

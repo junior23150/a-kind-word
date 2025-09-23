@@ -63,6 +63,7 @@ import { pt } from "date-fns/locale";
 import { TransferSlideIn } from "@/components/transactions/TransferSlideIn";
 import { TransactionSlideIn } from "@/components/transactions/TransactionSlideIn";
 import { DateFilterModal } from "@/components/transactions/DateFilterModal";
+import { BankLogo } from "@/components/ui/BankLogo";
 
 interface Transaction {
   id: string;
@@ -77,6 +78,11 @@ interface Transaction {
   bank_account_id: string | null;
   created_at: string;
   updated_at: string;
+  bank_account?: {
+    id: string;
+    bank_name: string;
+    account_type: string;
+  };
 }
 
 // Dados mockados removidos - usando apenas dados reais do Supabase
@@ -94,6 +100,7 @@ export function TransactionsPage() {
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [showFilterSidebar, setShowFilterSidebar] = useState(false);
+  const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
 
   // Filter states
   const [filterStatus, setFilterStatus] = useState("Em aberto");
@@ -137,7 +144,14 @@ export function TransactionsPage() {
       setLoading(true);
       const { data, error } = await supabase
         .from("transactions")
-        .select("*")
+        .select(`
+          *,
+          bank_account:bank_accounts (
+            id,
+            bank_name,
+            account_type
+          )
+        `)
         .eq("user_id", user.id)
         .order("date", { ascending: false });
 
@@ -373,6 +387,12 @@ export function TransactionsPage() {
     setSelectedTransactions(
       checked ? filteredTransactions.map((t) => t.id) : []
     );
+  };
+
+  // Handle transaction click for editing
+  const handleTransactionClick = (transaction: Transaction) => {
+    setEditingTransaction(transaction);
+    setShowTransactionModal(true);
   };
 
   // Handle category update
@@ -838,6 +858,9 @@ export function TransactionsPage() {
                         <th className="text-left p-2 lg:p-4 font-medium text-muted-foreground text-sm">
                           Descrição
                         </th>
+                        <th className="text-left p-2 lg:p-4 font-medium text-muted-foreground text-sm">
+                          Conta
+                        </th>
                         <th className="text-right p-2 lg:p-4 font-medium text-muted-foreground text-sm">
                           Valor
                         </th>
@@ -850,7 +873,7 @@ export function TransactionsPage() {
                       {filteredTransactions.length === 0 ? (
                         <tr>
                           <td
-                            colSpan={6}
+                            colSpan={7}
                             className="p-8 text-center text-muted-foreground"
                           >
                             Nenhuma transação encontrada
@@ -860,21 +883,23 @@ export function TransactionsPage() {
                         filteredTransactions.map((transaction) => (
                           <tr
                             key={transaction.id}
-                            className="border-b border-border hover:bg-muted/30"
+                            className="border-b border-border hover:bg-muted/30 cursor-pointer"
+                            onClick={() => handleTransactionClick(transaction)}
                           >
-                            <td className="p-2 lg:p-4">
-                              <Checkbox
-                                checked={selectedTransactions.includes(
-                                  transaction.id
-                                )}
-                                onCheckedChange={(checked) =>
-                                  handleTransactionSelect(
-                                    transaction.id,
-                                    checked as boolean
-                                  )
-                                }
-                              />
-                            </td>
+                             <td className="p-2 lg:p-4">
+                               <Checkbox
+                                 checked={selectedTransactions.includes(
+                                   transaction.id
+                                 )}
+                                 onCheckedChange={(checked) =>
+                                   handleTransactionSelect(
+                                     transaction.id,
+                                     checked as boolean
+                                   )
+                                 }
+                                 onClick={(e) => e.stopPropagation()}
+                               />
+                             </td>
                             <td className="p-2 lg:p-4 text-sm">
                               {formatDate(transaction.date)}
                             </td>
@@ -901,12 +926,13 @@ export function TransactionsPage() {
                                   </SelectContent>
                                 </Select>
                               ) : (
-                                <div
-                                  className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 p-1 rounded"
-                                  onClick={() =>
-                                    setEditingCategory(transaction.id)
-                                  }
-                                >
+                                 <div
+                                   className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 p-1 rounded"
+                                   onClick={(e) => {
+                                     e.stopPropagation();
+                                     setEditingCategory(transaction.id);
+                                   }}
+                                 >
                                   <span>
                                     {transaction.category || "Sem categoria"}
                                   </span>
@@ -914,9 +940,28 @@ export function TransactionsPage() {
                                 </div>
                               )}
                             </td>
-                            <td className="p-2 lg:p-4 text-sm max-w-xs truncate">
-                              {transaction.description}
-                            </td>
+                             <td className="p-2 lg:p-4 text-sm max-w-xs truncate">
+                               {transaction.description}
+                             </td>
+                             <td className="p-2 lg:p-4 text-sm">
+                               <div className="flex items-center gap-2">
+                                 {transaction.bank_account ? (
+                                   <>
+                                     <BankLogo
+                                       bankName={transaction.bank_account.bank_name}
+                                       size="sm"
+                                     />
+                                     <span className="text-xs">
+                                       {transaction.bank_account.bank_name}
+                                     </span>
+                                   </>
+                                 ) : (
+                                   <span className="text-muted-foreground text-xs">
+                                     Sem conta
+                                   </span>
+                                 )}
+                               </div>
+                             </td>
                             <td
                               className={`p-2 lg:p-4 text-sm text-right font-medium ${
                                 transaction.transaction_type === "income"
@@ -1179,8 +1224,12 @@ export function TransactionsPage() {
       {/* Transaction Modal */}
       {showTransactionModal && (
         <TransactionSlideIn
-          onClose={() => setShowTransactionModal(false)}
+          onClose={() => {
+            setShowTransactionModal(false);
+            setEditingTransaction(null);
+          }}
           onTransactionAdded={fetchTransactions}
+          existingTransaction={editingTransaction}
         />
       )}
     </div>
