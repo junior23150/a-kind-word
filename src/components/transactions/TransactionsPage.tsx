@@ -440,7 +440,7 @@ export function TransactionsPage() {
     <div className="min-h-screen bg-background">
       <div className="flex flex-col h-screen">
         {/* Header */}
-        <div className="bg-white p-4 lg:p-6 flex-shrink-0">
+        <div className="bg-white p-2 lg:p-4 flex-shrink-0">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between mb-4 gap-4">
             <div className="flex flex-col lg:flex-row lg:items-center gap-4">
               <div className="flex items-center gap-2">
