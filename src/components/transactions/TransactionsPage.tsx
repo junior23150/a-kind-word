@@ -471,7 +471,7 @@ export function TransactionsPage() {
         <div className="flex gap-4 flex-1 overflow-hidden">
           {/* Filter Sidebar */}
           {showFilterSidebar && (
-            <div className="w-80 bg-white border border-gray-200 rounded-lg shadow-lg flex flex-col">
+            <div className="w-56 bg-white border border-gray-200 rounded-lg shadow-lg flex flex-col ml-4">
               {/* Filter Header */}
               <div className="flex items-center justify-between p-4 border-b border-border rounded-t-lg">
                 <div className="flex items-center gap-2">
