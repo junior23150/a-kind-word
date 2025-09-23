@@ -771,8 +771,6 @@ export function TransactionsPage() {
           {/* Left Content - Table */}
           <div
             className={`flex-1 p-4 lg:p-6 overflow-hidden transition-all duration-300 ${
-              showFilterSidebar ? "ml-80" : "ml-0"
-            } ${
               sidebarCollapsed ? "mr-16" : "mr-60"
             }`}
           >
