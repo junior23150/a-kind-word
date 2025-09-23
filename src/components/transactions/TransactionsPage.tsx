@@ -500,7 +500,6 @@ export function TransactionsPage() {
                   <Select value={filterStatus} onValueChange={setFilterStatus}>
                     <SelectTrigger className="w-full">
                       <SelectValue />
-                      <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Em aberto">Em aberto</SelectItem>
@@ -522,7 +521,6 @@ export function TransactionsPage() {
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue />
-                      <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Todas categorias">
@@ -548,7 +546,6 @@ export function TransactionsPage() {
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue />
-                      <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Todas">Todas</SelectItem>
@@ -569,7 +566,6 @@ export function TransactionsPage() {
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue />
-                      <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Todas">Todas</SelectItem>
@@ -588,30 +584,17 @@ export function TransactionsPage() {
                   </Select>
                 </div>
 
-                {/* Valor e Nº documento */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                      Valor
-                    </Label>
-                    <Input
-                      placeholder=""
-                      value={filterValue}
-                      onChange={(e) => setFilterValue(e.target.value)}
-                      className="w-full"
-                    />
-                  </div>
-                  <div>
-                    <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                      Nº documento
-                    </Label>
-                    <Input
-                      placeholder=""
-                      value={filterDocumentNumber}
-                      onChange={(e) => setFilterDocumentNumber(e.target.value)}
-                      className="w-full"
-                    />
-                  </div>
+                {/* Valor */}
+                <div>
+                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Valor
+                  </Label>
+                  <Input
+                    placeholder=""
+                    value={filterValue}
+                    onChange={(e) => setFilterValue(e.target.value)}
+                    className="w-full"
+                  />
                 </div>
               </div>
 
