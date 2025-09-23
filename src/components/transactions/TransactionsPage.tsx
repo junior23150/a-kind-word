@@ -41,6 +41,7 @@ import {
   MoreVertical,
   Check,
   DollarSign,
+  Filter,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -90,6 +91,15 @@ export function TransactionsPage() {
   const [showCalendar, setShowCalendar] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [showTransactionModal, setShowTransactionModal] = useState(false);
+  const [showFilterSidebar, setShowFilterSidebar] = useState(false);
+  
+  // Filter states
+  const [filterStatus, setFilterStatus] = useState("Em aberto");
+  const [filterCategory, setFilterCategory] = useState("Todas categorias");
+  const [filterPaymentType, setFilterPaymentType] = useState("Todas");
+  const [filterPaymentMethod, setFilterPaymentMethod] = useState("Todas");
+  const [filterValue, setFilterValue] = useState("");
+  const [filterDocumentNumber, setFilterDocumentNumber] = useState("");
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [selectedTransactions, setSelectedTransactions] = useState<string[]>(
     []
@@ -457,14 +467,24 @@ export function TransactionsPage() {
           {/* Search and Date Filter */}
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-4">
             <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-              <div className="relative w-full lg:w-96">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-                <Input
-                  placeholder="Pesquisa por nome ou histórico"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 rounded-xl"
-                />
+              <div className="flex items-center gap-3">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowFilterSidebar(!showFilterSidebar)}
+                  className="h-10 w-12 px-0 rounded-xl border-gray-300 hover:bg-gray-50"
+                >
+                  <Filter className="h-4 w-4 text-green-600" />
+                </Button>
+                <div className="relative w-full lg:w-96">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                  <Input
+                    placeholder="Pesquisa por nome ou histórico"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10 rounded-xl"
+                  />
+                </div>
               </div>
 
               <Popover open={showCalendar} onOpenChange={setShowCalendar}>
@@ -591,6 +611,162 @@ export function TransactionsPage() {
 
         {/* Main Content Area */}
         <div className="flex flex-1 overflow-hidden relative">
+          {/* Filter Sidebar */}
+          {showFilterSidebar && (
+            <div className="w-80 bg-white border-r border-border flex flex-col shadow-lg">
+              {/* Filter Header */}
+              <div className="flex items-center justify-between p-4 border-b border-border">
+                <div className="flex items-center gap-2">
+                  <Filter className="h-4 w-4 text-gray-600" />
+                  <h3 className="text-lg font-semibold text-gray-800">Filtrar</h3>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowFilterSidebar(false)}
+                  className="h-6 w-6 p-0 hover:bg-gray-100"
+                >
+                  <X className="h-4 w-4 text-gray-500" />
+                </Button>
+              </div>
+
+              {/* Filter Content */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-6">
+                {/* Opção */}
+                <div>
+                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Opção
+                  </Label>
+                  <Select value={filterStatus} onValueChange={setFilterStatus}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                      <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Em aberto">Em aberto</SelectItem>
+                      <SelectItem value="Em Atraso">Em Atraso</SelectItem>
+                      <SelectItem value="Pago">Pago</SelectItem>
+                      <SelectItem value="Recebido">Recebido</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Categoria */}
+                <div>
+                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Categoria
+                  </Label>
+                  <Select value={filterCategory} onValueChange={setFilterCategory}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                      <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Todas categorias">Todas categorias</SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Tipo de pagamento */}
+                <div>
+                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Tipo de pagamento
+                  </Label>
+                  <Select value={filterPaymentType} onValueChange={setFilterPaymentType}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                      <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Todas">Todas</SelectItem>
+                      <SelectItem value="Entrada">Entrada</SelectItem>
+                      <SelectItem value="Saída">Saída</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Forma de pagamento */}
+                <div>
+                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Forma de pagamento
+                  </Label>
+                  <Select value={filterPaymentMethod} onValueChange={setFilterPaymentMethod}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                      <ChevronDown className="h-4 w-4 ml-2 text-gray-400" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Todas">Todas</SelectItem>
+                      <SelectItem value="Dinheiro">Dinheiro</SelectItem>
+                      <SelectItem value="Cartão de Crédito">Cartão de Crédito</SelectItem>
+                      <SelectItem value="Cartão de Débito">Cartão de Débito</SelectItem>
+                      <SelectItem value="PIX">PIX</SelectItem>
+                      <SelectItem value="Transferência">Transferência</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Valor e Nº documento */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                      Valor
+                    </Label>
+                    <Input
+                      placeholder=""
+                      value={filterValue}
+                      onChange={(e) => setFilterValue(e.target.value)}
+                      className="w-full"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                      Nº documento
+                    </Label>
+                    <Input
+                      placeholder=""
+                      value={filterDocumentNumber}
+                      onChange={(e) => setFilterDocumentNumber(e.target.value)}
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Filter Actions */}
+              <div className="p-4 border-t border-border space-y-3">
+                <Button
+                  className="w-full bg-green-600 hover:bg-green-700 text-white rounded-lg"
+                  onClick={() => {
+                    // Apply filters logic here
+                    console.log("Applying filters...");
+                  }}
+                >
+                  Filtrar
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full text-green-600 hover:text-green-700 hover:bg-green-50"
+                  onClick={() => {
+                    // Clear filters logic here
+                    setFilterStatus("Em aberto");
+                    setFilterCategory("Todas categorias");
+                    setFilterPaymentType("Todas");
+                    setFilterPaymentMethod("Todas");
+                    setFilterValue("");
+                    setFilterDocumentNumber("");
+                  }}
+                >
+                  Limpar filtros
+                </Button>
+              </div>
+            </div>
+          )}
           {/* Left Content - Table */}
           <div
             className={`flex-1 p-4 lg:p-6 overflow-hidden transition-all duration-300 ${
@@ -725,50 +901,50 @@ export function TransactionsPage() {
                                 );
                               })()}
 
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="h-6 w-6 p-0 hover:bg-gray-100 rounded-sm"
-                                    >
-                                      <MoreVertical className="h-3 w-3 text-gray-600" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent
-                                    align="end"
-                                    className="w-56 py-1"
-                                    sideOffset={5}
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="h-6 w-6 p-0 hover:bg-gray-100 rounded-sm"
                                   >
-                                    <DropdownMenuItem
-                                      onClick={() =>
-                                        handleFullPayment(transaction.id)
-                                      }
-                                      className="flex items-center gap-3 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50"
-                                    >
-                                      <Check className="h-4 w-4 text-green-600" />
-                                      Baixa total do pagamento
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                      onClick={() =>
-                                        handlePartialPayment(transaction.id)
-                                      }
-                                      className="flex items-center gap-3 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50"
-                                    >
-                                      <Check className="h-4 w-4 text-green-600" />
-                                      Baixa parcial do pagamento
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem
-                                      onClick={() =>
-                                        handleDeleteTransaction(transaction.id)
-                                      }
-                                      className="flex items-center gap-3 px-3 py-2 text-sm cursor-pointer hover:bg-red-50 text-red-600"
-                                    >
-                                      <Trash2 className="h-4 w-4 text-red-600" />
-                                      Excluir
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
+                                    <MoreVertical className="h-3 w-3 text-gray-600" />
+                                  </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent
+                                  align="end"
+                                  className="w-56 py-1"
+                                  sideOffset={5}
+                                >
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      handleFullPayment(transaction.id)
+                                    }
+                                    className="flex items-center gap-3 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50"
+                                  >
+                                    <Check className="h-4 w-4 text-green-600" />
+                                    Baixa total do pagamento
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      handlePartialPayment(transaction.id)
+                                    }
+                                    className="flex items-center gap-3 px-3 py-2 text-sm cursor-pointer hover:bg-gray-50"
+                                  >
+                                    <Check className="h-4 w-4 text-green-600" />
+                                    Baixa parcial do pagamento
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() =>
+                                      handleDeleteTransaction(transaction.id)
+                                    }
+                                    className="flex items-center gap-3 px-3 py-2 text-sm cursor-pointer hover:bg-red-50 text-red-600"
+                                  >
+                                    <Trash2 className="h-4 w-4 text-red-600" />
+                                    Excluir
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </div>
                           </td>
                         </tr>
