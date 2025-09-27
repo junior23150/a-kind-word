@@ -550,7 +550,7 @@ export function TransactionSlideIn({
                 htmlFor="description"
                 className="text-sm font-medium text-gray-700"
               >
-                Histórico <span className="text-red-500">*</span>
+                Descrição <span className="text-red-500">*</span>
               </Label>
               <Textarea
                 id="description"
