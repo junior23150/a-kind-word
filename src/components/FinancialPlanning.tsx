@@ -94,6 +94,9 @@ export function FinancialPlanning() {
     date: "",
     category: "",
     notes: "",
+    isRecurring: false,
+    recurrenceType: "",
+    installments: "",
   });
 
   const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
@@ -210,6 +213,9 @@ export function FinancialPlanning() {
           available: Number.parseFloat(entryForm.value.replace(/[^\d,]/g, "").replace(",", ".")) || 0,
           type: "Entrada",
           notes: entryForm.notes,
+          isRecurring: entryForm.isRecurring,
+          recurrenceType: entryForm.recurrenceType,
+          installments: entryForm.installments,
         };
         setEntries((prev) => [...prev, newEntry]);
       }
@@ -220,6 +226,9 @@ export function FinancialPlanning() {
         date: "",
         category: "",
         notes: "",
+        isRecurring: false,
+        recurrenceType: "",
+        installments: "",
       });
       setEditingEntry(null);
       setFormStep(1);
@@ -513,13 +522,16 @@ export function FinancialPlanning() {
                   if (!open) {
                     setFormStep(1);
                     setEditingEntry(null);
-                    setEntryForm({
-                      description: "",
-                      value: "",
-                      date: "",
-                      category: "",
-                      notes: "",
-                    });
+                      setEntryForm({
+                        description: "",
+                        value: "",
+                        date: "",
+                        category: "",
+                        notes: "",
+                        isRecurring: false,
+                        recurrenceType: "",
+                        installments: "",
+                      });
                   }
                 }}
               >
@@ -638,15 +650,22 @@ export function FinancialPlanning() {
                                   ))}
                                 </SelectContent>
                               </Select>
-                            ) : (
-                              <Badge variant="outline" className="capitalize">
-                                {
-                                  [...incomeCategories, ...customIncomeCategories].find(
-                                    (cat) => cat.id === entry.category,
-                                  )?.name
-                                }
-                              </Badge>
-                            )}
+                             ) : (
+                               <div className="flex items-center gap-2 flex-wrap">
+                                 <Badge variant="outline" className="capitalize">
+                                   {
+                                     [...incomeCategories, ...customIncomeCategories].find(
+                                       (cat) => cat.id === entry.category,
+                                     )?.name || entry.category
+                                   }
+                                 </Badge>
+                                 {entry.isRecurring && (
+                                   <Badge className="bg-purple-100 text-purple-800 border-purple-200 text-xs">
+                                     Recorrente
+                                   </Badge>
+                                 )}
+                               </div>
+                             )}
                           </TableCell>
                           <TableCell className="text-center">
                             {isEditing ? (
