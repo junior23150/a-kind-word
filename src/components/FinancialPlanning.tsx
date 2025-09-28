@@ -132,9 +132,31 @@ export function FinancialPlanning() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isExpenseSheetOpen, setIsExpenseSheetOpen] = useState(false);
 
-  const totalIncome = entries.reduce((sum, entry) => sum + entry.value, 0);
-  const totalPlanned = expenses.reduce((sum, expense) => sum + expense.planned, 0);
-  const totalSpent = expenses.reduce((sum, expense) => sum + expense.spent, 0);
+  // Helper function to get month index from name
+  const getMonthIndex = (monthName: string) => {
+    return months.indexOf(monthName);
+  };
+
+  // Filter entries and expenses by selected month
+  const filteredEntries = entries.filter((entry) => {
+    if (!entry.date) return false;
+    const entryDate = new Date(entry.date);
+    const entryMonth = entryDate.getMonth();
+    const selectedMonthIndex = getMonthIndex(selectedMonth);
+    return entryMonth === selectedMonthIndex;
+  });
+
+  const filteredExpenses = expenses.filter((expense) => {
+    if (!expense.date) return false;
+    const expenseDate = new Date(expense.date);
+    const expenseMonth = expenseDate.getMonth();
+    const selectedMonthIndex = getMonthIndex(selectedMonth);
+    return expenseMonth === selectedMonthIndex;
+  });
+
+  const totalIncome = filteredEntries.reduce((sum, entry) => sum + entry.value, 0);
+  const totalPlanned = filteredExpenses.reduce((sum, expense) => sum + expense.planned, 0);
+  const totalSpent = filteredExpenses.reduce((sum, expense) => sum + expense.spent, 0);
   const totalAvailable = totalIncome - totalSpent;
 
   const formatCurrency = (value: number) => {
@@ -337,7 +359,7 @@ export function FinancialPlanning() {
               <Separator />
               <div className="space-y-2">
                 <h4 className="font-medium">Suas Entradas</h4>
-                {entries.map((entry) => (
+                {filteredEntries.map((entry) => (
                   <div key={entry.id} className="flex justify-between items-center py-2">
                     <span className="text-sm">{entry.description}</span>
                     <span className="font-medium">R$ {formatCurrency(entry.value)}</span>
@@ -467,7 +489,7 @@ export function FinancialPlanning() {
             <div className="flex items-center justify-center gap-4">
               <Calendar className="h-5 w-5 text-purple-600" />
               <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                <SelectTrigger className="w-48 border-purple-200 focus:border-purple-500">
+                <SelectTrigger className="w-48 border-purple-200 focus:border-purple-500 rounded-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -596,7 +618,7 @@ export function FinancialPlanning() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {entries.map((entry) => {
+                    {filteredEntries.map((entry) => {
                       const Icon = getCategoryIcon(entry.category);
                       const colorClass = getCategoryColor(entry.category);
                       const isEditing = editingRowId === entry.id;
@@ -609,7 +631,7 @@ export function FinancialPlanning() {
                                 type="date"
                                 value={editingRowData.date || entry.date}
                                 onChange={(e) => setEditingRowData((prev) => ({ ...prev, date: e.target.value }))}
-                                className="h-8 text-sm"
+                                className="h-8 text-sm rounded-3xl"
                               />
                             ) : (
                               entry.date
@@ -622,7 +644,7 @@ export function FinancialPlanning() {
                                 onChange={(e) =>
                                   setEditingRowData((prev) => ({ ...prev, description: e.target.value }))
                                 }
-                                className="h-8 text-sm"
+                                className="h-8 text-sm rounded-3xl"
                                 placeholder="Descrição"
                               />
                             ) : (
@@ -640,9 +662,9 @@ export function FinancialPlanning() {
                                 value={editingRowData.category || entry.category}
                                 onValueChange={(value) => setEditingRowData((prev) => ({ ...prev, category: value }))}
                               >
-                                <SelectTrigger className="h-8 text-sm">
-                                  <SelectValue />
-                                </SelectTrigger>
+                <SelectTrigger className="h-8 text-sm rounded-3xl">
+                  <SelectValue />
+                </SelectTrigger>
                                 <SelectContent>
                                   {[...incomeCategories, ...customIncomeCategories].map((category) => (
                                     <SelectItem key={category.id} value={category.id}>
@@ -678,7 +700,7 @@ export function FinancialPlanning() {
                               <Input
                                 value={editingRowData.value || entry.value.toString()}
                                 onChange={(e) => setEditingRowData((prev) => ({ ...prev, value: e.target.value }))}
-                                className="h-8 text-sm text-center"
+                                className="h-8 text-sm text-center rounded-3xl"
                                 placeholder="0,00"
                               />
                             ) : (
@@ -856,7 +878,7 @@ export function FinancialPlanning() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {expenses.map((expense) => {
+                    {filteredExpenses.map((expense) => {
                       const Icon = getCategoryIcon(expense.category);
                       const colorClass = getCategoryColor(expense.category);
                       const isEditing = editingRowId === expense.id;
@@ -869,7 +891,7 @@ export function FinancialPlanning() {
                                 type="date"
                                 value={editingRowData.date || expense.date}
                                 onChange={(e) => setEditingRowData((prev) => ({ ...prev, date: e.target.value }))}
-                                className="h-8 text-sm"
+                                className="h-8 text-sm rounded-3xl"
                               />
                             ) : (
                               expense.date
@@ -882,7 +904,7 @@ export function FinancialPlanning() {
                                 onChange={(e) =>
                                   setEditingRowData((prev) => ({ ...prev, description: e.target.value }))
                                 }
-                                className="h-8 text-sm"
+                                className="h-8 text-sm rounded-3xl"
                                 placeholder="Descrição"
                               />
                             ) : (
@@ -900,9 +922,9 @@ export function FinancialPlanning() {
                                 value={editingRowData.category || expense.category}
                                 onValueChange={(value) => setEditingRowData((prev) => ({ ...prev, category: value }))}
                               >
-                                <SelectTrigger className="h-8 text-sm">
-                                  <SelectValue />
-                                </SelectTrigger>
+                <SelectTrigger className="h-8 text-sm rounded-3xl">
+                  <SelectValue />
+                </SelectTrigger>
                                 <SelectContent>
                                   {[...categories, ...customExpenseCategories].map((category) => (
                                     <SelectItem key={category.id} value={category.id}>
@@ -930,7 +952,7 @@ export function FinancialPlanning() {
                               <Input
                                 value={editingRowData.planned || expense.planned.toString()}
                                 onChange={(e) => setEditingRowData((prev) => ({ ...prev, planned: e.target.value }))}
-                                className="h-8 text-sm text-center"
+                                className="h-8 text-sm text-center rounded-3xl"
                                 placeholder="0,00"
                               />
                             ) : (
