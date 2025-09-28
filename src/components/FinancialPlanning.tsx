@@ -87,6 +87,7 @@ const months = [
 export function FinancialPlanning() {
   const { user } = useAuth();
   const [selectedMonth, setSelectedMonth] = useState("Outubro");
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [formStep, setFormStep] = useState(1);
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -216,7 +217,7 @@ export function FinancialPlanning() {
     return months.indexOf(monthName);
   };
 
-  // Filter entries and expenses by selected month
+  // Filter entries and expenses by selected month and year
   const filteredEntries = entries.filter((entry) => {
     if (!entry.date) return false;
     // Se a data está em formato ISO (YYYY-MM-DD), usar diretamente
@@ -231,8 +232,9 @@ export function FinancialPlanning() {
       entryDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
     }
     const entryMonth = entryDate.getMonth();
+    const entryYear = entryDate.getFullYear();
     const selectedMonthIndex = getMonthIndex(selectedMonth);
-    return entryMonth === selectedMonthIndex;
+    return entryMonth === selectedMonthIndex && entryYear === selectedYear;
   });
 
   const filteredExpenses = expenses.filter((expense) => {
@@ -249,8 +251,9 @@ export function FinancialPlanning() {
       expenseDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
     }
     const expenseMonth = expenseDate.getMonth();
+    const expenseYear = expenseDate.getFullYear();
     const selectedMonthIndex = getMonthIndex(selectedMonth);
-    return expenseMonth === selectedMonthIndex;
+    return expenseMonth === selectedMonthIndex && expenseYear === selectedYear;
   });
 
   const totalIncome = filteredEntries.reduce((sum, entry) => sum + entry.value, 0);
@@ -314,12 +317,44 @@ export function FinancialPlanning() {
     setDeleteConfirmOpen(true);
   };
 
-  const confirmDelete = () => {
-    if (deleteType === "entry") {
-      setEntries((prev) => prev.filter((entry) => entry.id !== itemToDelete.id));
-    } else {
-      setExpenses((prev) => prev.filter((expense) => expense.id !== itemToDelete.id));
+  const confirmDelete = async () => {
+    try {
+      if (deleteType === "entry") {
+        // Remover do banco de dados
+        const { error } = await supabase
+          .from('transactions')
+          .delete()
+          .eq('id', itemToDelete.id);
+
+        if (error) {
+          console.error('Error deleting entry:', error);
+          toast.error('Erro ao excluir entrada do banco de dados');
+          return;
+        }
+
+        setEntries((prev) => prev.filter((entry) => entry.id !== itemToDelete.id));
+        toast.success('Entrada excluída com sucesso!');
+      } else {
+        // Remover despesa do banco de dados
+        const { error } = await supabase
+          .from('transactions')
+          .delete()
+          .eq('id', itemToDelete.id);
+
+        if (error) {
+          console.error('Error deleting expense:', error);
+          toast.error('Erro ao excluir despesa do banco de dados');
+          return;
+        }
+
+        setExpenses((prev) => prev.filter((expense) => expense.id !== itemToDelete.id));
+        toast.success('Despesa excluída com sucesso!');
+      }
+    } catch (error) {
+      console.error('Unexpected error during deletion:', error);
+      toast.error('Erro inesperado ao excluir item');
     }
+
     setDeleteConfirmOpen(false);
     setItemToDelete(null);
     setDeleteType("");
@@ -809,6 +844,18 @@ export function FinancialPlanning() {
                   ))}
                 </SelectContent>
               </Select>
+              <Select value={selectedYear.toString()} onValueChange={(value) => setSelectedYear(parseInt(value))}>
+                <SelectTrigger className="w-32 border-purple-200 focus:border-purple-500 rounded-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - 2 + i).map((year) => (
+                    <SelectItem key={year} value={year.toString()}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
@@ -961,7 +1008,7 @@ export function FinancialPlanning() {
                                 <div className={`p-1 rounded ${colorClass}`}>
                                   <Icon className="h-3 w-3 text-white" />
                                 </div>
-                                <span className="font-medium">{entry.description}</span>
+                                <span className="font-medium">{entry.notes || entry.description}</span>
                               </div>
                             )}
                           </TableCell>
