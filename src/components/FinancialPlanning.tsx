@@ -20,6 +20,9 @@ import {
   ArrowRight,
   CheckCircle,
 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -82,6 +85,7 @@ const months = [
 ];
 
 export function FinancialPlanning() {
+  const { user } = useAuth();
   const [selectedMonth, setSelectedMonth] = useState("Outubro");
   const [formStep, setFormStep] = useState(1);
   const [entries, setEntries] = useState([]);
@@ -209,197 +213,267 @@ export function FinancialPlanning() {
     setDeleteType("");
   };
 
-  const handleSaveEntry = () => {
-    if (entryForm.category) {
-      if (editingEntry) {
-        setEntries((prev) =>
-          prev.map((entry) =>
-            entry.id === editingEntry.id
-              ? {
-                  ...entry,
-                  description: entryForm.description || "Nova Entrada",
-                  value: Number.parseFloat(entryForm.value.replace(/[^\d,]/g, "").replace(",", ".")) || 0,
-                  date: entryForm.date || new Date().toLocaleDateString("pt-BR"),
-                  category: entryForm.category,
-                  notes: entryForm.notes,
-                  available: Number.parseFloat(entryForm.value.replace(/[^\d,]/g, "").replace(",", ".")) || 0,
-                }
-              : entry,
-          ),
-        );
-      } else {
-        const baseDate = new Date(entryForm.date || new Date());
-        const baseEntry = {
-          date: entryForm.date || new Date().toLocaleDateString("pt-BR"),
-          description: entryForm.description || "Nova Entrada",
-          category: entryForm.category,
-          value: Number.parseFloat(entryForm.value.replace(/[^\d,]/g, "").replace(",", ".")) || 0,
-          spent: 0,
-          available: Number.parseFloat(entryForm.value.replace(/[^\d,]/g, "").replace(",", ".")) || 0,
-          type: "Entrada",
-          notes: entryForm.notes,
-          isRecurring: entryForm.isRecurring,
-          recurrenceType: entryForm.recurrenceType,
-          installments: entryForm.installments,
-        };
-
-        const newEntries = [];
-
-        if (entryForm.isRecurring && entryForm.recurrenceType) {
-          let monthsToCreate = 1;
-          
-          switch (entryForm.recurrenceType) {
-            case 'parcelada':
-              monthsToCreate = parseInt(entryForm.installments) || 1;
-              break;
-            case 'mensal':
-            case 'anual':
-              monthsToCreate = 12;
-              break;
-            case 'trimestral':
-              monthsToCreate = 3;
-              break;
-            case 'semestral':
-              monthsToCreate = 6;
-              break;
-            default:
-              monthsToCreate = 1;
-          }
-
-          for (let i = 0; i < monthsToCreate; i++) {
-            const entryDate = new Date(baseDate);
-            entryDate.setMonth(entryDate.getMonth() + i);
-            
-            const newEntry = {
-              ...baseEntry,
-              id: Date.now() + i,
-              date: entryDate.toLocaleDateString("pt-BR"),
-              description: entryForm.isRecurring ? 
-                `${baseEntry.description} ${entryForm.recurrenceType === 'parcelada' ? `(${i + 1}/${monthsToCreate})` : '(Recorrente)'}` : 
-                baseEntry.description,
-            };
-            newEntries.push(newEntry);
-          }
+  const handleSaveEntry = async () => {
+    if (entryForm.category && user) {
+      try {
+        if (editingEntry) {
+          setEntries((prev) =>
+            prev.map((entry) =>
+              entry.id === editingEntry.id
+                ? {
+                    ...entry,
+                    description: entryForm.description || "Nova Entrada",
+                    value: Number.parseFloat(entryForm.value.replace(/[^\d,]/g, "").replace(",", ".")) || 0,
+                    date: entryForm.date || new Date().toLocaleDateString("pt-BR"),
+                    category: entryForm.category,
+                    notes: entryForm.notes,
+                    available: Number.parseFloat(entryForm.value.replace(/[^\d,]/g, "").replace(",", ".")) || 0,
+                  }
+                : entry,
+            ),
+          );
         } else {
-          newEntries.push({
-            ...baseEntry,
-            id: Date.now(),
-          });
+          const baseDate = new Date(entryForm.date || new Date());
+          const baseAmount = Number.parseFloat(entryForm.value.replace(/[^\d,]/g, "").replace(",", ".")) || 0;
+          
+          const transactionsToCreate = [];
+
+          if (entryForm.isRecurring && entryForm.recurrenceType) {
+            let monthsToCreate = 1;
+            
+            switch (entryForm.recurrenceType) {
+              case 'parcelada':
+                monthsToCreate = parseInt(entryForm.installments) || 1;
+                break;
+              case 'mensal':
+              case 'anual':
+                monthsToCreate = 12;
+                break;
+              case 'trimestral':
+                monthsToCreate = 3;
+                break;
+              case 'semestral':
+                monthsToCreate = 6;
+                break;
+              default:
+                monthsToCreate = 1;
+            }
+
+            for (let i = 0; i < monthsToCreate; i++) {
+              const transactionDate = new Date(baseDate);
+              transactionDate.setMonth(transactionDate.getMonth() + i);
+              
+              const description = entryForm.isRecurring ? 
+                `${entryForm.description || "Nova Entrada"} ${entryForm.recurrenceType === 'parcelada' ? `(${i + 1}/${monthsToCreate})` : '(Recorrente)'}` : 
+                (entryForm.description || "Nova Entrada");
+
+              transactionsToCreate.push({
+                user_id: user.id,
+                amount: baseAmount,
+                description: description,
+                category: entryForm.category,
+                transaction_type: 'income',
+                date: transactionDate.toISOString().split('T')[0],
+                source: 'planning',
+                original_message: `Planejamento - ${description}`,
+              });
+            }
+          } else {
+            transactionsToCreate.push({
+              user_id: user.id,
+              amount: baseAmount,
+              description: entryForm.description || "Nova Entrada",
+              category: entryForm.category,
+              transaction_type: 'income',
+              date: baseDate.toISOString().split('T')[0],
+              source: 'planning',
+              original_message: `Planejamento - ${entryForm.description || "Nova Entrada"}`,
+            });
+          }
+
+          // Salvar no banco de dados
+          const { data, error } = await supabase
+            .from('transactions')
+            .insert(transactionsToCreate)
+            .select();
+
+          if (error) {
+            console.error('Error saving transactions:', error);
+            toast.error('Erro ao salvar entrada no banco de dados');
+            return;
+          }
+
+          // Atualizar estado local para exibição imediata
+          const newEntries = transactionsToCreate.map((transaction, index) => ({
+            id: data?.[index]?.id || Date.now() + index,
+            date: new Date(transaction.date).toLocaleDateString("pt-BR"),
+            description: transaction.description,
+            category: transaction.category,
+            value: transaction.amount,
+            spent: 0,
+            available: transaction.amount,
+            type: "Entrada",
+            notes: entryForm.notes,
+            isRecurring: entryForm.isRecurring,
+            recurrenceType: entryForm.recurrenceType,
+            installments: entryForm.installments,
+          }));
+
+          setEntries((prev) => [...prev, ...newEntries]);
+          toast.success(`${transactionsToCreate.length > 1 ? transactionsToCreate.length + ' entradas' : 'Entrada'} criada${transactionsToCreate.length > 1 ? 's' : ''} com sucesso!`);
         }
 
-        setEntries((prev) => [...prev, ...newEntries]);
+        setEntryForm({
+          description: "",
+          value: "",
+          date: "",
+          category: "",
+          notes: "",
+          isRecurring: false,
+          recurrenceType: "",
+          installments: "",
+        });
+        setEditingEntry(null);
+        setFormStep(1);
+        setIsSheetOpen(false);
+      } catch (error) {
+        console.error('Error in handleSaveEntry:', error);
+        toast.error('Erro inesperado ao salvar entrada');
       }
-
-      setEntryForm({
-        description: "",
-        value: "",
-        date: "",
-        category: "",
-        notes: "",
-        isRecurring: false,
-        recurrenceType: "",
-        installments: "",
-      });
-      setEditingEntry(null);
-      setFormStep(1);
-      setIsSheetOpen(false);
+    } else {
+      toast.error('Por favor, selecione uma categoria');
     }
   };
 
-  const handleSaveExpense = () => {
-    if (expenseForm.category) {
-      if (editingExpense) {
-        setExpenses((prev) =>
-          prev.map((expense) =>
-            expense.id === editingExpense.id
-              ? {
-                  ...expense,
-                  description: expenseForm.description || "Nova Despesa",
-                  planned: Number.parseFloat(expenseForm.planned.replace(/[^\d,]/g, "").replace(",", ".")) || 0,
-                  date: expenseForm.date || new Date().toLocaleDateString("pt-BR"),
-                  category: expenseForm.category,
-                  notes: expenseForm.notes,
-                  available: Number.parseFloat(expenseForm.planned.replace(/[^\d,]/g, "").replace(",", ".")) || 0,
-                }
-              : expense,
-          ),
-        );
-      } else {
-        const baseDate = new Date(expenseForm.date || new Date());
-        const baseExpense = {
-          date: expenseForm.date || new Date().toLocaleDateString("pt-BR"),
-          description: expenseForm.description || "Nova Despesa",
-          category: expenseForm.category,
-          planned: Number.parseFloat(expenseForm.planned.replace(/[^\d,]/g, "").replace(",", ".")) || 0,
-          spent: 0,
-          available: Number.parseFloat(expenseForm.planned.replace(/[^\d,]/g, "").replace(",", ".")) || 0,
-          type: "Despesa",
-          notes: expenseForm.notes,
-          isRecurring: expenseForm.isRecurring,
-          recurrenceType: expenseForm.recurrenceType,
-          installments: expenseForm.installments,
-        };
-
-        const newExpenses = [];
-
-        if (expenseForm.isRecurring && expenseForm.recurrenceType) {
-          let monthsToCreate = 1;
-          
-          switch (expenseForm.recurrenceType) {
-            case 'parcelada':
-              monthsToCreate = parseInt(expenseForm.installments) || 1;
-              break;
-            case 'mensal':
-            case 'anual':
-              monthsToCreate = 12;
-              break;
-            case 'trimestral':
-              monthsToCreate = 3;
-              break;
-            case 'semestral':
-              monthsToCreate = 6;
-              break;
-            default:
-              monthsToCreate = 1;
-          }
-
-          for (let i = 0; i < monthsToCreate; i++) {
-            const expenseDate = new Date(baseDate);
-            expenseDate.setMonth(expenseDate.getMonth() + i);
-            
-            const newExpense = {
-              ...baseExpense,
-              id: Date.now() + i,
-              date: expenseDate.toLocaleDateString("pt-BR"),
-              description: expenseForm.isRecurring ? 
-                `${baseExpense.description} ${expenseForm.recurrenceType === 'parcelada' ? `(${i + 1}/${monthsToCreate})` : '(Recorrente)'}` : 
-                baseExpense.description,
-            };
-            newExpenses.push(newExpense);
-          }
+  const handleSaveExpense = async () => {
+    if (expenseForm.category && user) {
+      try {
+        if (editingExpense) {
+          setExpenses((prev) =>
+            prev.map((expense) =>
+              expense.id === editingExpense.id
+                ? {
+                    ...expense,
+                    description: expenseForm.description || "Nova Despesa",
+                    planned: Number.parseFloat(expenseForm.planned.replace(/[^\d,]/g, "").replace(",", ".")) || 0,
+                    date: expenseForm.date || new Date().toLocaleDateString("pt-BR"),
+                    category: expenseForm.category,
+                    notes: expenseForm.notes,
+                    available: Number.parseFloat(expenseForm.planned.replace(/[^\d,]/g, "").replace(",", ".")) || 0,
+                  }
+                : expense,
+            ),
+          );
         } else {
-          newExpenses.push({
-            ...baseExpense,
-            id: Date.now(),
-          });
+          const baseDate = new Date(expenseForm.date || new Date());
+          const baseAmount = Number.parseFloat(expenseForm.planned.replace(/[^\d,]/g, "").replace(",", ".")) || 0;
+          
+          const transactionsToCreate = [];
+
+          if (expenseForm.isRecurring && expenseForm.recurrenceType) {
+            let monthsToCreate = 1;
+            
+            switch (expenseForm.recurrenceType) {
+              case 'parcelada':
+                monthsToCreate = parseInt(expenseForm.installments) || 1;
+                break;
+              case 'mensal':
+              case 'anual':
+                monthsToCreate = 12;
+                break;
+              case 'trimestral':
+                monthsToCreate = 3;
+                break;
+              case 'semestral':
+                monthsToCreate = 6;
+                break;
+              default:
+                monthsToCreate = 1;
+            }
+
+            for (let i = 0; i < monthsToCreate; i++) {
+              const transactionDate = new Date(baseDate);
+              transactionDate.setMonth(transactionDate.getMonth() + i);
+              
+              const description = expenseForm.isRecurring ? 
+                `${expenseForm.description || "Nova Despesa"} ${expenseForm.recurrenceType === 'parcelada' ? `(${i + 1}/${monthsToCreate})` : '(Recorrente)'}` : 
+                (expenseForm.description || "Nova Despesa");
+
+              transactionsToCreate.push({
+                user_id: user.id,
+                amount: baseAmount,
+                description: description,
+                category: expenseForm.category,
+                transaction_type: 'expense',
+                date: transactionDate.toISOString().split('T')[0],
+                source: 'planning',
+                original_message: `Planejamento - ${description}`,
+              });
+            }
+          } else {
+            transactionsToCreate.push({
+              user_id: user.id,
+              amount: baseAmount,
+              description: expenseForm.description || "Nova Despesa",
+              category: expenseForm.category,
+              transaction_type: 'expense',
+              date: baseDate.toISOString().split('T')[0],
+              source: 'planning',
+              original_message: `Planejamento - ${expenseForm.description || "Nova Despesa"}`,
+            });
+          }
+
+          // Salvar no banco de dados
+          const { data, error } = await supabase
+            .from('transactions')
+            .insert(transactionsToCreate)
+            .select();
+
+          if (error) {
+            console.error('Error saving expense transactions:', error);
+            toast.error('Erro ao salvar despesa no banco de dados');
+            return;
+          }
+
+          // Atualizar estado local para exibição imediata
+          const newExpenses = transactionsToCreate.map((transaction, index) => ({
+            id: data?.[index]?.id || Date.now() + index,
+            date: new Date(transaction.date).toLocaleDateString("pt-BR"),
+            description: transaction.description,
+            category: transaction.category,
+            planned: transaction.amount,
+            spent: 0,
+            available: transaction.amount,
+            type: "Despesa",
+            notes: expenseForm.notes,
+            isRecurring: expenseForm.isRecurring,
+            recurrenceType: expenseForm.recurrenceType,
+            installments: expenseForm.installments,
+          }));
+
+          setExpenses((prev) => [...prev, ...newExpenses]);
+          toast.success(`${transactionsToCreate.length > 1 ? transactionsToCreate.length + ' despesas' : 'Despesa'} criada${transactionsToCreate.length > 1 ? 's' : ''} com sucesso!`);
         }
 
-        setExpenses((prev) => [...prev, ...newExpenses]);
+        setExpenseForm({
+          description: "",
+          planned: "",
+          date: "",
+          category: "",
+          notes: "",
+          isRecurring: false,
+          recurrenceType: "",
+          installments: "",
+        });
+        setEditingExpense(null);
+        setFormStep(1);
+        setIsExpenseSheetOpen(false);
+      } catch (error) {
+        console.error('Error in handleSaveExpense:', error);
+        toast.error('Erro inesperado ao salvar despesa');
       }
-
-      setExpenseForm({
-        description: "",
-        planned: "",
-        date: "",
-        category: "",
-        notes: "",
-        isRecurring: false,
-        recurrenceType: "",
-        installments: "",
-      });
-      setEditingExpense(null);
-      setFormStep(1);
-      setIsExpenseSheetOpen(false);
+    } else {
+      toast.error('Por favor, selecione uma categoria');
     }
   };
 

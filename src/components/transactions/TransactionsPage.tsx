@@ -262,6 +262,11 @@ export function TransactionsPage() {
 
   // Função para calcular o status da transação
   const getTransactionStatus = (transaction: Transaction) => {
+    // Transações do planejamento sempre aparecem como "Em Aberto"
+    if (transaction.source === 'planning') {
+      return "Em Aberto";
+    }
+
     // Apenas transações de saída (despesas) têm status de pagamento
     if (transaction.transaction_type === "income") {
       return "Recebido";
@@ -940,8 +945,19 @@ export function TransactionsPage() {
                                 </div>
                               )}
                             </td>
-                             <td className="p-2 lg:p-4 text-sm max-w-xs truncate">
-                               {transaction.description}
+                             <td className="p-2 lg:p-4 text-sm max-w-xs">
+                               <div className="flex items-center gap-2">
+                                 <span className="truncate">{transaction.description}</span>
+                                 {(transaction.description.includes("(Recorrente)") || 
+                                   transaction.description.includes("(") && 
+                                   transaction.description.includes("/") && 
+                                   transaction.description.includes(")") &&
+                                   /\(\d+\/\d+\)/.test(transaction.description)) && (
+                                   <Badge className="bg-purple-100 text-purple-800 border-purple-200 text-xs px-2 py-0.5 rounded-full">
+                                     Recorrente
+                                   </Badge>
+                                 )}
+                               </div>
                              </td>
                              <td className="p-2 lg:p-4 text-sm">
                                <div className="flex items-center gap-2">
