@@ -229,7 +229,7 @@ export function ExpenseForm({
               <Input
                 id="expense-description"
                 placeholder="Ex: Aluguel, Supermercado, Academia..."
-                className="h-14 text-base bg-white border-2 rounded-2xl"
+                className="h-14 text-base bg-white border-2 rounded-2xl focus:border-purple-500 focus:ring-purple-500"
                 value={expenseForm.description}
                 onChange={(e) => setExpenseForm((prev: any) => ({ ...prev, description: e.target.value }))}
               />
@@ -243,7 +243,7 @@ export function ExpenseForm({
                 id="expense-planned"
                 placeholder="R$ 0,00"
                 type="number"
-                className="h-14 text-base bg-white border-2 rounded-2xl"
+                className="h-14 text-base bg-white border-2 rounded-2xl focus:border-purple-500 focus:ring-purple-500"
                 value={expenseForm.planned}
                 onChange={(e) => setExpenseForm((prev: any) => ({ ...prev, planned: e.target.value }))}
               />
@@ -256,7 +256,7 @@ export function ExpenseForm({
               <Input
                 id="expense-date"
                 type="date"
-                className="h-14 bg-white border-2 rounded-2xl"
+                className="h-14 bg-white border-2 rounded-2xl focus:border-purple-500 focus:ring-purple-500"
                 value={expenseForm.date}
                 onChange={(e) => setExpenseForm((prev: any) => ({ ...prev, date: e.target.value }))}
               />
@@ -269,7 +269,7 @@ export function ExpenseForm({
                   id="recurring"
                   checked={expenseForm.isRecurring}
                   onCheckedChange={(checked) => setExpenseForm((prev: any) => ({ ...prev, isRecurring: checked }))}
-                  className="rounded-lg"
+                  className="rounded-lg data-[state=checked]:bg-purple-500 data-[state=checked]:border-purple-500"
                 />
                 <Label htmlFor="recurring" className="text-lg font-medium text-gray-800">
                   Conta Recorrente
@@ -286,7 +286,7 @@ export function ExpenseForm({
                       value={expenseForm.recurrenceType} 
                       onValueChange={(value) => setExpenseForm((prev: any) => ({ ...prev, recurrenceType: value }))}
                     >
-                      <SelectTrigger className="h-12 rounded-2xl border-2">
+                      <SelectTrigger className="h-12 rounded-2xl border-2 focus:border-purple-500 focus:ring-purple-500">
                         <SelectValue placeholder="Selecione o tipo" />
                       </SelectTrigger>
                       <SelectContent>
@@ -304,16 +304,16 @@ export function ExpenseForm({
                       <Label htmlFor="installments" className="text-base font-medium text-gray-700">
                         Número de Parcelas
                       </Label>
-                      <Input
-                        id="installments"
-                        type="number"
-                        placeholder="Ex: 12"
-                        value={expenseForm.installments}
-                        onChange={(e) => setExpenseForm((prev: any) => ({ ...prev, installments: e.target.value }))}
-                        className="h-12 rounded-2xl border-2"
-                        min="1"
-                        max="60"
-                      />
+                        <Input
+                          id="installments"
+                          type="number"
+                          placeholder="Ex: 12"
+                          value={expenseForm.installments}
+                          onChange={(e) => setExpenseForm((prev: any) => ({ ...prev, installments: e.target.value }))}
+                          className="h-12 rounded-2xl border-2 focus:border-purple-500 focus:ring-purple-500"
+                          min="1"
+                          max="60"
+                        />
                     </div>
                   )}
                 </div>
@@ -408,7 +408,7 @@ export function ExpenseForm({
               <Textarea
                 id="expense-description"
                 placeholder="Adicione detalhes sobre esta despesa..."
-                className="min-h-[80px] text-base bg-white border-2 rounded-2xl resize-none"
+                className="min-h-[80px] text-base bg-white border-2 rounded-2xl resize-none focus:border-purple-500 focus:ring-purple-500"
                 value={expenseForm.notes}
                 onChange={(e) => setExpenseForm((prev: any) => ({ ...prev, notes: e.target.value }))}
               />
