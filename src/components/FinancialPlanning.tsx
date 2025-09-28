@@ -358,14 +358,16 @@ export function FinancialPlanning() {
                 monthsToCreate = parseInt(entryForm.installments) || 1;
                 break;
               case 'mensal':
-              case 'anual':
-                monthsToCreate = 12;
+                monthsToCreate = 12; // Mês atual + 11 seguintes = 12 total
                 break;
               case 'trimestral':
-                monthsToCreate = 3;
+                monthsToCreate = 4; // Mês atual + 3 seguintes = 4 total
                 break;
               case 'semestral':
-                monthsToCreate = 6;
+                monthsToCreate = 7; // Mês atual + 6 seguintes = 7 total
+                break;
+              case 'anual':
+                monthsToCreate = 13; // Mês atual + 12 seguintes = 13 total
                 break;
               default:
                 monthsToCreate = 1;
@@ -493,14 +495,16 @@ export function FinancialPlanning() {
                 monthsToCreate = parseInt(expenseForm.installments) || 1;
                 break;
               case 'mensal':
-              case 'anual':
-                monthsToCreate = 12;
+                monthsToCreate = 12; // Mês atual + 11 seguintes = 12 total
                 break;
               case 'trimestral':
-                monthsToCreate = 3;
+                monthsToCreate = 4; // Mês atual + 3 seguintes = 4 total
                 break;
               case 'semestral':
-                monthsToCreate = 6;
+                monthsToCreate = 7; // Mês atual + 6 seguintes = 7 total
+                break;
+              case 'anual':
+                monthsToCreate = 13; // Mês atual + 12 seguintes = 13 total
                 break;
               default:
                 monthsToCreate = 1;
