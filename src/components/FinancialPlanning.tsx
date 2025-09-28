@@ -172,7 +172,7 @@ export function FinancialPlanning() {
         spent: 0,
         available: Number(transaction.amount),
         type: "Entrada",
-        notes: transaction.original_message || '',
+        notes: transaction.original_message ? transaction.original_message.replace('Planejamento - ', '') : '',
         isRecurring: transaction.description.includes('Recorrente') || transaction.description.includes('('),
         recurrenceType: transaction.description.includes('Recorrente') ? 'mensal' : '',
         installments: '',
