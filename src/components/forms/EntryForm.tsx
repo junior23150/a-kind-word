@@ -212,7 +212,7 @@ export function EntryForm({
               <Input
                 id="entry-description"
                 placeholder="Ex: Salário, Freelance, Consultoria..."
-                className="h-14 text-base bg-white border-2 rounded-xl"
+                className="h-14 text-base bg-white border-2 rounded-2xl"
                 value={entryForm.description}
                 onChange={(e) => setEntryForm((prev: any) => ({ ...prev, description: e.target.value }))}
               />
@@ -226,7 +226,7 @@ export function EntryForm({
                 id="entry-value"
                 placeholder="R$ 0,00"
                 type="number"
-                className="h-14 text-base bg-white border-2 rounded-xl"
+                className="h-14 text-base bg-white border-2 rounded-2xl"
                 value={entryForm.value}
                 onChange={(e) => setEntryForm((prev: any) => ({ ...prev, value: e.target.value }))}
               />
@@ -239,7 +239,7 @@ export function EntryForm({
               <Input
                 id="entry-date"
                 type="date"
-                className="h-14 bg-white border-2 rounded-xl"
+                className="h-14 bg-white border-2 rounded-2xl"
                 value={entryForm.date}
                 onChange={(e) => setEntryForm((prev: any) => ({ ...prev, date: e.target.value }))}
               />
@@ -269,7 +269,7 @@ export function EntryForm({
                       value={entryForm.recurrenceType} 
                       onValueChange={(value) => setEntryForm((prev: any) => ({ ...prev, recurrenceType: value }))}
                     >
-                      <SelectTrigger className="h-12 rounded-xl border-2">
+                      <SelectTrigger className="h-12 rounded-2xl border-2">
                         <SelectValue placeholder="Selecione o tipo" />
                       </SelectTrigger>
                       <SelectContent>
@@ -293,7 +293,7 @@ export function EntryForm({
                         placeholder="Ex: 12"
                         value={entryForm.installments}
                         onChange={(e) => setEntryForm((prev: any) => ({ ...prev, installments: e.target.value }))}
-                        className="h-12 rounded-xl border-2"
+                        className="h-12 rounded-2xl border-2"
                         min="1"
                         max="60"
                       />
@@ -323,7 +323,7 @@ export function EntryForm({
                       <Button
                         key={category.id}
                         variant={isSelected ? "default" : "outline"}
-                        className={`h-16 flex items-center gap-3 text-left justify-start px-4 rounded-xl ${
+                        className={`h-16 flex items-center gap-3 text-left justify-start px-4 rounded-2xl ${
                           isSelected
                             ? "bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-500"
                             : "hover:border-emerald-500 hover:bg-emerald-50 bg-white border-2"
@@ -343,7 +343,7 @@ export function EntryForm({
 
                   <Button
                     variant="outline"
-                    className="h-16 flex items-center gap-3 hover:border-emerald-500 hover:bg-emerald-50 bg-white border-2 border-dashed rounded-xl"
+                    className="h-16 flex items-center gap-3 hover:border-emerald-500 hover:bg-emerald-50 bg-white border-2 border-dashed rounded-2xl"
                     onClick={() => setShowNewCategoryDialog(true)}
                   >
                     <div className="p-2 rounded-lg bg-gray-200">
@@ -355,32 +355,20 @@ export function EntryForm({
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="entry-notes" className="text-lg font-medium text-gray-800">
-                Observações
-              </Label>
-              <Textarea
-                id="entry-notes"
-                placeholder="Detalhes sobre esta entrada..."
-                className="min-h-[120px] text-base resize-none bg-white border-2 rounded-xl"
-                value={entryForm.notes}
-                onChange={(e) => setEntryForm((prev: any) => ({ ...prev, notes: e.target.value }))}
-              />
-            </div>
           </div>
         </div>
 
         {/* Footer Buttons */}
-        <div className="flex justify-center gap-4 pt-8">
+        <div className="flex justify-center gap-4 pt-4">
           <Button 
             onClick={onCancel} 
             variant="outline" 
-            className="px-8 py-3 text-base border-2 rounded-xl"
+            className="px-8 py-3 text-base border-2 rounded-2xl"
           >
             Voltar
           </Button>
           <Button
-            className="px-8 py-3 text-base bg-emerald-500 hover:bg-emerald-600 rounded-xl"
+            className="px-8 py-3 text-base bg-emerald-500 hover:bg-emerald-600 rounded-2xl"
             disabled={!entryForm.category}
             onClick={onSave}
           >
