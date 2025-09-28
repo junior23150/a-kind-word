@@ -110,6 +110,9 @@ export function FinancialPlanning() {
     date: "",
     category: "",
     notes: "",
+    isRecurring: false,
+    recurrenceType: "",
+    installments: "",
   });
 
   const [showNewExpenseCategoryInput, setShowNewExpenseCategoryInput] = useState(false);
@@ -275,6 +278,9 @@ export function FinancialPlanning() {
         date: "",
         category: "",
         notes: "",
+        isRecurring: false,
+        recurrenceType: "",
+        installments: "",
       });
       setEditingExpense(null);
       setFormStep(1);
@@ -788,6 +794,9 @@ export function FinancialPlanning() {
                       date: "",
                       category: "",
                       notes: "",
+                      isRecurring: false,
+                      recurrenceType: "",
+                      installments: "",
                     });
                   }
                 }}
