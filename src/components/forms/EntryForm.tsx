@@ -273,16 +273,16 @@ export function EntryForm({
                         <SelectValue placeholder="Selecione o tipo" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="installment">Parcelada</SelectItem>
-                        <SelectItem value="monthly">Mensal</SelectItem>
-                        <SelectItem value="quarterly">Trimestral</SelectItem>
-                        <SelectItem value="biannual">Semestral</SelectItem>
-                        <SelectItem value="annual">Anual</SelectItem>
+                        <SelectItem value="parcelada">Parcelada</SelectItem>
+                        <SelectItem value="mensal">Mensal</SelectItem>
+                        <SelectItem value="trimestral">Trimestral</SelectItem>
+                        <SelectItem value="semestral">Semestral</SelectItem>
+                        <SelectItem value="anual">Anual</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
 
-                  {entryForm.recurrenceType === "installment" && (
+                  {entryForm.recurrenceType === "parcelada" && (
                     <div className="space-y-2">
                       <Label htmlFor="installments" className="text-base font-medium text-gray-700">
                         Número de Parcelas
