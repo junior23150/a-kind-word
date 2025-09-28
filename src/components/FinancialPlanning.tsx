@@ -144,7 +144,17 @@ export function FinancialPlanning() {
   // Filter entries and expenses by selected month
   const filteredEntries = entries.filter((entry) => {
     if (!entry.date) return false;
-    const entryDate = new Date(entry.date);
+    // Se a data está em formato ISO (YYYY-MM-DD), usar diretamente
+    // Se está em formato brasileiro (DD/MM/YYYY), converter
+    let entryDate;
+    if (entry.date.includes('-')) {
+      // Formato ISO (YYYY-MM-DD)
+      entryDate = new Date(entry.date + 'T00:00:00');
+    } else {
+      // Formato brasileiro (DD/MM/YYYY)
+      const [day, month, year] = entry.date.split('/');
+      entryDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    }
     const entryMonth = entryDate.getMonth();
     const selectedMonthIndex = getMonthIndex(selectedMonth);
     return entryMonth === selectedMonthIndex;
@@ -152,7 +162,17 @@ export function FinancialPlanning() {
 
   const filteredExpenses = expenses.filter((expense) => {
     if (!expense.date) return false;
-    const expenseDate = new Date(expense.date);
+    // Se a data está em formato ISO (YYYY-MM-DD), usar diretamente
+    // Se está em formato brasileiro (DD/MM/YYYY), converter
+    let expenseDate;
+    if (expense.date.includes('-')) {
+      // Formato ISO (YYYY-MM-DD)
+      expenseDate = new Date(expense.date + 'T00:00:00');
+    } else {
+      // Formato brasileiro (DD/MM/YYYY)
+      const [day, month, year] = expense.date.split('/');
+      expenseDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    }
     const expenseMonth = expenseDate.getMonth();
     const selectedMonthIndex = getMonthIndex(selectedMonth);
     return expenseMonth === selectedMonthIndex;
@@ -165,6 +185,23 @@ export function FinancialPlanning() {
 
   const formatCurrency = (value: number) => {
     return value.toLocaleString("pt-BR", { minimumFractionDigits: 2 });
+  };
+
+  const formatDateForDisplay = (dateString: string) => {
+    if (!dateString) return '';
+    
+    // Se já está em formato brasileiro (DD/MM/YYYY), retornar como está
+    if (dateString.includes('/')) {
+      return dateString;
+    }
+    
+    // Se está em formato ISO (YYYY-MM-DD), converter para brasileiro
+    if (dateString.includes('-')) {
+      const date = new Date(dateString + 'T00:00:00');
+      return date.toLocaleDateString("pt-BR");
+    }
+    
+    return dateString;
   };
 
   const getAvailableColor = (available: number) => {
@@ -306,7 +343,7 @@ export function FinancialPlanning() {
           // Atualizar estado local para exibição imediata
           const newEntries = transactionsToCreate.map((transaction, index) => ({
             id: data?.[index]?.id || Date.now() + index,
-            date: new Date(transaction.date).toLocaleDateString("pt-BR"),
+            date: transaction.date, // Manter formato ISO (YYYY-MM-DD)
             description: transaction.description,
             category: transaction.category,
             value: transaction.amount,
@@ -438,7 +475,7 @@ export function FinancialPlanning() {
           // Atualizar estado local para exibição imediata
           const newExpenses = transactionsToCreate.map((transaction, index) => ({
             id: data?.[index]?.id || Date.now() + index,
-            date: new Date(transaction.date).toLocaleDateString("pt-BR"),
+            date: transaction.date, // Manter formato ISO (YYYY-MM-DD)
             description: transaction.description,
             category: transaction.category,
             planned: transaction.amount,
@@ -792,18 +829,18 @@ export function FinancialPlanning() {
 
                       return (
                         <TableRow key={entry.id} className="hover:bg-gray-50">
-                          <TableCell>
-                            {isEditing ? (
-                              <Input
-                                type="date"
-                                value={editingRowData.date || entry.date}
-                                onChange={(e) => setEditingRowData((prev) => ({ ...prev, date: e.target.value }))}
-                                className="h-8 text-sm rounded-3xl"
-                              />
-                            ) : (
-                              entry.date
-                            )}
-                          </TableCell>
+                           <TableCell>
+                             {isEditing ? (
+                               <Input
+                                 type="date"
+                                 value={editingRowData.date || entry.date}
+                                 onChange={(e) => setEditingRowData((prev) => ({ ...prev, date: e.target.value }))}
+                                 className="h-8 text-sm rounded-3xl"
+                               />
+                             ) : (
+                               formatDateForDisplay(entry.date)
+                             )}
+                           </TableCell>
                           <TableCell>
                             {isEditing ? (
                               <Input
@@ -1052,18 +1089,18 @@ export function FinancialPlanning() {
 
                       return (
                         <TableRow key={expense.id} className="hover:bg-gray-50">
-                          <TableCell>
-                            {isEditing ? (
-                              <Input
-                                type="date"
-                                value={editingRowData.date || expense.date}
-                                onChange={(e) => setEditingRowData((prev) => ({ ...prev, date: e.target.value }))}
-                                className="h-8 text-sm rounded-3xl"
-                              />
-                            ) : (
-                              expense.date
-                            )}
-                          </TableCell>
+                           <TableCell>
+                             {isEditing ? (
+                               <Input
+                                 type="date"
+                                 value={editingRowData.date || expense.date}
+                                 onChange={(e) => setEditingRowData((prev) => ({ ...prev, date: e.target.value }))}
+                                 className="h-8 text-sm rounded-3xl"
+                               />
+                             ) : (
+                               formatDateForDisplay(expense.date)
+                             )}
+                           </TableCell>
                           <TableCell>
                             {isEditing ? (
                               <Input
