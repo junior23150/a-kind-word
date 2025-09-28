@@ -228,8 +228,8 @@ export function FinancialPlanning() {
           ),
         );
       } else {
-        const newEntry = {
-          id: Date.now(),
+        const baseDate = new Date(entryForm.date || new Date());
+        const baseEntry = {
           date: entryForm.date || new Date().toLocaleDateString("pt-BR"),
           description: entryForm.description || "Nova Entrada",
           category: entryForm.category,
@@ -242,7 +242,52 @@ export function FinancialPlanning() {
           recurrenceType: entryForm.recurrenceType,
           installments: entryForm.installments,
         };
-        setEntries((prev) => [...prev, newEntry]);
+
+        const newEntries = [];
+
+        if (entryForm.isRecurring && entryForm.recurrenceType) {
+          let monthsToCreate = 1;
+          
+          switch (entryForm.recurrenceType) {
+            case 'parcelada':
+              monthsToCreate = parseInt(entryForm.installments) || 1;
+              break;
+            case 'mensal':
+            case 'anual':
+              monthsToCreate = 12;
+              break;
+            case 'trimestral':
+              monthsToCreate = 3;
+              break;
+            case 'semestral':
+              monthsToCreate = 6;
+              break;
+            default:
+              monthsToCreate = 1;
+          }
+
+          for (let i = 0; i < monthsToCreate; i++) {
+            const entryDate = new Date(baseDate);
+            entryDate.setMonth(entryDate.getMonth() + i);
+            
+            const newEntry = {
+              ...baseEntry,
+              id: Date.now() + i,
+              date: entryDate.toLocaleDateString("pt-BR"),
+              description: entryForm.isRecurring ? 
+                `${baseEntry.description} ${entryForm.recurrenceType === 'parcelada' ? `(${i + 1}/${monthsToCreate})` : '(Recorrente)'}` : 
+                baseEntry.description,
+            };
+            newEntries.push(newEntry);
+          }
+        } else {
+          newEntries.push({
+            ...baseEntry,
+            id: Date.now(),
+          });
+        }
+
+        setEntries((prev) => [...prev, ...newEntries]);
       }
 
       setEntryForm({
@@ -280,8 +325,8 @@ export function FinancialPlanning() {
           ),
         );
       } else {
-        const newExpense = {
-          id: Date.now(),
+        const baseDate = new Date(expenseForm.date || new Date());
+        const baseExpense = {
           date: expenseForm.date || new Date().toLocaleDateString("pt-BR"),
           description: expenseForm.description || "Nova Despesa",
           category: expenseForm.category,
@@ -290,8 +335,56 @@ export function FinancialPlanning() {
           available: Number.parseFloat(expenseForm.planned.replace(/[^\d,]/g, "").replace(",", ".")) || 0,
           type: "Despesa",
           notes: expenseForm.notes,
+          isRecurring: expenseForm.isRecurring,
+          recurrenceType: expenseForm.recurrenceType,
+          installments: expenseForm.installments,
         };
-        setExpenses((prev) => [...prev, newExpense]);
+
+        const newExpenses = [];
+
+        if (expenseForm.isRecurring && expenseForm.recurrenceType) {
+          let monthsToCreate = 1;
+          
+          switch (expenseForm.recurrenceType) {
+            case 'parcelada':
+              monthsToCreate = parseInt(expenseForm.installments) || 1;
+              break;
+            case 'mensal':
+            case 'anual':
+              monthsToCreate = 12;
+              break;
+            case 'trimestral':
+              monthsToCreate = 3;
+              break;
+            case 'semestral':
+              monthsToCreate = 6;
+              break;
+            default:
+              monthsToCreate = 1;
+          }
+
+          for (let i = 0; i < monthsToCreate; i++) {
+            const expenseDate = new Date(baseDate);
+            expenseDate.setMonth(expenseDate.getMonth() + i);
+            
+            const newExpense = {
+              ...baseExpense,
+              id: Date.now() + i,
+              date: expenseDate.toLocaleDateString("pt-BR"),
+              description: expenseForm.isRecurring ? 
+                `${baseExpense.description} ${expenseForm.recurrenceType === 'parcelada' ? `(${i + 1}/${monthsToCreate})` : '(Recorrente)'}` : 
+                baseExpense.description,
+            };
+            newExpenses.push(newExpense);
+          }
+        } else {
+          newExpenses.push({
+            ...baseExpense,
+            id: Date.now(),
+          });
+        }
+
+        setExpenses((prev) => [...prev, ...newExpenses]);
       }
 
       setExpenseForm({
