@@ -331,35 +331,64 @@ export function ExpenseForm({
                   <p className="text-sm text-gray-500 mt-2">Carregando categorias...</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-2 gap-3">
-                  {systemCategories.map((category) => {
-                    const IconComponent = getIconComponent(category.icon);
-                    const isSelected = expenseForm.category === category.name;
-                    return (
-                      <Button
-                        key={category.id}
-                        variant={isSelected ? "default" : "outline"}
-                        className={`h-16 flex items-center gap-3 text-left justify-start px-4 rounded-2xl ${
-                          isSelected
-                            ? "bg-purple-500 hover:bg-purple-600 text-white border-purple-500"
-                            : "hover:border-purple-500 hover:bg-purple-50 bg-white border-2"
-                        }`}
-                        onClick={() => setExpenseForm((prev: any) => ({ ...prev, category: category.name }))}
-                      >
-                        <div 
-                          className={`p-2 rounded-lg ${isSelected ? "bg-white/20" : ""}`}
-                          style={!isSelected ? { backgroundColor: category.color } : {}}
-                        >
-                          <IconComponent className={`h-5 w-5 ${isSelected ? "text-white" : "text-white"}`} />
-                        </div>
-                        <span className="text-sm font-medium">{category.name}</span>
-                      </Button>
-                    );
-                  })}
+                <div className="space-y-3">
+                  <Select 
+                    value={expenseForm.category} 
+                    onValueChange={(value) => setExpenseForm((prev: any) => ({ ...prev, category: value }))}
+                  >
+                    <SelectTrigger className="h-16 rounded-2xl border-2 bg-white">
+                      <SelectValue placeholder="Selecione uma categoria">
+                        {expenseForm.category && (
+                          <div className="flex items-center gap-3">
+                            {(() => {
+                              const selectedCategory = systemCategories.find(cat => cat.name === expenseForm.category);
+                              if (selectedCategory) {
+                                const IconComponent = getIconComponent(selectedCategory.icon);
+                                return (
+                                  <>
+                                    <div 
+                                      className="p-2 rounded-lg"
+                                      style={{ backgroundColor: selectedCategory.color }}
+                                    >
+                                      <IconComponent className="h-5 w-5 text-white" />
+                                    </div>
+                                    <span className="text-sm font-medium">{selectedCategory.name}</span>
+                                  </>
+                                );
+                              }
+                              return null;
+                            })()}
+                          </div>
+                        )}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent className="max-h-80 rounded-2xl">
+                      {systemCategories.map((category) => {
+                        const IconComponent = getIconComponent(category.icon);
+                        return (
+                          <SelectItem 
+                            key={category.id} 
+                            value={category.name}
+                            className="h-16 rounded-xl cursor-pointer"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div 
+                                className="p-2 rounded-lg"
+                                style={{ backgroundColor: category.color }}
+                              >
+                                <IconComponent className="h-5 w-5 text-white" />
+                              </div>
+                              <span className="text-sm font-medium">{category.name}</span>
+                            </div>
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
 
                   <Button
                     variant="outline"
-                    className="h-16 flex items-center gap-3 hover:border-purple-500 hover:bg-purple-50 bg-white border-2 border-dashed rounded-2xl"
+                    className="w-full h-16 flex items-center gap-3 hover:border-purple-500 hover:bg-purple-50 bg-white border-2 border-dashed rounded-2xl"
                     onClick={() => setShowNewCategoryDialog(true)}
                   >
                     <div className="p-2 rounded-lg bg-gray-200">
