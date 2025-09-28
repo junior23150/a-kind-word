@@ -584,7 +584,7 @@ export function FinancialPlanning() {
                           </Tooltip>
                         </div>
                       </TableHead>
-                      <TableHead className="font-bold text-gray-800 text-center">Gasto</TableHead>
+                      <TableHead className="font-bold text-gray-800 text-center">Recebido</TableHead>
                       <TableHead className="font-bold text-gray-800 text-center">Disponível</TableHead>
                       <TableHead className="font-bold text-gray-800 text-center">Ações</TableHead>
                     </TableRow>
