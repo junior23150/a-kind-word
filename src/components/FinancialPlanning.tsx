@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Calendar,
   Plus,
@@ -89,7 +89,7 @@ export function FinancialPlanning() {
   const [selectedMonth, setSelectedMonth] = useState("Outubro");
   const [formStep, setFormStep] = useState(1);
   const [entries, setEntries] = useState([]);
-
+  const [loading, setLoading] = useState(true);
   const [expenses, setExpenses] = useState([]);
 
   const [entryForm, setEntryForm] = useState({
@@ -135,6 +135,81 @@ export function FinancialPlanning() {
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isExpenseSheetOpen, setIsExpenseSheetOpen] = useState(false);
+
+  // Função para carregar dados existentes do banco
+  const loadExistingData = async () => {
+    if (!user) return;
+    
+    try {
+      setLoading(true);
+      
+      // Buscar transações de planejamento do usuário
+      const { data: transactions, error } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('source', 'planning')
+        .order('date', { ascending: false });
+
+      if (error) {
+        console.error('Error loading planning data:', error);
+        toast.error('Erro ao carregar dados de planejamento');
+        return;
+      }
+
+      // Separar entradas e despesas
+      const incomeTransactions = transactions?.filter(t => t.transaction_type === 'income') || [];
+      const expenseTransactions = transactions?.filter(t => t.transaction_type === 'expense') || [];
+
+      // Converter para formato do componente
+      const loadedEntries = incomeTransactions.map(transaction => ({
+        id: transaction.id,
+        date: transaction.date, // Formato ISO (YYYY-MM-DD)
+        description: transaction.description,
+        category: transaction.category,
+        value: Number(transaction.amount),
+        spent: 0,
+        available: Number(transaction.amount),
+        type: "Entrada",
+        notes: transaction.original_message || '',
+        isRecurring: transaction.description.includes('Recorrente') || transaction.description.includes('('),
+        recurrenceType: transaction.description.includes('Recorrente') ? 'mensal' : '',
+        installments: '',
+      }));
+
+      const loadedExpenses = expenseTransactions.map(transaction => ({
+        id: transaction.id,
+        date: transaction.date, // Formato ISO (YYYY-MM-DD)
+        description: transaction.description,
+        category: transaction.category,
+        planned: Number(transaction.amount),
+        spent: 0,
+        available: Number(transaction.amount),
+        type: "Despesa",
+        notes: transaction.original_message || '',
+        isRecurring: transaction.description.includes('Recorrente') || transaction.description.includes('('),
+        recurrenceType: transaction.description.includes('Recorrente') ? 'mensal' : '',
+        installments: '',
+      }));
+
+      setEntries(loadedEntries);
+      setExpenses(loadedExpenses);
+    } catch (error) {
+      console.error('Error in loadExistingData:', error);
+      toast.error('Erro inesperado ao carregar dados');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Carregar dados quando o componente monta ou quando o usuário muda
+  useEffect(() => {
+    if (user) {
+      loadExistingData();
+    } else {
+      setLoading(false);
+    }
+  }, [user]);
 
   // Helper function to get month index from name
   const getMonthIndex = (monthName: string) => {
@@ -358,6 +433,9 @@ export function FinancialPlanning() {
 
           setEntries((prev) => [...prev, ...newEntries]);
           toast.success(`${transactionsToCreate.length > 1 ? transactionsToCreate.length + ' entradas' : 'Entrada'} criada${transactionsToCreate.length > 1 ? 's' : ''} com sucesso!`);
+          
+          // Recarregar dados para manter sincronização
+          await loadExistingData();
         }
 
         setEntryForm({
@@ -490,6 +568,9 @@ export function FinancialPlanning() {
 
           setExpenses((prev) => [...prev, ...newExpenses]);
           toast.success(`${transactionsToCreate.length > 1 ? transactionsToCreate.length + ' despesas' : 'Despesa'} criada${transactionsToCreate.length > 1 ? 's' : ''} com sucesso!`);
+          
+          // Recarregar dados para manter sincronização
+          await loadExistingData();
         }
 
         setExpenseForm({
@@ -683,7 +764,27 @@ export function FinancialPlanning() {
   return (
     <TooltipProvider>
       <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-purple-50 p-4">
-        <div className="max-w-7xl mx-auto space-y-6">
+        {loading ? (
+          <div className="max-w-7xl mx-auto space-y-6">
+            <div className="text-center space-y-4">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-purple-600 bg-clip-text text-transparent">
+                Hora de Planejar
+              </h1>
+              <p className="text-gray-600 text-lg">Carregando seus dados financeiros...</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[1, 2, 3, 4].map((i) => (
+                <Card key={i} className="p-6">
+                  <div className="animate-pulse">
+                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="max-w-7xl mx-auto space-y-6">
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-purple-600 bg-clip-text text-transparent">
               Hora de Planejar
@@ -1253,6 +1354,7 @@ export function FinancialPlanning() {
             </CardContent>
           </Card>
         </div>
+        )}
       </div>
       <Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <DialogContent className="sm:max-w-md">
