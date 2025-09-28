@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -398,6 +399,19 @@ export function ExpenseForm({
                   </Button>
                 </div>
               )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="expense-description" className="text-lg font-medium text-gray-800">
+                Descrição
+              </Label>
+              <Textarea
+                id="expense-description"
+                placeholder="Adicione detalhes sobre esta despesa..."
+                className="min-h-[80px] text-base bg-white border-2 rounded-2xl resize-none"
+                value={expenseForm.notes}
+                onChange={(e) => setExpenseForm((prev: any) => ({ ...prev, notes: e.target.value }))}
+              />
             </div>
           </div>
         </div>
