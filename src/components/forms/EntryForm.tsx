@@ -384,6 +384,19 @@ export function EntryForm({
               )}
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="entry-description" className="text-lg font-medium text-gray-800">
+                Descrição
+              </Label>
+              <Textarea
+                id="entry-description"
+                placeholder="Adicione detalhes sobre esta entrada..."
+                className="min-h-[80px] text-base bg-white border-2 rounded-2xl resize-none"
+                value={entryForm.notes}
+                onChange={(e) => setEntryForm((prev: any) => ({ ...prev, notes: e.target.value }))}
+              />
+            </div>
+
           </div>
         </div>
 
