@@ -41,6 +41,7 @@ interface BankAccount {
 interface TransactionSlideInProps {
   onClose: () => void;
   onTransactionAdded?: () => void;
+  onOpenPaymentConfirmation?: (transaction: any) => void;
   existingTransaction?: {
     id: string;
     amount: number;
@@ -55,6 +56,7 @@ interface TransactionSlideInProps {
 export function TransactionSlideIn({
   onClose,
   onTransactionAdded,
+  onOpenPaymentConfirmation,
   existingTransaction,
 }: TransactionSlideInProps) {
   const [category, setCategory] = useState("");
@@ -221,6 +223,7 @@ export function TransactionSlideIn({
         source: "manual",
         original_message: `Lançamento manual - ${description}`,
         bank_account_id: financialAccount || null,
+        status: "Em Aberto",
       });
 
       if (error) {
@@ -271,7 +274,6 @@ export function TransactionSlideIn({
     }
 
     if (!user?.id) {
-      console.log("Usuário não autenticado (salvar e dar baixa) - user object:", user);
       toast({
         title: "Erro",
         description: "Usuário não autenticado",
@@ -280,54 +282,39 @@ export function TransactionSlideIn({
       return;
     }
 
-    console.log("User autenticado (salvar e dar baixa):", user.id, "Email:", user.email);
-
-    // Verificar se o usuário existe na tabela profiles
-    const { data: profileData, error: profileError } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
-
-    console.log("Perfil do usuário (salvar e dar baixa):", profileData, "Erro:", profileError);
-
     setLoading(true);
 
     try {
-      console.log("Tentando criar transação (salvar e dar baixa) com user_id:", user.id);
-      console.log("Dados da transação:", {
-        user_id: user.id,
-        amount: parseFloat(value.replace(",", ".")),
-        description,
-        category,
-        transaction_type: type,
-        date: format(date, "yyyy-MM-dd"),
-        source: "manual",
-        original_message: `Lançamento manual - ${description}`,
-        bank_account_id: financialAccount || null,
-      });
-
-      const { error } = await supabase.from("transactions").insert({
-        user_id: user.id,
-        amount: parseFloat(value.replace(",", ".")),
-        description,
-        category,
-        transaction_type: type,
-        date: format(date, "yyyy-MM-dd"),
-        source: "manual",
-        original_message: `Lançamento manual - ${description}`,
-        bank_account_id: financialAccount || null,
-      });
+      // Criar a transação primeiro
+      const { data: newTransaction, error } = await supabase
+        .from("transactions")
+        .insert({
+          user_id: user.id,
+          amount: parseFloat(value.replace(",", ".")),
+          description,
+          category,
+          transaction_type: type,
+          date: format(date, "yyyy-MM-dd"),
+          source: "manual",
+          original_message: `Lançamento manual - ${description}`,
+          bank_account_id: financialAccount || null,
+          status: "Em Aberto",
+        })
+        .select()
+        .single();
 
       if (error) {
-        console.error("Erro detalhado ao inserir transação (salvar e dar baixa):", error);
+        console.error("Erro ao inserir transação:", error);
         throw error;
       }
 
-      toast({
-        title: "Sucesso",
-        description: "Lançamento criado e baixado com sucesso!",
-      });
+      // Fechar este modal
+      onClose();
+
+      // Abrir modal de confirmação de pagamento
+      if (onOpenPaymentConfirmation && newTransaction) {
+        onOpenPaymentConfirmation(newTransaction);
+      }
 
       // Reset form
       setCategory("");
@@ -343,7 +330,6 @@ export function TransactionSlideIn({
       setOccurrence("");
 
       onTransactionAdded?.();
-      onClose();
     } catch (error) {
       console.error("Erro ao criar lançamento:", error);
       toast({

@@ -301,6 +301,7 @@ export type Database = {
           id: string
           original_message: string | null
           source: string | null
+          status: string | null
           transaction_type: string
           updated_at: string
           user_id: string | null
@@ -317,6 +318,7 @@ export type Database = {
           id?: string
           original_message?: string | null
           source?: string | null
+          status?: string | null
           transaction_type: string
           updated_at?: string
           user_id?: string | null
@@ -333,6 +335,7 @@ export type Database = {
           id?: string
           original_message?: string | null
           source?: string | null
+          status?: string | null
           transaction_type?: string
           updated_at?: string
           user_id?: string | null

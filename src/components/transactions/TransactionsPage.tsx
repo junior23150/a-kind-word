@@ -73,6 +73,7 @@ import { pt } from "date-fns/locale";
 import { TransferSlideIn } from "@/components/transactions/TransferSlideIn";
 import { TransactionSlideIn } from "@/components/transactions/TransactionSlideIn";
 import { DateFilterModal } from "@/components/transactions/DateFilterModal";
+import { PaymentConfirmationSlideIn } from "@/components/transactions/PaymentConfirmationSlideIn";
 import { BankLogo } from "@/components/ui/BankLogo";
 
 interface Transaction {
@@ -86,6 +87,7 @@ interface Transaction {
   original_message: string;
   user_id: string;
   bank_account_id: string | null;
+  status?: string;
   created_at: string;
   updated_at: string;
   bank_account?: {
@@ -112,6 +114,8 @@ export function TransactionsPage() {
   const [showFilterSidebar, setShowFilterSidebar] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showPaymentConfirmation, setShowPaymentConfirmation] = useState(false);
+  const [transactionsForPayment, setTransactionsForPayment] = useState<Transaction[]>([]);
 
   // Filter states
   const [filterStatus, setFilterStatus] = useState("Em aberto");
@@ -208,6 +212,62 @@ export function TransactionsPage() {
     }
   }, [user, toast]);
 
+  // Verificar e atualizar transações em atraso
+  useEffect(() => {
+    const checkOverdueTransactions = async () => {
+      if (!user || transactions.length === 0) return;
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const overdueTransactions = transactions.filter((t) => {
+        const transactionDate = new Date(t.date);
+        transactionDate.setHours(0, 0, 0, 0);
+
+        // Verificar se é recorrente e se está vencida
+        const isRecurring = (t.original_message && t.original_message.includes("Recorrente:")) || 
+                          (t.description.includes("(") && 
+                          t.description.includes("/") && 
+                          t.description.includes(")") &&
+                          /\(\d+\/\d+\)/.test(t.description));
+
+        return (
+          t.status === "Em Aberto" &&
+          isRecurring &&
+          transactionDate < today &&
+          t.transaction_type === "expense"
+        );
+      });
+
+      if (overdueTransactions.length > 0) {
+        try {
+          const updatePromises = overdueTransactions.map((t) =>
+            supabase
+              .from("transactions")
+              .update({ status: "Em Atraso" })
+              .eq("id", t.id)
+              .eq("user_id", user.id)
+          );
+
+          await Promise.all(updatePromises);
+
+          // Atualizar estado local
+          setTransactions((prev) =>
+            prev.map((t) =>
+              overdueTransactions.find((ot) => ot.id === t.id)
+                ? { ...t, status: "Em Atraso" }
+                : t
+            )
+          );
+        } catch (error) {
+          console.error("Erro ao atualizar transações em atraso:", error);
+        }
+      }
+    };
+
+    checkOverdueTransactions();
+  }, [transactions, user]);
+
   // Filtrar transações
   const filteredTransactions = transactions.filter((transaction) => {
     const transactionDate = new Date(transaction.date);
@@ -273,9 +333,9 @@ export function TransactionsPage() {
 
   // Função para calcular o status da transação
   const getTransactionStatus = (transaction: Transaction) => {
-    // Transações do planejamento sempre aparecem como "Em Aberto"
-    if (transaction.source === 'planning') {
-      return "Em Aberto";
+    // Se tem status definido no banco, usar ele
+    if (transaction.status) {
+      return transaction.status;
     }
 
     // Apenas transações de saída (despesas) têm status de pagamento
@@ -289,29 +349,37 @@ export function TransactionsPage() {
     const transactionDate = new Date(transaction.date);
     transactionDate.setHours(0, 0, 0, 0);
 
-    // Se a transação já foi paga (podemos usar um campo 'paid' no futuro)
-    // Por enquanto, vamos assumir que todas estão em aberto ou em atraso
+    // Verificar se está em atraso (contas recorrentes não pagas após data de vencimento)
+    const isRecurring = (transaction.original_message && transaction.original_message.includes("Recorrente:")) || 
+                        (transaction.description.includes("(") && 
+                        transaction.description.includes("/") && 
+                        transaction.description.includes(")") &&
+                        /\(\d+\/\d+\)/.test(transaction.description));
 
-    if (transactionDate < today) {
-      return "Em Atraso";
-    } else {
-      return "Em Aberto";
+    if (isRecurring) {
+      if (transactionDate < today) {
+        return "Em Atraso";
+      } else {
+        return "Em Aberto";
+      }
     }
+
+    return "Em Aberto";
   };
 
   // Função para obter a cor do status
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "Pago":
-        return "bg-green-100 text-green-700 border-green-200";
+      case "Paga":
+        return "bg-green-50 text-green-800 border-green-300";
       case "Recebido":
-        return "bg-green-100 text-green-700 border-green-200";
+        return "bg-green-50 text-green-800 border-green-300";
       case "Em Aberto":
-        return "bg-blue-100 text-blue-700 border-blue-200";
+        return "bg-blue-50 text-blue-700 border-blue-200";
       case "Em Atraso":
-        return "bg-red-100 text-red-700 border-red-200";
+        return "bg-red-50 text-red-800 border-red-300";
       default:
-        return "bg-gray-100 text-gray-700 border-gray-200";
+        return "bg-gray-50 text-gray-700 border-gray-200";
     }
   };
 
@@ -322,25 +390,10 @@ export function TransactionsPage() {
 
   // Handle payment actions
   const handleFullPayment = async (transactionId: string) => {
-    try {
-      // Aqui você pode implementar a lógica para marcar como pago
-      // Por exemplo, atualizar um campo 'paid' na tabela de transações
-      console.log("Baixa total do pagamento para:", transactionId);
-
-      toast({
-        title: "Sucesso",
-        description: "Pagamento baixado com sucesso!",
-      });
-
-      // Recarregar transações para atualizar status
-      fetchTransactions();
-    } catch (error) {
-      console.error("Erro ao baixar pagamento:", error);
-      toast({
-        title: "Erro",
-        description: "Erro ao baixar pagamento",
-        variant: "destructive",
-      });
+    const transaction = transactions.find((t) => t.id === transactionId);
+    if (transaction) {
+      setTransactionsForPayment([transaction]);
+      setShowPaymentConfirmation(true);
     }
   };
 
@@ -1256,6 +1309,10 @@ export function TransactionsPage() {
             setEditingTransaction(null);
           }}
           onTransactionAdded={fetchTransactions}
+          onOpenPaymentConfirmation={(transaction) => {
+            setTransactionsForPayment([transaction]);
+            setShowPaymentConfirmation(true);
+          }}
           existingTransaction={editingTransaction}
         />
       )}
@@ -1284,6 +1341,18 @@ export function TransactionsPage() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Payment Confirmation Modal */}
+      {showPaymentConfirmation && (
+        <PaymentConfirmationSlideIn
+          onClose={() => {
+            setShowPaymentConfirmation(false);
+            setTransactionsForPayment([]);
+          }}
+          onPaymentConfirmed={fetchTransactions}
+          transactions={transactionsForPayment}
+        />
+      )}
     </div>
   );
 }
