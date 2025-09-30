@@ -1311,7 +1311,7 @@ export function FinancialPlanning() {
                                 <Badge variant="outline" className="capitalize">
                                   {
                                     [...categories, ...customExpenseCategories].find((cat) => cat.id === expense.category)
-                                      ?.name
+                                      ?.name || expense.category
                                   }
                                 </Badge>
                                 {expense.isRecurring && (
