@@ -231,41 +231,7 @@ export function PaymentConfirmationSlideIn({
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {/* Form Fields Row */}
-            <div className="grid grid-cols-4 gap-4">
-              {/* Destino */}
-              <div className="space-y-2">
-                <Label htmlFor="destination" className="text-sm text-foreground">
-                  Destino
-                </Label>
-                <Select value={destination} onValueChange={setDestination}>
-                  <SelectTrigger className="rounded-lg">
-                    <SelectValue placeholder="-" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="default">-</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Categoria */}
-              <div className="space-y-2">
-                <Label htmlFor="category" className="text-sm text-foreground">
-                  Categoria
-                </Label>
-                <Select value={category} onValueChange={setCategory}>
-                  <SelectTrigger className="rounded-lg">
-                    <SelectValue placeholder="Sem categoria" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((cat) => (
-                      <SelectItem key={cat.id} value={cat.id}>
-                        {cat.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
+            <div className="grid grid-cols-2 gap-4">
               {/* Data do pagamento */}
               <div className="space-y-2">
                 <Label className="text-sm text-foreground">
