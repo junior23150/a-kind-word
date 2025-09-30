@@ -230,40 +230,6 @@ export function PaymentConfirmationSlideIn({
 
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
-            {/* Toggle Options */}
-            <div className="grid grid-cols-3 gap-6">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="grouped" className="text-sm text-foreground">
-                  Lançamento agrupado
-                </Label>
-                <Switch
-                  id="grouped"
-                  checked={groupedLaunch}
-                  onCheckedChange={setGroupedLaunch}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="single-cat" className="text-sm text-foreground">
-                  Categoria única para todos registros
-                </Label>
-                <Switch
-                  id="single-cat"
-                  checked={singleCategory}
-                  onCheckedChange={setSingleCategory}
-                />
-              </div>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="due-date" className="text-sm text-foreground">
-                  Utilizar data de vencimento
-                </Label>
-                <Switch
-                  id="due-date"
-                  checked={useDueDate}
-                  onCheckedChange={setUseDueDate}
-                />
-              </div>
-            </div>
-
             {/* Form Fields Row */}
             <div className="grid grid-cols-4 gap-4">
               {/* Destino */}
