@@ -948,11 +948,11 @@ export function TransactionsPage() {
                              <td className="p-2 lg:p-4 text-sm max-w-xs">
                                <div className="flex items-center gap-2">
                                  <span className="truncate">{transaction.description}</span>
-                                 {(transaction.description.includes("(Recorrente)") || 
-                                   transaction.description.includes("(") && 
+                                 {((transaction.original_message && transaction.original_message.includes("Recorrente:")) || 
+                                   (transaction.description.includes("(") && 
                                    transaction.description.includes("/") && 
                                    transaction.description.includes(")") &&
-                                   /\(\d+\/\d+\)/.test(transaction.description)) && (
+                                   /\(\d+\/\d+\)/.test(transaction.description))) && (
                                    <Badge className="bg-purple-100 text-purple-800 border-purple-200 text-xs px-2 py-0.5 rounded-full">
                                      Recorrente
                                    </Badge>
