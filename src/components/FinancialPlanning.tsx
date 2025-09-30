@@ -163,35 +163,47 @@ export function FinancialPlanning() {
       const expenseTransactions = transactions?.filter(t => t.transaction_type === 'expense') || [];
 
       // Converter para formato do componente
-      const loadedEntries = incomeTransactions.map(transaction => ({
-        id: transaction.id,
-        date: transaction.date, // Formato ISO (YYYY-MM-DD)
-        description: transaction.description,
-        category: transaction.category,
-        value: Number(transaction.amount),
-        spent: 0,
-        available: Number(transaction.amount),
-        type: "Entrada",
-        notes: transaction.original_message ? transaction.original_message.replace('Planejamento - ', '') : '',
-        isRecurring: transaction.description.includes('Recorrente') || transaction.description.includes('('),
-        recurrenceType: transaction.description.includes('Recorrente') ? 'mensal' : '',
-        installments: '',
-      }));
+      const loadedEntries = incomeTransactions.map(transaction => {
+        const isRecurring = transaction.original_message?.includes('Recorrente:') || false;
+        const recurrenceMatch = transaction.original_message?.match(/Recorrente: (\w+)/);
+        const recurrenceType = recurrenceMatch ? recurrenceMatch[1] : '';
+        
+        return {
+          id: transaction.id,
+          date: transaction.date, // Formato ISO (YYYY-MM-DD)
+          description: transaction.description,
+          category: transaction.category,
+          value: Number(transaction.amount),
+          spent: 0,
+          available: Number(transaction.amount),
+          type: "Entrada",
+          notes: transaction.original_message ? transaction.original_message.replace(/Planejamento( - Recorrente: \w+)? - /, '') : '',
+          isRecurring: isRecurring,
+          recurrenceType: recurrenceType,
+          installments: '',
+        };
+      });
 
-      const loadedExpenses = expenseTransactions.map(transaction => ({
-        id: transaction.id,
-        date: transaction.date, // Formato ISO (YYYY-MM-DD)
-        description: transaction.description,
-        category: transaction.category,
-        planned: Number(transaction.amount),
-        spent: 0,
-        available: Number(transaction.amount),
-        type: "Despesa",
-        notes: transaction.original_message || '',
-        isRecurring: transaction.description.includes('Recorrente') || transaction.description.includes('('),
-        recurrenceType: transaction.description.includes('Recorrente') ? 'mensal' : '',
-        installments: '',
-      }));
+      const loadedExpenses = expenseTransactions.map(transaction => {
+        const isRecurring = transaction.original_message?.includes('Recorrente:') || false;
+        const recurrenceMatch = transaction.original_message?.match(/Recorrente: (\w+)/);
+        const recurrenceType = recurrenceMatch ? recurrenceMatch[1] : '';
+        
+        return {
+          id: transaction.id,
+          date: transaction.date, // Formato ISO (YYYY-MM-DD)
+          description: transaction.description,
+          category: transaction.category,
+          planned: Number(transaction.amount),
+          spent: 0,
+          available: Number(transaction.amount),
+          type: "Despesa",
+          notes: transaction.original_message || '',
+          isRecurring: isRecurring,
+          recurrenceType: recurrenceType,
+          installments: '',
+        };
+      });
 
       setEntries(loadedEntries);
       setExpenses(loadedExpenses);
@@ -424,7 +436,7 @@ export function FinancialPlanning() {
                 transaction_type: 'income',
                 date: transactionDate.toISOString().split('T')[0],
                 source: 'planning',
-                original_message: `Planejamento - ${description}`,
+                original_message: `Planejamento${entryForm.isRecurring ? ` - Recorrente: ${entryForm.recurrenceType}` : ''} - ${description}`,
               });
             }
           } else {
@@ -561,7 +573,7 @@ export function FinancialPlanning() {
                 transaction_type: 'expense',
                 date: transactionDate.toISOString().split('T')[0],
                 source: 'planning',
-                original_message: `Planejamento - ${description}`,
+                original_message: `Planejamento${expenseForm.isRecurring ? ` - Recorrente: ${expenseForm.recurrenceType}` : ''} - ${description}`,
               });
             }
           } else {
