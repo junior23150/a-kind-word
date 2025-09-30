@@ -115,9 +115,14 @@ export function PaymentConfirmationSlideIn({
         // Inicializar detalhes de cada transação
         const initialDetails: typeof transactionDetails = {};
         transactions.forEach((t) => {
+          // Encontrar o ID da categoria pelo nome
+          const categoryMatch = categoriesData.data?.find(
+            (cat) => cat.name === t.category || cat.id === t.category
+          );
+          
           initialDetails[t.id] = {
             bankAccountId: t.bank_account_id || "",
-            categoryId: t.category || "",
+            categoryId: categoryMatch?.id || t.category || "",
             interest: "0,00",
             discount: "0,00",
             penalty: "0,00",
