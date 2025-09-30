@@ -335,34 +335,6 @@ export function PaymentConfirmationSlideIn({
                       className="border border-border rounded-lg p-4 space-y-4"
                     >
                       {/* Transaction Summary */}
-                      <div className="grid grid-cols-4 gap-4 text-sm">
-                        <div>
-                          <span className="text-muted-foreground">Cliente:</span>
-                          <p className="font-medium">{transaction.description}</p>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">
-                            Nº do documento:
-                          </span>
-                          <p className="font-medium">-</p>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">
-                            Vencimento:
-                          </span>
-                          <p className="font-medium">
-                            {format(new Date(transaction.date), "dd/MM/yyyy")}
-                          </p>
-                        </div>
-                        <div>
-                          <span className="text-muted-foreground">
-                            Valor original:
-                          </span>
-                          <p className="font-medium">
-                            R$ {transaction.amount.toFixed(2).replace(".", ",")}
-                          </p>
-                        </div>
-                      </div>
 
                       {/* Transaction Details */}
                       <div className="grid grid-cols-7 gap-3">
