@@ -393,16 +393,16 @@ export function FinancialPlanning() {
                 monthsToCreate = parseInt(entryForm.installments) || 1;
                 break;
               case 'mensal':
-                monthsToCreate = 12; // Mês atual + 11 seguintes = 12 total
+                monthsToCreate = 12;
                 break;
               case 'trimestral':
-                monthsToCreate = 4; // Mês atual + 3 seguintes = 4 total
+                monthsToCreate = 3;
                 break;
               case 'semestral':
-                monthsToCreate = 7; // Mês atual + 6 seguintes = 7 total
+                monthsToCreate = 6;
                 break;
               case 'anual':
-                monthsToCreate = 13; // Mês atual + 12 seguintes = 13 total
+                monthsToCreate = 1;
                 break;
               default:
                 monthsToCreate = 1;
@@ -412,8 +412,8 @@ export function FinancialPlanning() {
               const transactionDate = new Date(baseDate);
               transactionDate.setMonth(transactionDate.getMonth() + i);
               
-              const description = entryForm.isRecurring ? 
-                `${entryForm.description || "Nova Entrada"} ${entryForm.recurrenceType === 'parcelada' ? `(${i + 1}/${monthsToCreate})` : '(Recorrente)'}` : 
+              const description = entryForm.recurrenceType === 'parcelada' ? 
+                `${entryForm.description || "Nova Entrada"} (${i + 1}/${monthsToCreate})` : 
                 (entryForm.description || "Nova Entrada");
 
               transactionsToCreate.push({
@@ -530,16 +530,16 @@ export function FinancialPlanning() {
                 monthsToCreate = parseInt(expenseForm.installments) || 1;
                 break;
               case 'mensal':
-                monthsToCreate = 12; // Mês atual + 11 seguintes = 12 total
+                monthsToCreate = 12;
                 break;
               case 'trimestral':
-                monthsToCreate = 4; // Mês atual + 3 seguintes = 4 total
+                monthsToCreate = 3;
                 break;
               case 'semestral':
-                monthsToCreate = 7; // Mês atual + 6 seguintes = 7 total
+                monthsToCreate = 6;
                 break;
               case 'anual':
-                monthsToCreate = 13; // Mês atual + 12 seguintes = 13 total
+                monthsToCreate = 1;
                 break;
               default:
                 monthsToCreate = 1;
@@ -549,8 +549,8 @@ export function FinancialPlanning() {
               const transactionDate = new Date(baseDate);
               transactionDate.setMonth(transactionDate.getMonth() + i);
               
-              const description = expenseForm.isRecurring ? 
-                `${expenseForm.description || "Nova Despesa"} ${expenseForm.recurrenceType === 'parcelada' ? `(${i + 1}/${monthsToCreate})` : '(Recorrente)'}` : 
+              const description = expenseForm.recurrenceType === 'parcelada' ? 
+                `${expenseForm.description || "Nova Despesa"} (${i + 1}/${monthsToCreate})` : 
                 (expenseForm.description || "Nova Despesa");
 
               transactionsToCreate.push({
