@@ -1307,12 +1307,19 @@ export function FinancialPlanning() {
                                 </SelectContent>
                               </Select>
                             ) : (
-                              <Badge variant="outline" className="capitalize">
-                                {
-                                  [...categories, ...customExpenseCategories].find((cat) => cat.id === expense.category)
-                                    ?.name
-                                }
-                              </Badge>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <Badge variant="outline" className="capitalize">
+                                  {
+                                    [...categories, ...customExpenseCategories].find((cat) => cat.id === expense.category)
+                                      ?.name
+                                  }
+                                </Badge>
+                                {expense.isRecurring && (
+                                  <Badge className="bg-purple-100 text-purple-800 border-purple-200 text-xs">
+                                    Recorrente
+                                  </Badge>
+                                )}
+                              </div>
                             )}
                           </TableCell>
                           <TableCell className="text-center">
