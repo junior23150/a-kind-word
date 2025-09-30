@@ -332,13 +332,11 @@ export function PaymentConfirmationSlideIn({
                   {transactions.map((transaction, index) => (
                     <div
                       key={transaction.id}
-                      className="border border-border rounded-lg p-4 space-y-4"
+                      className="border border-border rounded-lg p-4"
                     >
-                      {/* Transaction Summary */}
-
-                      {/* Transaction Details */}
+                      {/* Transaction Details - Single Row */}
                       <div className="grid grid-cols-7 gap-3">
-                        <div className="col-span-2 space-y-2">
+                        <div className="space-y-2">
                           <Label className="text-xs text-muted-foreground">
                             Conta financeira
                           </Label>
@@ -355,7 +353,7 @@ export function PaymentConfirmationSlideIn({
                             <SelectTrigger className="rounded-lg text-sm h-9">
                               <SelectValue placeholder="Selecione" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="bg-white z-50">
                               {bankAccounts.map((account) => (
                                 <SelectItem key={account.id} value={account.id}>
                                   {account.bank_name} - {account.account_type}
@@ -365,7 +363,7 @@ export function PaymentConfirmationSlideIn({
                           </Select>
                         </div>
 
-                        <div className="col-span-2 space-y-2">
+                        <div className="space-y-2">
                           <Label className="text-xs text-muted-foreground">
                             Categoria
                           </Label>
@@ -382,7 +380,7 @@ export function PaymentConfirmationSlideIn({
                             <SelectTrigger className="rounded-lg text-sm h-9">
                               <SelectValue placeholder="Sem categoria" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="bg-white z-50">
                               {categories.map((cat) => (
                                 <SelectItem key={cat.id} value={cat.id}>
                                   {cat.name}
@@ -442,9 +440,7 @@ export function PaymentConfirmationSlideIn({
                             className="rounded-lg text-sm h-9 text-center"
                           />
                         </div>
-                      </div>
 
-                      <div className="grid grid-cols-7 gap-3">
                         <div className="space-y-2">
                           <Label className="text-xs text-muted-foreground">
                             Tarifa
