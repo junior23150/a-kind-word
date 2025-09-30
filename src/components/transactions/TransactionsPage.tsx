@@ -4,6 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -101,6 +111,7 @@ export function TransactionsPage() {
   const [showTransactionModal, setShowTransactionModal] = useState(false);
   const [showFilterSidebar, setShowFilterSidebar] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // Filter states
   const [filterStatus, setFilterStatus] = useState("Em aberto");
@@ -756,7 +767,7 @@ export function TransactionsPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={handleDeleteTransactions}
+                  onClick={() => setShowDeleteConfirm(true)}
                   disabled={selectedTransactions.length === 0}
                   className={`rounded-xl ${
                     selectedTransactions.length === 0
@@ -1248,6 +1259,31 @@ export function TransactionsPage() {
           existingTransaction={editingTransaction}
         />
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tem certeza que deseja excluir {selectedTransactions.length} transação(ões) selecionada(s)? 
+              Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                handleDeleteTransactions();
+                setShowDeleteConfirm(false);
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Sim, excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
