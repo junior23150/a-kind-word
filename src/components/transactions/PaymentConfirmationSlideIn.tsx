@@ -336,7 +336,7 @@ export function PaymentConfirmationSlideIn({
                     >
                       {/* Transaction Details - Single Row */}
                       <div className="grid grid-cols-12 gap-3">
-                        <div className="col-span-2 space-y-2">
+                        <div className="col-span-3 space-y-2">
                           <Label className="text-xs text-muted-foreground">
                             Conta financeira
                           </Label>
@@ -363,7 +363,7 @@ export function PaymentConfirmationSlideIn({
                           </Select>
                         </div>
 
-                        <div className="col-span-2 space-y-2">
+                        <div className="col-span-3 space-y-2">
                           <Label className="text-xs text-muted-foreground">
                             Categoria
                           </Label>
@@ -458,7 +458,7 @@ export function PaymentConfirmationSlideIn({
                           />
                         </div>
 
-                        <div className="space-y-2">
+                        <div className="col-span-2 space-y-2">
                           <Label className="text-xs text-muted-foreground">
                             Valor pago
                           </Label>
