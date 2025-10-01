@@ -200,8 +200,7 @@ export function TransactionSlideIn({
     setLoading(true);
 
     try {
-      console.log("Tentando criar transação com user_id:", user.id);
-      console.log("Dados da transação:", {
+      const transactionData = {
         user_id: user.id,
         amount: parseFloat(value.replace(",", ".")),
         description,
@@ -211,30 +210,46 @@ export function TransactionSlideIn({
         source: "manual",
         original_message: `Lançamento manual - ${description}`,
         bank_account_id: financialAccount || null,
-      });
+      };
 
-      const { error } = await supabase.from("transactions").insert({
-        user_id: user.id,
-        amount: parseFloat(value.replace(",", ".")),
-        description,
-        category,
-        transaction_type: type,
-        date: format(date, "yyyy-MM-dd"),
-        source: "manual",
-        original_message: `Lançamento manual - ${description}`,
-        bank_account_id: financialAccount || null,
-        status: "Em Aberto",
-      });
+      console.log("Dados da transação:", transactionData);
 
-      if (error) {
-        console.error("Erro detalhado ao inserir transação:", error);
-        throw error;
+      // Se existingTransaction existe, fazer UPDATE; senão, INSERT
+      if (existingTransaction?.id) {
+        console.log("Atualizando transação existente:", existingTransaction.id);
+        const { error } = await supabase
+          .from("transactions")
+          .update(transactionData)
+          .eq("id", existingTransaction.id);
+
+        if (error) {
+          console.error("Erro ao atualizar transação:", error);
+          throw error;
+        }
+
+        toast({
+          title: "Sucesso",
+          description: "Lançamento atualizado com sucesso!",
+        });
+      } else {
+        console.log("Criando nova transação");
+        const { error } = await supabase
+          .from("transactions")
+          .insert({
+            ...transactionData,
+            status: "Em Aberto",
+          });
+
+        if (error) {
+          console.error("Erro ao inserir transação:", error);
+          throw error;
+        }
+
+        toast({
+          title: "Sucesso",
+          description: "Lançamento criado com sucesso!",
+        });
       }
-
-      toast({
-        title: "Sucesso",
-        description: "Lançamento criado com sucesso!",
-      });
 
       // Reset form
       setCategory("");
@@ -252,10 +267,10 @@ export function TransactionSlideIn({
       onTransactionAdded?.();
       onClose();
     } catch (error) {
-      console.error("Erro ao criar lançamento:", error);
+      console.error("Erro ao salvar lançamento:", error);
       toast({
         title: "Erro",
-        description: "Erro ao criar lançamento",
+        description: "Erro ao salvar lançamento",
         variant: "destructive",
       });
     } finally {
@@ -285,35 +300,61 @@ export function TransactionSlideIn({
     setLoading(true);
 
     try {
-      // Criar a transação primeiro
-      const { data: newTransaction, error } = await supabase
-        .from("transactions")
-        .insert({
-          user_id: user.id,
-          amount: parseFloat(value.replace(",", ".")),
-          description,
-          category,
-          transaction_type: type,
-          date: format(date, "yyyy-MM-dd"),
-          source: "manual",
-          original_message: `Lançamento manual - ${description}`,
-          bank_account_id: financialAccount || null,
-          status: "Em Aberto",
-        })
-        .select()
-        .single();
+      const transactionData = {
+        user_id: user.id,
+        amount: parseFloat(value.replace(",", ".")),
+        description,
+        category,
+        transaction_type: type,
+        date: format(date, "yyyy-MM-dd"),
+        source: "manual",
+        original_message: `Lançamento manual - ${description}`,
+        bank_account_id: financialAccount || null,
+      };
 
-      if (error) {
-        console.error("Erro ao inserir transação:", error);
-        throw error;
+      let transactionToSettle;
+
+      // Se existingTransaction existe, fazer UPDATE; senão, INSERT
+      if (existingTransaction?.id) {
+        console.log("Atualizando transação existente para dar baixa:", existingTransaction.id);
+        const { data: updatedTransaction, error } = await supabase
+          .from("transactions")
+          .update(transactionData)
+          .eq("id", existingTransaction.id)
+          .select()
+          .single();
+
+        if (error) {
+          console.error("Erro ao atualizar transação:", error);
+          throw error;
+        }
+
+        transactionToSettle = updatedTransaction;
+      } else {
+        console.log("Criando nova transação para dar baixa");
+        const { data: newTransaction, error } = await supabase
+          .from("transactions")
+          .insert({
+            ...transactionData,
+            status: "Em Aberto",
+          })
+          .select()
+          .single();
+
+        if (error) {
+          console.error("Erro ao inserir transação:", error);
+          throw error;
+        }
+
+        transactionToSettle = newTransaction;
       }
 
       // Fechar este modal
       onClose();
 
       // Abrir modal de confirmação de pagamento
-      if (onOpenPaymentConfirmation && newTransaction) {
-        onOpenPaymentConfirmation(newTransaction);
+      if (onOpenPaymentConfirmation && transactionToSettle) {
+        onOpenPaymentConfirmation(transactionToSettle);
       }
 
       // Reset form
@@ -331,10 +372,10 @@ export function TransactionSlideIn({
 
       onTransactionAdded?.();
     } catch (error) {
-      console.error("Erro ao criar lançamento:", error);
+      console.error("Erro ao salvar lançamento:", error);
       toast({
         title: "Erro",
-        description: "Erro ao criar lançamento",
+        description: "Erro ao salvar lançamento",
         variant: "destructive",
       });
     } finally {
