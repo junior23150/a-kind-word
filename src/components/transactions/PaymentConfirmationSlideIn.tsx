@@ -60,6 +60,9 @@ export function PaymentConfirmationSlideIn({
   onPaymentConfirmed,
   transactions,
 }: PaymentConfirmationSlideInProps) {
+  // Detectar o tipo de transação (income ou expense)
+  const isIncome = transactions[0]?.transaction_type === "income";
+  
   const [groupedLaunch, setGroupedLaunch] = useState(false);
   const [singleCategory, setSingleCategory] = useState(false);
   const [useDueDate, setUseDueDate] = useState(false);
@@ -173,11 +176,12 @@ export function PaymentConfirmationSlideIn({
     setLoading(true);
 
     try {
-      // Atualizar status de todas as transações selecionadas para "Paga"
+      // Atualizar status de todas as transações selecionadas
+      const newStatus = isIncome ? "Recebido" : "Paga";
       const updatePromises = transactions.map((transaction) =>
         supabase
           .from("transactions")
-          .update({ status: "Paga" })
+          .update({ status: newStatus })
           .eq("id", transaction.id)
       );
 
@@ -185,7 +189,7 @@ export function PaymentConfirmationSlideIn({
 
       toast({
         title: "Sucesso",
-        description: "Pagamento confirmado com sucesso!",
+        description: isIncome ? "Recebimento confirmado com sucesso!" : "Pagamento confirmado com sucesso!",
       });
 
       onPaymentConfirmed?.();
@@ -237,10 +241,10 @@ export function PaymentConfirmationSlideIn({
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
             {/* Form Fields Row */}
             <div className="grid grid-cols-2 gap-4">
-              {/* Data do pagamento */}
+              {/* Data do pagamento/recebimento */}
               <div className="space-y-2">
                 <Label className="text-sm text-foreground">
-                  Data do pagamento
+                  {isIncome ? "Data do recebimento" : "Data do pagamento"}
                 </Label>
                 <div className="relative">
                   <Input
@@ -300,7 +304,7 @@ export function PaymentConfirmationSlideIn({
                 value={history}
                 onChange={(e) => setHistory(e.target.value)}
                 className="rounded-lg min-h-[80px] resize-none"
-                placeholder="Digite o histórico do pagamento..."
+                placeholder={isIncome ? "Digite o histórico do recebimento..." : "Digite o histórico do pagamento..."}
               />
             </div>
 
@@ -465,7 +469,7 @@ export function PaymentConfirmationSlideIn({
 
                         <div className="col-span-2 space-y-2">
                           <Label className="text-xs text-muted-foreground">
-                            Valor pago
+                            {isIncome ? "Valor recebido" : "Valor pago"}
                           </Label>
                           <Input
                             value={transactionDetails[transaction.id]?.paidValue || ""}
@@ -502,7 +506,7 @@ export function PaymentConfirmationSlideIn({
               disabled={loading}
               className="px-6 bg-primary hover:bg-primary/90"
             >
-              {loading ? "Processando..." : "Baixar pagamento"}
+              {loading ? "Processando..." : isIncome ? "Baixar recebimento" : "Baixar pagamento"}
             </Button>
           </div>
         </div>
