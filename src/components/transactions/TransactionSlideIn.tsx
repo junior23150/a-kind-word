@@ -588,20 +588,22 @@ export function TransactionSlideIn({
               />
             </div>
 
-            {/* Abas Pagamento e Ocorrência */}
+            {/* Abas Pagamento/Recebimento e Ocorrência */}
             <Tabs defaultValue="pagamento" className="w-full">
               <TabsList className="grid w-full grid-cols-2 rounded-xl">
-                <TabsTrigger value="pagamento" className="rounded-xl">Pagamento</TabsTrigger>
+                <TabsTrigger value="pagamento" className="rounded-xl">
+                  {type === "income" ? "Recebimento" : "Pagamento"}
+                </TabsTrigger>
                 <TabsTrigger value="ocorrencia" className="rounded-xl">Ocorrência</TabsTrigger>
               </TabsList>
               
-              {/* Aba Pagamento */}
+              {/* Aba Pagamento/Recebimento */}
               <TabsContent value="pagamento" className="space-y-4 mt-4">
-                {/* Primeira linha: Forma de pagamento / Conta financeira */}
+                {/* Primeira linha: Forma de pagamento/recebimento / Conta financeira */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-gray-700">
-                      Forma de pagamento
+                      {type === "income" ? "Forma de recebimento" : "Forma de pagamento"}
                     </Label>
                     <Select value={paymentMethod} onValueChange={setPaymentMethod}>
                       <SelectTrigger className="rounded-xl">
@@ -620,7 +622,7 @@ export function TransactionSlideIn({
                   
                   <div className="space-y-2">
                     <Label className="text-sm font-medium text-gray-700">
-                      Conta financeira
+                      {type === "income" ? "Conta de recebimento" : "Conta de pagamento"}
                     </Label>
                     <Select value={financialAccount} onValueChange={setFinancialAccount}>
                       <SelectTrigger className="rounded-xl">
@@ -676,10 +678,10 @@ export function TransactionSlideIn({
                   </div>
                 </div>
 
-                {/* Resumo Pagamento */}
+                {/* Resumo Pagamento/Recebimento */}
                 <div className="bg-gray-50 p-4 rounded-xl">
                   <div className="flex justify-between items-center text-sm">
-                    <span className="font-medium">Vencimento:</span>
+                    <span className="font-medium">{type === "income" ? "Data de recebimento:" : "Vencimento:"}</span>
                     <span>{format(date, "dd/MM/yyyy", { locale: pt })}</span>
                   </div>
                   <div className="flex justify-between items-center text-sm">
