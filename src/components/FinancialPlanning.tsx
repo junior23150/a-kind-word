@@ -643,7 +643,7 @@ export function FinancialPlanning() {
               });
             }
           } else {
-            // Criar budget_item único
+            // Criar budget_item único (apenas planejamento, sem criar transação)
             budgetItemsToCreate.push({
               user_id: user.id,
               planned_amount: baseAmount,
@@ -654,19 +654,9 @@ export function FinancialPlanning() {
               year: baseDate.getFullYear(),
               is_recurring: false,
             });
-
-            // Criar transaction única
-            transactionsToCreate.push({
-              user_id: user.id,
-              amount: baseAmount,
-              description: expenseForm.description || "Nova Despesa",
-              category: expenseForm.category,
-              transaction_type: 'expense',
-              date: baseDate.toISOString().split('T')[0],
-              source: 'planning',
-              status: 'Em Aberto',
-              original_message: `Planejamento - ${expenseForm.description || "Nova Despesa"}`,
-            });
+            
+            // NÃO criar transaction para saídas não recorrentes
+            // Estas são apenas planejamentos de categoria, não gastos reais
           }
 
           // Salvar budget_items (planejamento)
@@ -680,15 +670,17 @@ export function FinancialPlanning() {
             return;
           }
 
-          // Salvar transactions (lançamentos)
-          const { error: transError } = await supabase
-            .from('transactions')
-            .insert(transactionsToCreate);
+          // Salvar transactions (lançamentos) - apenas para recorrentes
+          if (transactionsToCreate.length > 0) {
+            const { error: transError } = await supabase
+              .from('transactions')
+              .insert(transactionsToCreate);
 
-          if (transError) {
-            console.error('Error saving transactions:', transError);
-            toast.error('Erro ao criar lançamentos');
-            return;
+            if (transError) {
+              console.error('Error saving transactions:', transError);
+              toast.error('Erro ao criar lançamentos');
+              return;
+            }
           }
 
           toast.success(`${budgetItemsToCreate.length > 1 ? budgetItemsToCreate.length + ' despesas' : 'Despesa'} criada${budgetItemsToCreate.length > 1 ? 's' : ''} com sucesso!`);
