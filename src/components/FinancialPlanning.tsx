@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useDataSync } from "@/contexts/DataSyncContext";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -86,6 +87,7 @@ const months = [
 
 export function FinancialPlanning() {
   const { user } = useAuth();
+  const { transactionSyncKey } = useDataSync();
   const [selectedMonth, setSelectedMonth] = useState("Outubro");
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [formStep, setFormStep] = useState(1);
@@ -232,14 +234,14 @@ export function FinancialPlanning() {
     }
   };
 
-  // Carregar dados quando o componente monta ou quando o usuário muda
+  // Carregar dados quando o componente monta, quando o usuário muda ou quando transações são atualizadas
   useEffect(() => {
     if (user) {
       loadExistingData();
     } else {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, transactionSyncKey]);
 
   // Helper function to get month index from name
   const getMonthIndex = (monthName: string) => {

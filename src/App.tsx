@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import { AuthProvider } from "./contexts/AuthContext";
+import { DataSyncProvider } from "./contexts/DataSyncContext";
 import AuthPage from "./pages/Auth";
 import Index from "./pages/Index";
 import Landing from "./pages/Landing";
@@ -30,7 +31,8 @@ const App = () => {
       <QueryClientProvider client={queryClient}>
         <BrowserRouter>
           <AuthProvider>
-            <TooltipProvider>
+            <DataSyncProvider>
+              <TooltipProvider>
               <Toaster />
               <Sonner />
               <Routes>
@@ -120,7 +122,8 @@ const App = () => {
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
-            </TooltipProvider>
+              </TooltipProvider>
+            </DataSyncProvider>
           </AuthProvider>
         </BrowserRouter>
       </QueryClientProvider>

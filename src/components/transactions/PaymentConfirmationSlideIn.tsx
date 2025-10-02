@@ -23,6 +23,7 @@ import { pt } from "date-fns/locale";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { useDataSync } from "@/contexts/DataSyncContext";
 import { cn } from "@/lib/utils";
 
 interface Transaction {
@@ -78,6 +79,7 @@ export function PaymentConfirmationSlideIn({
   
   const { toast } = useToast();
   const { user } = useAuth();
+  const { triggerTransactionSync } = useDataSync();
 
   // Estados para cada transação individual
   const [transactionDetails, setTransactionDetails] = useState<{
@@ -192,6 +194,9 @@ export function PaymentConfirmationSlideIn({
         description: isIncome ? "Recebimento confirmado com sucesso!" : "Pagamento confirmado com sucesso!",
       });
 
+      // Disparar evento de sincronização para atualizar tela de planejamento
+      triggerTransactionSync();
+      
       onPaymentConfirmed?.();
       onClose();
     } catch (error) {
