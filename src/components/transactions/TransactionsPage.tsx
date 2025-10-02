@@ -392,8 +392,8 @@ export function TransactionsPage() {
   const handleFullPayment = async (transactionId: string) => {
     const transaction = transactions.find((t) => t.id === transactionId);
     if (transaction) {
-      setTransactionsForPayment([transaction]);
-      setShowPaymentConfirmation(true);
+      setEditingTransaction(transaction);
+      setShowTransactionModal(true);
     }
   };
 
