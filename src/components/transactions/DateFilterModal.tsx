@@ -31,6 +31,7 @@ type FilterType =
   | "thisMonth"
   | "lastMonth"
   | "nextMonth"
+  | "selectMonth"
   | "customPeriod";
 
 export function DateFilterModal({
@@ -45,6 +46,8 @@ export function DateFilterModal({
   const [customEndDate, setCustomEndDate] = useState<Date | undefined>();
   const [startInputValue, setStartInputValue] = useState<string>("");
   const [endInputValue, setEndInputValue] = useState<string>("");
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+  const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
 
   // Função para determinar as classes do dia baseado no range customizado
   const getCustomDayClasses = (date: Date) => {
@@ -70,7 +73,23 @@ export function DateFilterModal({
     { key: "thisMonth", label: "Este mês" },
     { key: "lastMonth", label: "Mês passado" },
     { key: "nextMonth", label: "Mês seguinte" },
+    { key: "selectMonth", label: "Selecionar mês" },
     { key: "customPeriod", label: "Período customizado" },
+  ];
+
+  const months = [
+    { key: 0, label: "Jan", fullName: "Janeiro" },
+    { key: 1, label: "Fev", fullName: "Fevereiro" },
+    { key: 2, label: "Mar", fullName: "Março" },
+    { key: 3, label: "Abr", fullName: "Abril" },
+    { key: 4, label: "Mai", fullName: "Maio" },
+    { key: 5, label: "Jun", fullName: "Junho" },
+    { key: 6, label: "Jul", fullName: "Julho" },
+    { key: 7, label: "Ago", fullName: "Agosto" },
+    { key: 8, label: "Set", fullName: "Setembro" },
+    { key: 9, label: "Out", fullName: "Outubro" },
+    { key: 10, label: "Nov", fullName: "Novembro" },
+    { key: 11, label: "Dez", fullName: "Dezembro" },
   ];
 
   const handleFilterSelect = (filterType: FilterType) => {
@@ -105,6 +124,9 @@ export function DateFilterModal({
         from = startOfMonth(nextMonth);
         to = endOfMonth(nextMonth);
         break;
+      case "selectMonth":
+        // Para seleção de mês, não definimos range aqui
+        return;
       case "customPeriod":
         // Para período customizado, não definimos range aqui
         return;
@@ -121,6 +143,12 @@ export function DateFilterModal({
         })} - ${format(customEndDate, "dd/MM/yyyy", { locale: pt })}`;
         onApply({ from: customStartDate, to: customEndDate }, label);
       }
+    } else if (selectedFilter === "selectMonth" && selectedMonth !== null) {
+      const monthStart = new Date(selectedYear, selectedMonth, 1);
+      const monthEnd = endOfMonth(monthStart);
+      const monthName = months.find(m => m.key === selectedMonth)?.fullName;
+      const label = `${monthName} de ${selectedYear}`;
+      onApply({ from: monthStart, to: monthEnd }, label);
     } else {
       const selectedOption = filterOptions.find(
         (opt) => opt.key === selectedFilter
@@ -130,13 +158,75 @@ export function DateFilterModal({
     }
   };
 
+  const handleMonthSelect = (monthKey: number) => {
+    setSelectedMonth(monthKey);
+    const monthStart = new Date(selectedYear, monthKey, 1);
+    const monthEnd = endOfMonth(monthStart);
+    setTempRange({ from: monthStart, to: monthEnd });
+  };
+
   const isCustomPeriod = selectedFilter === "customPeriod";
+  const isSelectMonth = selectedFilter === "selectMonth";
 
   return (
     <div className="flex bg-white rounded-xl shadow-lg border overflow-hidden w-auto">
       {/* Seção dos Calendários */}
       <div className="flex-1">
-        {isCustomPeriod ? (
+        {isSelectMonth ? (
+          // Seletor de mês
+          <div className="p-6">
+            <div className="text-left mb-6">
+              <div className="text-sm font-medium text-gray-600 mb-2 text-center">
+                Início do período
+              </div>
+              <div className="bg-white border border-gray-300 rounded-xl px-4 py-3 text-center min-w-[160px]">
+                <div className="text-sm text-gray-700 font-medium">
+                  {selectedMonth !== null 
+                    ? format(new Date(selectedYear, selectedMonth, 1), "dd/MM/yyyy", { locale: pt })
+                    : "Selecione um mês"}
+                </div>
+              </div>
+            </div>
+            
+            {/* Seletor de ano */}
+            <div className="flex items-center justify-center mb-6 gap-4">
+              <button
+                onClick={() => setSelectedYear(selectedYear - 1)}
+                className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 flex items-center justify-center"
+              >
+                «
+              </button>
+              <div className="text-sm font-medium text-gray-700 min-w-[60px] text-center">
+                {selectedYear}
+              </div>
+              <button
+                onClick={() => setSelectedYear(selectedYear + 1)}
+                className="h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 flex items-center justify-center"
+              >
+                »
+              </button>
+            </div>
+
+            {/* Grid de meses */}
+            <div className="grid grid-cols-4 gap-3">
+              {months.map((month) => (
+                <button
+                  key={month.key}
+                  onClick={() => handleMonthSelect(month.key)}
+                  className={`
+                    h-16 rounded-lg font-medium text-sm transition-colors
+                    ${selectedMonth === month.key
+                      ? "bg-green-500 text-white hover:bg-green-600"
+                      : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
+                    }
+                  `}
+                >
+                  {month.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : isCustomPeriod ? (
           // Dois calendários para período customizado
           <div className="flex">
             {/* Calendário Início */}
@@ -457,8 +547,8 @@ export function DateFilterModal({
               onClick={handleApply}
               className="flex-1 bg-green-600 hover:bg-green-700 text-white rounded-xl h-10"
               disabled={
-                selectedFilter === "customPeriod" &&
-                (!customStartDate || !customEndDate)
+                (selectedFilter === "customPeriod" && (!customStartDate || !customEndDate)) ||
+                (selectedFilter === "selectMonth" && selectedMonth === null)
               }
             >
               Filtrar
