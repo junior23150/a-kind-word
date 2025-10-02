@@ -144,63 +144,80 @@ export function FinancialPlanning() {
     try {
       setLoading(true);
       
-      // Buscar transações de planejamento do usuário
-      const { data: transactions, error } = await supabase
-        .from('transactions')
+      // Buscar items de planejamento do usuário (permanente)
+      const { data: budgetItems, error } = await supabase
+        .from('budget_items')
         .select('*')
         .eq('user_id', user.id)
-        .eq('source', 'planning')
-        .order('date', { ascending: false });
+        .order('year', { ascending: false })
+        .order('month', { ascending: false });
 
       if (error) {
-        console.error('Error loading planning data:', error);
+        console.error('Error loading budget items:', error);
         toast.error('Erro ao carregar dados de planejamento');
         return;
       }
 
       // Separar entradas e despesas
-      const incomeTransactions = transactions?.filter(t => t.transaction_type === 'income') || [];
-      const expenseTransactions = transactions?.filter(t => t.transaction_type === 'expense') || [];
+      const incomeBudgets = budgetItems?.filter(b => b.type === 'income') || [];
+      const expenseBudgets = budgetItems?.filter(b => b.type === 'expense') || [];
+
+      // Buscar transações para calcular gastos reais
+      const { data: transactions } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', user.id)
+        .in('status', ['Pago', 'Recebido']);
 
       // Converter para formato do componente
-      const loadedEntries = incomeTransactions.map(transaction => {
-        const isRecurring = transaction.original_message?.includes('Recorrente:') || false;
-        const recurrenceMatch = transaction.original_message?.match(/Recorrente: (\w+)/);
-        const recurrenceType = recurrenceMatch ? recurrenceMatch[1] : '';
+      const loadedEntries = incomeBudgets.map(budget => {
+        // Calcular quanto já foi recebido desta categoria no mês/ano
+        const received = transactions?.filter(t => {
+          const tDate = new Date(t.date);
+          return t.transaction_type === 'income' && 
+                 t.category === budget.category &&
+                 tDate.getMonth() + 1 === budget.month &&
+                 tDate.getFullYear() === budget.year;
+        }).reduce((sum, t) => sum + Number(t.amount), 0) || 0;
         
         return {
-          id: transaction.id,
-          date: transaction.date, // Formato ISO (YYYY-MM-DD)
-          description: transaction.description,
-          category: transaction.category,
-          value: Number(transaction.amount),
-          spent: 0,
-          available: Number(transaction.amount),
+          id: budget.id,
+          date: `${budget.year}-${String(budget.month).padStart(2, '0')}-01`,
+          description: budget.description || budget.category,
+          category: budget.category,
+          value: Number(budget.planned_amount),
+          spent: received,
+          available: Number(budget.planned_amount) - received,
           type: "Entrada",
-          notes: transaction.original_message ? transaction.original_message.replace(/Planejamento( - Recorrente: \w+)? - /, '') : '',
-          isRecurring: isRecurring,
-          recurrenceType: recurrenceType,
+          notes: '',
+          isRecurring: budget.is_recurring,
+          recurrenceType: budget.recurrence_type || '',
           installments: '',
         };
       });
 
-      const loadedExpenses = expenseTransactions.map(transaction => {
-        const isRecurring = transaction.original_message?.includes('Recorrente:') || false;
-        const recurrenceMatch = transaction.original_message?.match(/Recorrente: (\w+)/);
-        const recurrenceType = recurrenceMatch ? recurrenceMatch[1] : '';
+      const loadedExpenses = expenseBudgets.map(budget => {
+        // Calcular quanto já foi gasto desta categoria no mês/ano
+        const spent = transactions?.filter(t => {
+          const tDate = new Date(t.date);
+          return t.transaction_type === 'expense' && 
+                 t.category === budget.category &&
+                 tDate.getMonth() + 1 === budget.month &&
+                 tDate.getFullYear() === budget.year;
+        }).reduce((sum, t) => sum + Number(t.amount), 0) || 0;
         
         return {
-          id: transaction.id,
-          date: transaction.date, // Formato ISO (YYYY-MM-DD)
-          description: transaction.description,
-          category: transaction.category,
-          planned: Number(transaction.amount),
-          spent: 0,
-          available: Number(transaction.amount),
+          id: budget.id,
+          date: `${budget.year}-${String(budget.month).padStart(2, '0')}-01`,
+          description: budget.description || budget.category,
+          category: budget.category,
+          planned: Number(budget.planned_amount),
+          spent: spent,
+          available: Number(budget.planned_amount) - spent,
           type: "Despesa",
-          notes: transaction.original_message || '',
-          isRecurring: isRecurring,
-          recurrenceType: recurrenceType,
+          notes: '',
+          isRecurring: budget.is_recurring,
+          recurrenceType: budget.recurrence_type || '',
           installments: '',
         };
       });
@@ -332,14 +349,14 @@ export function FinancialPlanning() {
   const confirmDelete = async () => {
     try {
       if (deleteType === "entry") {
-        // Remover do banco de dados
+        // Remover do banco de dados (budget_items)
         const { error } = await supabase
-          .from('transactions')
+          .from('budget_items')
           .delete()
           .eq('id', itemToDelete.id);
 
         if (error) {
-          console.error('Error deleting entry:', error);
+          console.error('Error deleting budget item:', error);
           toast.error('Erro ao excluir entrada do banco de dados');
           return;
         }
@@ -347,14 +364,14 @@ export function FinancialPlanning() {
         setEntries((prev) => prev.filter((entry) => entry.id !== itemToDelete.id));
         toast.success('Entrada excluída com sucesso!');
       } else {
-        // Remover despesa do banco de dados
+        // Remover despesa do banco de dados (budget_items)
         const { error } = await supabase
-          .from('transactions')
+          .from('budget_items')
           .delete()
           .eq('id', itemToDelete.id);
 
         if (error) {
-          console.error('Error deleting expense:', error);
+          console.error('Error deleting budget item:', error);
           toast.error('Erro ao excluir despesa do banco de dados');
           return;
         }
@@ -376,25 +393,31 @@ export function FinancialPlanning() {
     if (entryForm.category && user) {
       try {
         if (editingEntry) {
-          setEntries((prev) =>
-            prev.map((entry) =>
-              entry.id === editingEntry.id
-                ? {
-                    ...entry,
-                    description: entryForm.description || "Nova Entrada",
-                    value: Number.parseFloat(entryForm.value.replace(/[^\d,]/g, "").replace(",", ".")) || 0,
-                    date: entryForm.date || new Date().toLocaleDateString("pt-BR"),
-                    category: entryForm.category,
-                    notes: entryForm.notes,
-                    available: Number.parseFloat(entryForm.value.replace(/[^\d,]/g, "").replace(",", ".")) || 0,
-                  }
-                : entry,
-            ),
-          );
+          // Atualizar budget_item existente
+          const amount = Number.parseFloat(entryForm.value.replace(/[^\d,]/g, "").replace(",", ".")) || 0;
+          
+          const { error } = await supabase
+            .from('budget_items')
+            .update({
+              description: entryForm.description || "Nova Entrada",
+              planned_amount: amount,
+              category: entryForm.category,
+            })
+            .eq('id', editingEntry.id);
+
+          if (error) {
+            console.error('Error updating budget item:', error);
+            toast.error('Erro ao atualizar entrada');
+            return;
+          }
+
+          toast.success('Entrada atualizada com sucesso!');
+          await loadExistingData();
         } else {
           const baseDate = new Date(entryForm.date || new Date());
           const baseAmount = Number.parseFloat(entryForm.value.replace(/[^\d,]/g, "").replace(",", ".")) || 0;
           
+          const budgetItemsToCreate = [];
           const transactionsToCreate = [];
 
           if (entryForm.isRecurring && entryForm.recurrenceType) {
@@ -421,25 +444,53 @@ export function FinancialPlanning() {
             }
 
             for (let i = 0; i < monthsToCreate; i++) {
-              const transactionDate = new Date(baseDate);
-              transactionDate.setMonth(transactionDate.getMonth() + i);
+              const itemDate = new Date(baseDate);
+              itemDate.setMonth(itemDate.getMonth() + i);
               
               const description = entryForm.recurrenceType === 'parcelada' ? 
                 `${entryForm.description || "Nova Entrada"} (${i + 1}/${monthsToCreate})` : 
                 (entryForm.description || "Nova Entrada");
 
+              // Criar budget_item (planejamento permanente)
+              budgetItemsToCreate.push({
+                user_id: user.id,
+                planned_amount: baseAmount,
+                description: description,
+                category: entryForm.category,
+                type: 'income',
+                month: itemDate.getMonth() + 1,
+                year: itemDate.getFullYear(),
+                is_recurring: entryForm.isRecurring,
+                recurrence_type: entryForm.recurrenceType,
+              });
+
+              // Criar transaction (lançamento de caixa)
               transactionsToCreate.push({
                 user_id: user.id,
                 amount: baseAmount,
                 description: description,
                 category: entryForm.category,
                 transaction_type: 'income',
-                date: transactionDate.toISOString().split('T')[0],
+                date: itemDate.toISOString().split('T')[0],
                 source: 'planning',
+                status: 'Em Aberto',
                 original_message: `Planejamento${entryForm.isRecurring ? ` - Recorrente: ${entryForm.recurrenceType}` : ''} - ${description}`,
               });
             }
           } else {
+            // Criar budget_item único
+            budgetItemsToCreate.push({
+              user_id: user.id,
+              planned_amount: baseAmount,
+              description: entryForm.description || "Nova Entrada",
+              category: entryForm.category,
+              type: 'income',
+              month: baseDate.getMonth() + 1,
+              year: baseDate.getFullYear(),
+              is_recurring: false,
+            });
+
+            // Criar transaction única
             transactionsToCreate.push({
               user_id: user.id,
               amount: baseAmount,
@@ -448,42 +499,36 @@ export function FinancialPlanning() {
               transaction_type: 'income',
               date: baseDate.toISOString().split('T')[0],
               source: 'planning',
+              status: 'Em Aberto',
               original_message: `Planejamento - ${entryForm.description || "Nova Entrada"}`,
             });
           }
 
-          // Salvar no banco de dados
-          const { data, error } = await supabase
-            .from('transactions')
-            .insert(transactionsToCreate)
-            .select();
+          // Salvar budget_items (planejamento)
+          const { error: budgetError } = await supabase
+            .from('budget_items')
+            .insert(budgetItemsToCreate);
 
-          if (error) {
-            console.error('Error saving transactions:', error);
-            toast.error('Erro ao salvar entrada no banco de dados');
+          if (budgetError) {
+            console.error('Error saving budget items:', budgetError);
+            toast.error('Erro ao salvar planejamento');
             return;
           }
 
-          // Atualizar estado local para exibição imediata
-          const newEntries = transactionsToCreate.map((transaction, index) => ({
-            id: data?.[index]?.id || Date.now() + index,
-            date: transaction.date, // Manter formato ISO (YYYY-MM-DD)
-            description: transaction.description,
-            category: transaction.category,
-            value: transaction.amount,
-            spent: 0,
-            available: transaction.amount,
-            type: "Entrada",
-            notes: entryForm.notes,
-            isRecurring: entryForm.isRecurring,
-            recurrenceType: entryForm.recurrenceType,
-            installments: entryForm.installments,
-          }));
+          // Salvar transactions (lançamentos)
+          const { error: transError } = await supabase
+            .from('transactions')
+            .insert(transactionsToCreate);
 
-          setEntries((prev) => [...prev, ...newEntries]);
-          toast.success(`${transactionsToCreate.length > 1 ? transactionsToCreate.length + ' entradas' : 'Entrada'} criada${transactionsToCreate.length > 1 ? 's' : ''} com sucesso!`);
+          if (transError) {
+            console.error('Error saving transactions:', transError);
+            toast.error('Erro ao criar lançamentos');
+            return;
+          }
+
+          toast.success(`${budgetItemsToCreate.length > 1 ? budgetItemsToCreate.length + ' entradas' : 'Entrada'} criada${budgetItemsToCreate.length > 1 ? 's' : ''} com sucesso!`);
           
-          // Recarregar dados para manter sincronização
+          // Recarregar dados
           await loadExistingData();
         }
 
@@ -513,25 +558,31 @@ export function FinancialPlanning() {
     if (expenseForm.category && user) {
       try {
         if (editingExpense) {
-          setExpenses((prev) =>
-            prev.map((expense) =>
-              expense.id === editingExpense.id
-                ? {
-                    ...expense,
-                    description: expenseForm.description || "Nova Despesa",
-                    planned: Number.parseFloat(expenseForm.planned.replace(/[^\d,]/g, "").replace(",", ".")) || 0,
-                    date: expenseForm.date || new Date().toLocaleDateString("pt-BR"),
-                    category: expenseForm.category,
-                    notes: expenseForm.notes,
-                    available: Number.parseFloat(expenseForm.planned.replace(/[^\d,]/g, "").replace(",", ".")) || 0,
-                  }
-                : expense,
-            ),
-          );
+          // Atualizar budget_item existente
+          const amount = Number.parseFloat(expenseForm.planned.replace(/[^\d,]/g, "").replace(",", ".")) || 0;
+          
+          const { error } = await supabase
+            .from('budget_items')
+            .update({
+              description: expenseForm.description || "Nova Despesa",
+              planned_amount: amount,
+              category: expenseForm.category,
+            })
+            .eq('id', editingExpense.id);
+
+          if (error) {
+            console.error('Error updating budget item:', error);
+            toast.error('Erro ao atualizar despesa');
+            return;
+          }
+
+          toast.success('Despesa atualizada com sucesso!');
+          await loadExistingData();
         } else {
           const baseDate = new Date(expenseForm.date || new Date());
           const baseAmount = Number.parseFloat(expenseForm.planned.replace(/[^\d,]/g, "").replace(",", ".")) || 0;
           
+          const budgetItemsToCreate = [];
           const transactionsToCreate = [];
 
           if (expenseForm.isRecurring && expenseForm.recurrenceType) {
@@ -558,25 +609,53 @@ export function FinancialPlanning() {
             }
 
             for (let i = 0; i < monthsToCreate; i++) {
-              const transactionDate = new Date(baseDate);
-              transactionDate.setMonth(transactionDate.getMonth() + i);
+              const itemDate = new Date(baseDate);
+              itemDate.setMonth(itemDate.getMonth() + i);
               
               const description = expenseForm.recurrenceType === 'parcelada' ? 
                 `${expenseForm.description || "Nova Despesa"} (${i + 1}/${monthsToCreate})` : 
                 (expenseForm.description || "Nova Despesa");
 
+              // Criar budget_item (planejamento permanente)
+              budgetItemsToCreate.push({
+                user_id: user.id,
+                planned_amount: baseAmount,
+                description: description,
+                category: expenseForm.category,
+                type: 'expense',
+                month: itemDate.getMonth() + 1,
+                year: itemDate.getFullYear(),
+                is_recurring: expenseForm.isRecurring,
+                recurrence_type: expenseForm.recurrenceType,
+              });
+
+              // Criar transaction (lançamento de caixa)
               transactionsToCreate.push({
                 user_id: user.id,
                 amount: baseAmount,
                 description: description,
                 category: expenseForm.category,
                 transaction_type: 'expense',
-                date: transactionDate.toISOString().split('T')[0],
+                date: itemDate.toISOString().split('T')[0],
                 source: 'planning',
+                status: 'Em Aberto',
                 original_message: `Planejamento${expenseForm.isRecurring ? ` - Recorrente: ${expenseForm.recurrenceType}` : ''} - ${description}`,
               });
             }
           } else {
+            // Criar budget_item único
+            budgetItemsToCreate.push({
+              user_id: user.id,
+              planned_amount: baseAmount,
+              description: expenseForm.description || "Nova Despesa",
+              category: expenseForm.category,
+              type: 'expense',
+              month: baseDate.getMonth() + 1,
+              year: baseDate.getFullYear(),
+              is_recurring: false,
+            });
+
+            // Criar transaction única
             transactionsToCreate.push({
               user_id: user.id,
               amount: baseAmount,
@@ -585,42 +664,36 @@ export function FinancialPlanning() {
               transaction_type: 'expense',
               date: baseDate.toISOString().split('T')[0],
               source: 'planning',
+              status: 'Em Aberto',
               original_message: `Planejamento - ${expenseForm.description || "Nova Despesa"}`,
             });
           }
 
-          // Salvar no banco de dados
-          const { data, error } = await supabase
-            .from('transactions')
-            .insert(transactionsToCreate)
-            .select();
+          // Salvar budget_items (planejamento)
+          const { error: budgetError } = await supabase
+            .from('budget_items')
+            .insert(budgetItemsToCreate);
 
-          if (error) {
-            console.error('Error saving expense transactions:', error);
-            toast.error('Erro ao salvar despesa no banco de dados');
+          if (budgetError) {
+            console.error('Error saving budget items:', budgetError);
+            toast.error('Erro ao salvar planejamento');
             return;
           }
 
-          // Atualizar estado local para exibição imediata
-          const newExpenses = transactionsToCreate.map((transaction, index) => ({
-            id: data?.[index]?.id || Date.now() + index,
-            date: transaction.date, // Manter formato ISO (YYYY-MM-DD)
-            description: transaction.description,
-            category: transaction.category,
-            planned: transaction.amount,
-            spent: 0,
-            available: transaction.amount,
-            type: "Despesa",
-            notes: expenseForm.notes,
-            isRecurring: expenseForm.isRecurring,
-            recurrenceType: expenseForm.recurrenceType,
-            installments: expenseForm.installments,
-          }));
+          // Salvar transactions (lançamentos)
+          const { error: transError } = await supabase
+            .from('transactions')
+            .insert(transactionsToCreate);
 
-          setExpenses((prev) => [...prev, ...newExpenses]);
-          toast.success(`${transactionsToCreate.length > 1 ? transactionsToCreate.length + ' despesas' : 'Despesa'} criada${transactionsToCreate.length > 1 ? 's' : ''} com sucesso!`);
+          if (transError) {
+            console.error('Error saving transactions:', transError);
+            toast.error('Erro ao criar lançamentos');
+            return;
+          }
+
+          toast.success(`${budgetItemsToCreate.length > 1 ? budgetItemsToCreate.length + ' despesas' : 'Despesa'} criada${budgetItemsToCreate.length > 1 ? 's' : ''} com sucesso!`);
           
-          // Recarregar dados para manter sincronização
+          // Recarregar dados
           await loadExistingData();
         }
 

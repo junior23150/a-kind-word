@@ -94,6 +94,57 @@ export type Database = {
           },
         ]
       }
+      budget_items: {
+        Row: {
+          category: string
+          color: string | null
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          is_recurring: boolean
+          month: number
+          planned_amount: number
+          recurrence_type: string | null
+          type: string
+          updated_at: string
+          user_id: string
+          year: number
+        }
+        Insert: {
+          category: string
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_recurring?: boolean
+          month: number
+          planned_amount: number
+          recurrence_type?: string | null
+          type: string
+          updated_at?: string
+          user_id: string
+          year: number
+        }
+        Update: {
+          category?: string
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          is_recurring?: boolean
+          month?: number
+          planned_amount?: number
+          recurrence_type?: string | null
+          type?: string
+          updated_at?: string
+          user_id?: string
+          year?: number
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           color: string

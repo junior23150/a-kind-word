@@ -233,16 +233,30 @@ export function TransactionSlideIn({
         });
       } else {
         console.log("Criando nova transação");
-        const { error } = await supabase
+        const { data: newTransaction, error } = await supabase
           .from("transactions")
           .insert({
             ...transactionData,
             status: "Em Aberto",
-          });
+          })
+          .select()
+          .single();
 
         if (error) {
           console.error("Erro ao inserir transação:", error);
           throw error;
+        }
+
+        // Sincronizar com planejamento automaticamente
+        if (newTransaction) {
+          try {
+            await supabase.functions.invoke('sync-transaction-to-planning', {
+              body: { transaction: newTransaction }
+            });
+          } catch (syncError) {
+            console.error('Erro ao sincronizar com planejamento:', syncError);
+            // Não falhar a transação por erro de sincronização
+          }
         }
 
         toast({
@@ -344,6 +358,18 @@ export function TransactionSlideIn({
         if (error) {
           console.error("Erro ao inserir transação:", error);
           throw error;
+        }
+
+        // Sincronizar com planejamento automaticamente
+        if (newTransaction) {
+          try {
+            await supabase.functions.invoke('sync-transaction-to-planning', {
+              body: { transaction: newTransaction }
+            });
+          } catch (syncError) {
+            console.error('Erro ao sincronizar com planejamento:', syncError);
+            // Não falhar a transação por erro de sincronização
+          }
         }
 
         transactionToSettle = newTransaction;
