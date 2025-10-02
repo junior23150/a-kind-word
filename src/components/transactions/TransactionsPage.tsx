@@ -57,6 +57,7 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
+import { useDataSync } from "@/contexts/DataSyncContext";
 import {
   format,
   startOfMonth,
@@ -101,6 +102,7 @@ interface Transaction {
 
 export function TransactionsPage() {
   const { user } = useAuth();
+  const { triggerTransactionSync } = useDataSync();
   const [selectedAccount, setSelectedAccount] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [dateRange, setDateRange] = useState({
@@ -418,15 +420,45 @@ export function TransactionsPage() {
   };
 
   const handleDeleteTransaction = async (transactionId: string) => {
+    if (!user) return;
+
     try {
-      const { error } = await supabase
+      const transaction = transactions.find((t) => t.id === transactionId);
+      if (!transaction) return;
+
+      // Deletar a transação
+      const { error: transactionError } = await supabase
         .from("transactions")
         .delete()
         .eq("id", transactionId);
 
-      if (error) throw error;
+      if (transactionError) throw transactionError;
+
+      // Se houver categoria e descrição, tentar deletar budget_item relacionado
+      if (transaction.category && transaction.description) {
+        const transactionDate = new Date(transaction.date);
+        const month = transactionDate.getMonth() + 1;
+        const year = transactionDate.getFullYear();
+
+        // Buscar e deletar budget_item relacionado
+        const { error: budgetError } = await supabase
+          .from("budget_items")
+          .delete()
+          .eq("user_id", user.id)
+          .eq("category", transaction.category)
+          .eq("description", transaction.description)
+          .eq("month", month)
+          .eq("year", year);
+
+        if (budgetError) {
+          console.warn("Erro ao deletar budget_item relacionado:", budgetError);
+        }
+      }
 
       setTransactions((prev) => prev.filter((t) => t.id !== transactionId));
+
+      // Disparar sincronização para atualizar tela de planejamento
+      triggerTransactionSync();
 
       toast({
         title: "Sucesso",

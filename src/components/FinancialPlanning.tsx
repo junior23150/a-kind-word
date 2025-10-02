@@ -87,7 +87,7 @@ const months = [
 
 export function FinancialPlanning() {
   const { user } = useAuth();
-  const { transactionSyncKey } = useDataSync();
+  const { transactionSyncKey, triggerTransactionSync } = useDataSync();
   const [selectedMonth, setSelectedMonth] = useState("Outubro");
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [formStep, setFormStep] = useState(1);
@@ -349,36 +349,80 @@ export function FinancialPlanning() {
   };
 
   const confirmDelete = async () => {
+    if (!user) return;
+
     try {
       if (deleteType === "entry") {
         // Remover do banco de dados (budget_items)
-        const { error } = await supabase
+        const { error: budgetError } = await supabase
           .from('budget_items')
           .delete()
           .eq('id', itemToDelete.id);
 
-        if (error) {
-          console.error('Error deleting budget item:', error);
+        if (budgetError) {
+          console.error('Error deleting budget item:', budgetError);
           toast.error('Erro ao excluir entrada do banco de dados');
           return;
         }
 
+        // Para entradas (income), também remover transações relacionadas
+        const monthIndex = getMonthIndex(selectedMonth);
+        
+        const { error: transactionError } = await supabase
+          .from("transactions")
+          .delete()
+          .eq("user_id", user.id)
+          .eq("category", itemToDelete.category)
+          .eq("description", itemToDelete.description)
+          .gte("date", `${selectedYear}-${String(monthIndex + 1).padStart(2, "0")}-01`)
+          .lte("date", `${selectedYear}-${String(monthIndex + 1).padStart(2, "0")}-31`);
+
+        if (transactionError) {
+          console.warn("Erro ao deletar transações relacionadas:", transactionError);
+        }
+
         setEntries((prev) => prev.filter((entry) => entry.id !== itemToDelete.id));
+        
+        // Disparar sincronização para atualizar tela de transações
+        triggerTransactionSync();
+        
         toast.success('Entrada excluída com sucesso!');
       } else {
         // Remover despesa do banco de dados (budget_items)
-        const { error } = await supabase
+        const { error: budgetError } = await supabase
           .from('budget_items')
           .delete()
           .eq('id', itemToDelete.id);
 
-        if (error) {
-          console.error('Error deleting budget item:', error);
+        if (budgetError) {
+          console.error('Error deleting budget item:', budgetError);
           toast.error('Erro ao excluir despesa do banco de dados');
           return;
         }
 
+        // Para saídas recorrentes, também remover transações relacionadas
+        if (itemToDelete.isRecurring) {
+          const monthIndex = getMonthIndex(selectedMonth);
+          
+          const { error: transactionError } = await supabase
+            .from("transactions")
+            .delete()
+            .eq("user_id", user.id)
+            .eq("category", itemToDelete.category)
+            .eq("description", itemToDelete.description)
+            .gte("date", `${selectedYear}-${String(monthIndex + 1).padStart(2, "0")}-01`)
+            .lte("date", `${selectedYear}-${String(monthIndex + 1).padStart(2, "0")}-31`);
+
+          if (transactionError) {
+            console.warn("Erro ao deletar transações relacionadas:", transactionError);
+          }
+        }
+
         setExpenses((prev) => prev.filter((expense) => expense.id !== itemToDelete.id));
+        
+        // Disparar sincronização para atualizar tela de transações
+        triggerTransactionSync();
+        
         toast.success('Despesa excluída com sucesso!');
       }
     } catch (error) {
