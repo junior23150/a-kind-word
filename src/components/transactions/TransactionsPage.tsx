@@ -212,40 +212,55 @@ export function TransactionsPage() {
     }
   }, [user, toast]);
 
-  // Verificar e atualizar transações em atraso
+  // Verificar e atualizar transações em atraso e entradas recebidas
   useEffect(() => {
-    const checkOverdueTransactions = async () => {
+    const checkTransactionStatuses = async () => {
       if (!user || transactions.length === 0) return;
 
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
-      const overdueTransactions = transactions.filter((t) => {
+      const transactionsToUpdate: { transaction: Transaction; newStatus: string }[] = [];
+
+      transactions.forEach((t) => {
         const transactionDate = new Date(t.date);
         transactionDate.setHours(0, 0, 0, 0);
 
-        // Verificar se é recorrente e se está vencida
+        // Verificar se é recorrente
         const isRecurring = (t.original_message && t.original_message.includes("Recorrente:")) || 
                           (t.description.includes("(") && 
                           t.description.includes("/") && 
                           t.description.includes(")") &&
                           /\(\d+\/\d+\)/.test(t.description));
 
-        return (
+        // Despesas recorrentes em atraso
+        if (
           t.status === "Em Aberto" &&
           isRecurring &&
           transactionDate < today &&
           t.transaction_type === "expense"
-        );
+        ) {
+          transactionsToUpdate.push({ transaction: t, newStatus: "Em Atraso" });
+        }
+
+        // Entradas recorrentes que devem ser marcadas como recebidas
+        if (
+          t.status === "Aguardando Recebimento" &&
+          isRecurring &&
+          transactionDate <= today &&
+          t.transaction_type === "income"
+        ) {
+          transactionsToUpdate.push({ transaction: t, newStatus: "Recebido" });
+        }
       });
 
-      if (overdueTransactions.length > 0) {
+      if (transactionsToUpdate.length > 0) {
         try {
-          const updatePromises = overdueTransactions.map((t) =>
+          const updatePromises = transactionsToUpdate.map(({ transaction, newStatus }) =>
             supabase
               .from("transactions")
-              .update({ status: "Em Atraso" })
-              .eq("id", t.id)
+              .update({ status: newStatus })
+              .eq("id", transaction.id)
               .eq("user_id", user.id)
           );
 
@@ -253,19 +268,20 @@ export function TransactionsPage() {
 
           // Atualizar estado local
           setTransactions((prev) =>
-            prev.map((t) =>
-              overdueTransactions.find((ot) => ot.id === t.id)
-                ? { ...t, status: "Em Atraso" }
-                : t
-            )
+            prev.map((t) => {
+              const update = transactionsToUpdate.find(
+                (tu) => tu.transaction.id === t.id
+              );
+              return update ? { ...t, status: update.newStatus } : t;
+            })
           );
         } catch (error) {
-          console.error("Erro ao atualizar transações em atraso:", error);
+          console.error("Erro ao atualizar status das transações:", error);
         }
       }
     };
 
-    checkOverdueTransactions();
+    checkTransactionStatuses();
   }, [transactions, user]);
 
   // Filtrar transações
@@ -338,24 +354,34 @@ export function TransactionsPage() {
       return transaction.status;
     }
 
-    // Apenas transações de saída (despesas) têm status de pagamento
-    if (transaction.transaction_type === "income") {
-      return "Recebido";
-    }
-
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Zerar horas para comparação apenas de data
 
     const transactionDate = new Date(transaction.date);
     transactionDate.setHours(0, 0, 0, 0);
 
-    // Verificar se está em atraso (contas recorrentes não pagas após data de vencimento)
+    // Verificar se é recorrente
     const isRecurring = (transaction.original_message && transaction.original_message.includes("Recorrente:")) || 
                         (transaction.description.includes("(") && 
                         transaction.description.includes("/") && 
                         transaction.description.includes(")") &&
                         /\(\d+\/\d+\)/.test(transaction.description));
 
+    // Para entradas recorrentes
+    if (transaction.transaction_type === "income" && isRecurring) {
+      if (transactionDate <= today) {
+        return "Recebido";
+      } else {
+        return "Aguardando Recebimento";
+      }
+    }
+
+    // Para entradas não recorrentes
+    if (transaction.transaction_type === "income") {
+      return "Recebido";
+    }
+
+    // Para despesas recorrentes
     if (isRecurring) {
       if (transactionDate < today) {
         return "Em Atraso";
@@ -374,6 +400,8 @@ export function TransactionsPage() {
         return "bg-green-50 text-green-800 border-green-300";
       case "Recebido":
         return "bg-green-50 text-green-800 border-green-300";
+      case "Aguardando Recebimento":
+        return "bg-yellow-50 text-yellow-800 border-yellow-300";
       case "Em Aberto":
         return "bg-blue-50 text-blue-700 border-blue-200";
       case "Em Atraso":
