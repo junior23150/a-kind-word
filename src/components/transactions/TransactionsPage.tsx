@@ -919,7 +919,7 @@ export function TransactionsPage() {
                           />
                         </th>
                         <th className="text-left p-2 lg:p-4 font-medium text-muted-foreground text-sm">
-                          Data
+                          Vencimento
                         </th>
                         <th className="text-left p-2 lg:p-4 font-medium text-muted-foreground text-sm">
                           Categoria
