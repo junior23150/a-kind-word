@@ -13,6 +13,7 @@ import * as LucideIcons from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ContributeDialog } from "./ContributeDialog";
+import { GoalAIInsights } from "./GoalAIInsights";
 
 interface GoalCardProps {
   goal: {
@@ -180,6 +181,9 @@ export const GoalCard = ({ goal, onEdit, onUpdate }: GoalCardProps) => {
               </Button>
             </div>
           </div>
+
+          {/* AI Insights */}
+          <GoalAIInsights goal={goal} />
         </div>
       </Card>
 

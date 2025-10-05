@@ -4,11 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import * as LucideIcons from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useGoalAI, AICreationSuggestion } from "@/hooks/useGoalAI";
+import { Loader2 } from "lucide-react";
 
 interface GoalDialogProps {
   open: boolean;
@@ -49,6 +52,9 @@ export const GoalDialog = ({ open, onOpenChange, goalId }: GoalDialogProps) => {
   const [selectedColor, setSelectedColor] = useState(GOAL_COLORS[0]);
   const [selectedIcon, setSelectedIcon] = useState(GOAL_ICONS[0].name);
   const [coverImage, setCoverImage] = useState("");
+  const [aiSuggestion, setAiSuggestion] = useState<AICreationSuggestion | null>(null);
+  const [showAISuggestion, setShowAISuggestion] = useState(false);
+  const { getCreationAdvice, loading: aiLoading } = useGoalAI();
 
   useEffect(() => {
     if (goalId && open) {
@@ -91,6 +97,8 @@ export const GoalDialog = ({ open, onOpenChange, goalId }: GoalDialogProps) => {
     setSelectedColor(GOAL_COLORS[0]);
     setSelectedIcon(GOAL_ICONS[0].name);
     setCoverImage("");
+    setAiSuggestion(null);
+    setShowAISuggestion(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -131,6 +139,36 @@ export const GoalDialog = ({ open, onOpenChange, goalId }: GoalDialogProps) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGetAIAdvice = async () => {
+    if (!name || !targetAmount) {
+      toast.error('Preencha o nome e valor do objetivo para receber sugestões');
+      return;
+    }
+
+    const suggestion = await getCreationAdvice({
+      name,
+      target_amount: parseFloat(targetAmount),
+      current_amount: currentAmount ? parseFloat(currentAmount) : 0,
+      target_date: targetDate || undefined,
+    });
+
+    if (suggestion) {
+      setAiSuggestion(suggestion);
+      setShowAISuggestion(true);
+    }
+  };
+
+  const applyAISuggestion = () => {
+    if (!aiSuggestion) return;
+
+    const suggestedDate = new Date();
+    suggestedDate.setMonth(suggestedDate.getMonth() + aiSuggestion.prazo_estimado_meses);
+    setTargetDate(suggestedDate.toISOString().split('T')[0]);
+    
+    setShowAISuggestion(false);
+    toast.success(`Sugestão aplicada! Prazo: ${aiSuggestion.prazo_estimado_meses} meses`);
   };
 
   return (
@@ -224,6 +262,96 @@ export const GoalDialog = ({ open, onOpenChange, goalId }: GoalDialogProps) => {
               </div>
             )}
           </div>
+
+          {/* AI Assistant */}
+          <div className="pt-4 border-t border-border">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleGetAIAdvice}
+              disabled={aiLoading || !name || !targetAmount}
+              className="w-full gap-2"
+            >
+              {aiLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Analisando...
+                </>
+              ) : (
+                <>
+                  <LucideIcons.Sparkles className="w-4 h-4" />
+                  💡 Me ajude a planejar
+                </>
+              )}
+            </Button>
+          </div>
+
+          {/* AI Suggestion Card */}
+          {showAISuggestion && aiSuggestion && (
+            <Card className="p-4 space-y-3 bg-primary/5 border-primary/20">
+              <div className="flex items-center justify-between">
+                <h4 className="font-semibold text-sm flex items-center gap-2">
+                  <LucideIcons.Sparkles className="w-4 h-4 text-primary" />
+                  Sugestão da IA
+                </h4>
+                <span className={cn(
+                  "text-xs px-2 py-1 rounded-full",
+                  aiSuggestion.viabilidade === 'alta' && 'bg-green-500/20 text-green-700',
+                  aiSuggestion.viabilidade === 'média' && 'bg-yellow-500/20 text-yellow-700',
+                  aiSuggestion.viabilidade === 'baixa' && 'bg-red-500/20 text-red-700'
+                )}>
+                  Viabilidade {aiSuggestion.viabilidade}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground">Guardar por mês</p>
+                  <p className="text-lg font-bold text-primary">
+                    R$ {aiSuggestion.valor_mensal_sugerido.toLocaleString('pt-BR')}
+                  </p>
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs text-muted-foreground">Prazo estimado</p>
+                  <p className="text-lg font-bold">
+                    {aiSuggestion.prazo_estimado_meses} meses
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-xs font-medium">Conselhos:</p>
+                <ul className="space-y-1">
+                  {aiSuggestion.conselhos.map((conselho, index) => (
+                    <li key={index} className="text-xs text-muted-foreground flex gap-2">
+                      <span className="text-primary">•</span>
+                      <span>{conselho}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {aiSuggestion.alternativas.length > 0 && (
+                <div className="space-y-2 pt-2 border-t border-border/50">
+                  <p className="text-xs font-medium">Alternativas:</p>
+                  {aiSuggestion.alternativas.slice(0, 2).map((alt, index) => (
+                    <div key={index} className="text-xs text-muted-foreground">
+                      <span className="font-medium">Opção {index + 1}:</span> R$ {alt.valor_mensal}/mês em {alt.prazo_meses} meses
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <Button
+                type="button"
+                size="sm"
+                onClick={applyAISuggestion}
+                className="w-full mt-2"
+              >
+                Aplicar sugestão ao prazo
+              </Button>
+            </Card>
+          )}
 
           <div className="space-y-2">
             <Label>Cor</Label>
