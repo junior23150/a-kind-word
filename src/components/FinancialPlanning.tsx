@@ -19,6 +19,8 @@ import {
   Trash2,
   ArrowRight,
   CheckCircle,
+  RefreshCw,
+  Loader2,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -93,6 +95,7 @@ export function FinancialPlanning() {
   const [formStep, setFormStep] = useState(1);
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
   const [expenses, setExpenses] = useState([]);
 
   const [entryForm, setEntryForm] = useState({
@@ -242,6 +245,62 @@ export function FinancialPlanning() {
       setLoading(false);
     }
   }, [user, transactionSyncKey]);
+
+  // Configurar Supabase Realtime para escutar mudanças na tabela transactions
+  useEffect(() => {
+    if (!user) return;
+
+    console.log('Setting up realtime subscription for transactions...');
+    
+    const channel = supabase
+      .channel('transactions-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'transactions',
+          filter: `user_id=eq.${user.id}`,
+        },
+        async (payload) => {
+          console.log('Transaction changed:', payload);
+          
+          // Se uma transação foi atualizada para status "Pago" ou "Recebido"
+          if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
+            const transaction = payload.new;
+            if (transaction.status === 'Pago' || transaction.status === 'Recebido') {
+              console.log('Transaction marked as paid/received, reloading data...');
+              setSyncing(true);
+              await loadExistingData();
+              setSyncing(false);
+              toast.success('Dados sincronizados automaticamente!');
+            }
+          }
+          
+          // Se uma transação foi deletada
+          if (payload.eventType === 'DELETE') {
+            console.log('Transaction deleted, reloading data...');
+            setSyncing(true);
+            await loadExistingData();
+            setSyncing(false);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      console.log('Cleaning up realtime subscription...');
+      supabase.removeChannel(channel);
+    };
+  }, [user]);
+
+  // Função para atualização manual
+  const manualRefresh = async () => {
+    setSyncing(true);
+    await loadExistingData();
+    setSyncing(false);
+    toast.success('Dados atualizados!');
+  };
 
   // Helper function to get month index from name
   const getMonthIndex = (monthName: string) => {
@@ -948,10 +1007,28 @@ export function FinancialPlanning() {
         ) : (
           <div className="max-w-7xl mx-auto space-y-6">
           <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-purple-600 bg-clip-text text-transparent">
-              Hora de Planejar
-            </h1>
-            <p className="text-gray-600 text-lg">Organize suas finanças de forma simples e eficiente</p>
+            <div className="flex items-center justify-center gap-4">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-purple-600 bg-clip-text text-transparent">
+                Hora de Planejar
+              </h1>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={manualRefresh}
+                disabled={syncing}
+                className="rounded-full hover:bg-purple-100"
+              >
+                {syncing ? (
+                  <Loader2 className="h-5 w-5 text-purple-600 animate-spin" />
+                ) : (
+                  <RefreshCw className="h-5 w-5 text-purple-600" />
+                )}
+              </Button>
+            </div>
+            <p className="text-gray-600 text-lg">
+              Organize suas finanças de forma simples e eficiente
+              {syncing && <span className="text-purple-600 ml-2 font-medium">• Sincronizando...</span>}
+            </p>
 
             <div className="flex items-center justify-center gap-4">
               <Calendar className="h-5 w-5 text-purple-600" />
