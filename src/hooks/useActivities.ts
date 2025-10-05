@@ -25,6 +25,12 @@ export function useActivities(startDate: Date, endDate: Date) {
       const startStr = format(startDate, "yyyy-MM-dd");
       const endStr = format(endDate, "yyyy-MM-dd");
 
+      console.log("🔍 [useActivities] Buscando atividades:", {
+        startDate: startStr,
+        endDate: endStr,
+        user_id: user.id,
+      });
+
       // Fetch transactions
       const { data: transactions } = await supabase
         .from("transactions")
@@ -99,6 +105,13 @@ export function useActivities(startDate: Date, endDate: Date) {
 
       // Sort by date
       activities.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
+      console.log("✅ [useActivities] Atividades encontradas:", {
+        total: activities.length,
+        transactions: transactions?.length || 0,
+        bills: bills?.length || 0,
+        dateRange: `${startStr} a ${endStr}`,
+      });
 
       return activities;
     },

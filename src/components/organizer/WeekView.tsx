@@ -1,6 +1,7 @@
 import { startOfWeek, endOfWeek, eachDayOfInterval, format, isSameDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useActivities } from "@/hooks/useActivities";
+import { Badge } from "@/components/ui/badge";
 
 interface WeekViewProps {
   currentDate: Date;
@@ -27,6 +28,15 @@ export function WeekView({ currentDate, searchQuery, onDateClick }: WeekViewProp
     return filteredActivities.filter((activity) =>
       isSameDay(new Date(activity.date), day)
     );
+  };
+
+  const getStatusVariant = (status: string | null | undefined): "success" | "warning" | "destructive" | "secondary" => {
+    if (!status) return "secondary";
+    const statusLower = status.toLowerCase();
+    if (statusLower.includes("pago") || statusLower.includes("concluído")) return "success";
+    if (statusLower.includes("aberto") || statusLower.includes("pendente")) return "warning";
+    if (statusLower.includes("atrasado") || statusLower.includes("vencido")) return "destructive";
+    return "secondary";
   };
 
   return (
@@ -68,23 +78,21 @@ export function WeekView({ currentDate, searchQuery, onDateClick }: WeekViewProp
                 {dayActivities.slice(0, 3).map((activity) => (
                   <div
                     key={activity.id}
-                    className="text-xs p-2 rounded bg-muted/50"
+                    className="text-xs p-2 rounded bg-muted/50 border border-border/50"
                   >
-                    <p className="font-medium truncate">{activity.description}</p>
-                    <div className="flex items-center justify-between mt-1">
-                      <p
-                        className={`font-semibold ${
-                          activity.type === "income" ? "text-green-600" : "text-red-600"
-                        }`}
-                      >
-                        {activity.type === "income" ? "+" : "-"} R$ {activity.amount.toFixed(2)}
-                      </p>
-                      {activity.status && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-background text-muted-foreground">
-                          {activity.status}
-                        </span>
-                      )}
-                    </div>
+                    <p className="font-medium truncate mb-1">{activity.description}</p>
+                    {activity.status && (
+                      <Badge variant={getStatusVariant(activity.status)} className="text-[10px] px-1.5 py-0 h-4 mb-1">
+                        {activity.status}
+                      </Badge>
+                    )}
+                    <p
+                      className={`font-semibold ${
+                        activity.type === "income" ? "text-green-600" : "text-red-600"
+                      }`}
+                    >
+                      {activity.type === "income" ? "+" : "-"} R$ {activity.amount.toFixed(2)}
+                    </p>
                   </div>
                 ))}
                 {dayActivities.length > 3 && (

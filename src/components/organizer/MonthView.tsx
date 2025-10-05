@@ -10,6 +10,7 @@ import {
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useActivities } from "@/hooks/useActivities";
+import { Badge } from "@/components/ui/badge";
 
 interface MonthViewProps {
   currentDate: Date;
@@ -38,6 +39,15 @@ export function MonthView({ currentDate, searchQuery, onDateClick }: MonthViewPr
     return filteredActivities.filter((activity) =>
       isSameDay(new Date(activity.date), day)
     );
+  };
+
+  const getStatusVariant = (status: string | null | undefined): "success" | "warning" | "destructive" | "secondary" => {
+    if (!status) return "secondary";
+    const statusLower = status.toLowerCase();
+    if (statusLower.includes("pago") || statusLower.includes("concluído")) return "success";
+    if (statusLower.includes("aberto") || statusLower.includes("pendente")) return "warning";
+    if (statusLower.includes("atrasado") || statusLower.includes("vencido")) return "destructive";
+    return "secondary";
   };
 
   const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
@@ -88,17 +98,26 @@ export function MonthView({ currentDate, searchQuery, onDateClick }: MonthViewPr
                   {dayActivities.slice(0, 2).map((activity) => (
                     <div
                       key={activity.id}
-                      className="text-xs p-1 rounded bg-muted/50"
+                      className="text-xs p-1.5 rounded bg-muted/50 border border-border/50"
                     >
-                      <p className="truncate font-medium">{activity.description}</p>
+                      <div className="flex items-start gap-1 mb-1">
+                        <div
+                          className={`w-2 h-2 rounded-full mt-0.5 flex-shrink-0 ${
+                            activity.type === "income" ? "bg-green-500" : "bg-red-500"
+                          }`}
+                        />
+                        <p className="truncate font-medium flex-1">{activity.description}</p>
+                      </div>
                       {activity.status && (
-                        <p className="text-[10px] text-muted-foreground truncate">{activity.status}</p>
+                        <Badge variant={getStatusVariant(activity.status)} className="text-[9px] px-1 py-0 h-3">
+                          {activity.status}
+                        </Badge>
                       )}
                     </div>
                   ))}
                   {dayActivities.length > 2 && (
-                    <p className="text-xs text-muted-foreground">
-                      +{dayActivities.length - 2}
+                    <p className="text-xs text-muted-foreground font-medium">
+                      +{dayActivities.length - 2} mais
                     </p>
                   )}
                 </div>
