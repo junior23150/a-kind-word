@@ -21,6 +21,7 @@ import DashboardBusiness from "./pages/DashboardBusiness";
 import Categories from "./pages/Categories";
 import UserManagement from "./pages/UserManagement";
 import Objetivos from "./pages/Objetivos";
+import Organizador from "./pages/Organizador";
 
 const queryClient = new QueryClient();
 
@@ -93,6 +94,14 @@ const App = () => {
                   element={
                     <ProtectedRoute>
                       <Objetivos />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/organizador"
+                  element={
+                    <ProtectedRoute>
+                      <Organizador />
                     </ProtectedRoute>
                   }
                 />
