@@ -2,6 +2,7 @@ import { Calendar } from "lucide-react";
 import { format, isSameDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useActivities } from "@/hooks/useActivities";
+import { Badge } from "@/components/ui/badge";
 
 interface DayViewProps {
   currentDate: Date;
@@ -26,6 +27,15 @@ export function DayView({ currentDate, searchQuery, onDateClick }: DayViewProps)
 
   const dayName = format(currentDate, "EEEE, dd 'de' MMMM", { locale: ptBR });
 
+  const getStatusVariant = (status: string | null | undefined): "success" | "warning" | "destructive" | "secondary" => {
+    if (!status) return "secondary";
+    const statusLower = status.toLowerCase();
+    if (statusLower.includes("pago") || statusLower.includes("concluído")) return "success";
+    if (statusLower.includes("aberto") || statusLower.includes("pendente")) return "warning";
+    if (statusLower.includes("atrasado") || statusLower.includes("vencido")) return "destructive";
+    return "secondary";
+  };
+
   return (
     <div className="space-y-4">
       <div className="text-center py-4 border-b">
@@ -48,35 +58,50 @@ export function DayView({ currentDate, searchQuery, onDateClick }: DayViewProps)
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-4">
           {dayActivities.map((activity) => (
             <div
               key={activity.id}
               onClick={() => onDateClick(currentDate)}
-              className="p-4 rounded-lg border bg-card hover:bg-accent/50 cursor-pointer transition-colors"
+              className="p-5 rounded-lg border bg-card hover:bg-accent/50 cursor-pointer transition-colors shadow-sm"
             >
-              <div className="flex items-start justify-between">
+              <div className="flex items-start justify-between gap-4 mb-3">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-medium text-foreground">{activity.description}</h4>
+                  <h4 className="font-semibold text-lg text-foreground mb-2">{activity.description}</h4>
+                  <div className="flex items-center gap-2 flex-wrap">
                     {activity.status && (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                      <Badge variant={getStatusVariant(activity.status)}>
                         {activity.status}
-                      </span>
+                      </Badge>
+                    )}
+                    {activity.category && (
+                      <Badge variant="outline">{activity.category}</Badge>
                     )}
                   </div>
-                  {activity.category && (
-                    <p className="text-sm text-muted-foreground mt-1">{activity.category}</p>
+                </div>
+                <div className="text-right">
+                  <span
+                    className={`text-xl font-bold ${
+                      activity.type === "income" ? "text-green-600" : "text-red-600"
+                    }`}
+                  >
+                    {activity.type === "income" ? "+" : "-"} R$ {activity.amount.toFixed(2)}
+                  </span>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {activity.type === "income" ? "Receita" : "Despesa"}
+                  </p>
+                </div>
+              </div>
+              {(activity.payment_method || activity.bank_account_name) && (
+                <div className="flex items-center gap-4 text-sm text-muted-foreground pt-3 border-t">
+                  {activity.payment_method && (
+                    <span>Método: {activity.payment_method}</span>
+                  )}
+                  {activity.bank_account_name && (
+                    <span>Conta: {activity.bank_account_name}</span>
                   )}
                 </div>
-                <span
-                  className={`text-sm font-semibold ${
-                    activity.type === "income" ? "text-green-600" : "text-red-600"
-                  }`}
-                >
-                  {activity.type === "income" ? "+" : "-"} R$ {activity.amount.toFixed(2)}
-                </span>
-              </div>
+              )}
             </div>
           ))}
         </div>
