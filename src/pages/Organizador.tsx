@@ -5,8 +5,10 @@ import { CalendarControls } from "@/components/organizer/CalendarControls";
 import { DayView } from "@/components/organizer/DayView";
 import { WeekView } from "@/components/organizer/WeekView";
 import { MonthView } from "@/components/organizer/MonthView";
-import { ActivitySlideIn } from "@/components/organizer/ActivitySlideIn";
-import { startOfWeek, endOfWeek } from "date-fns";
+import { TransactionSlideIn } from "@/components/transactions/TransactionSlideIn";
+import { ActivitySelectionDialog } from "@/components/organizer/ActivitySelectionDialog";
+import { startOfWeek, endOfWeek, isSameDay, parseISO } from "date-fns";
+import { useActivities } from "@/hooks/useActivities";
 
 export type ViewMode = "day" | "week" | "month";
 export type TabMode = "calendar" | "tasks";
@@ -17,11 +19,57 @@ const Organizador = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [isSlideInOpen, setIsSlideInOpen] = useState(false);
+  const [isTransactionSlideInOpen, setIsTransactionSlideInOpen] = useState(false);
+  const [isSelectionDialogOpen, setIsSelectionDialogOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<any>(null);
+
+  // Buscar atividades para o período visível
+  const { activities } = useActivities(
+    viewMode === "month" ? new Date(currentDate.getFullYear(), currentDate.getMonth(), 1) : currentDate,
+    viewMode === "month" ? new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0) : currentDate
+  );
 
   const handleDateClick = (date: Date) => {
     setSelectedDate(date);
-    setIsSlideInOpen(true);
+    
+    // Filtrar atividades do dia
+    const dayActivities = activities.filter((activity) =>
+      isSameDay(parseISO(activity.date), date)
+    );
+
+    // Se houver apenas 1 atividade, abrir diretamente
+    if (dayActivities.length === 1) {
+      const activity = dayActivities[0];
+      setSelectedTransaction({
+        id: activity.id,
+        amount: activity.amount,
+        description: activity.description,
+        category: activity.category,
+        transaction_type: activity.type,
+        date: activity.date,
+        bank_account_id: null,
+        payment_method: activity.payment_method,
+      });
+      setIsTransactionSlideInOpen(true);
+    } 
+    // Se houver múltiplas, mostrar diálogo de seleção
+    else if (dayActivities.length > 1) {
+      setIsSelectionDialogOpen(true);
+    }
+  };
+
+  const handleActivitySelected = (activity: any) => {
+    setSelectedTransaction({
+      id: activity.id,
+      amount: activity.amount,
+      description: activity.description,
+      category: activity.category,
+      transaction_type: activity.type,
+      date: activity.date,
+      bank_account_id: null,
+      payment_method: activity.payment_method,
+    });
+    setIsTransactionSlideInOpen(true);
   };
 
   const handleToday = () => {
@@ -96,11 +144,27 @@ const Organizador = () => {
         </div>
       </div>
 
-      <ActivitySlideIn
-        isOpen={isSlideInOpen}
-        onClose={() => setIsSlideInOpen(false)}
-        selectedDate={selectedDate}
-      />
+      {isTransactionSlideInOpen && (
+        <TransactionSlideIn
+          onClose={() => {
+            setIsTransactionSlideInOpen(false);
+            setSelectedTransaction(null);
+          }}
+          existingTransaction={selectedTransaction}
+        />
+      )}
+
+      {selectedDate && (
+        <ActivitySelectionDialog
+          isOpen={isSelectionDialogOpen}
+          onClose={() => setIsSelectionDialogOpen(false)}
+          activities={activities.filter((activity) =>
+            isSameDay(parseISO(activity.date), selectedDate)
+          )}
+          selectedDate={selectedDate}
+          onSelectActivity={handleActivitySelected}
+        />
+      )}
     </DashboardLayout>
   );
 };

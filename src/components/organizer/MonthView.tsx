@@ -42,12 +42,13 @@ export function MonthView({ currentDate, searchQuery, onDateClick }: MonthViewPr
     );
   };
 
-  const getStatusVariant = (status: string | null | undefined): "success" | "warning" | "destructive" | "secondary" => {
+  const getStatusVariant = (status: string | null | undefined): "open" | "paid" | "overdue" | "received" | "secondary" => {
     if (!status) return "secondary";
     const statusLower = status.toLowerCase();
-    if (statusLower.includes("pago") || statusLower.includes("concluído")) return "success";
-    if (statusLower.includes("aberto") || statusLower.includes("pendente")) return "warning";
-    if (statusLower.includes("atrasado") || statusLower.includes("vencido")) return "destructive";
+    if (statusLower === "em aberto") return "open";
+    if (statusLower === "paga") return "paid";
+    if (statusLower === "em atraso") return "overdue";
+    if (statusLower === "recebido") return "received";
     return "secondary";
   };
 
@@ -99,7 +100,11 @@ export function MonthView({ currentDate, searchQuery, onDateClick }: MonthViewPr
                   {dayActivities.slice(0, 2).map((activity) => (
                     <div
                       key={activity.id}
-                      className="text-xs p-1.5 rounded bg-muted/50 border border-border/50"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDateClick(day);
+                      }}
+                      className="text-xs p-1.5 rounded bg-muted/50 border border-border/50 hover:bg-muted cursor-pointer transition-colors"
                     >
                       <div className="flex items-start gap-1 mb-1">
                         <div
