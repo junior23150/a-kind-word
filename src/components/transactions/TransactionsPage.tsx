@@ -1027,18 +1027,9 @@ export function TransactionsPage() {
                                   </SelectContent>
                                 </Select>
                               ) : (
-                                 <div
-                                   className="flex items-center gap-2 cursor-pointer hover:bg-muted/50 p-1 rounded"
-                                   onClick={(e) => {
-                                     e.stopPropagation();
-                                     setEditingCategory(transaction.id);
-                                   }}
-                                 >
-                                  <span>
-                                    {transaction.category || "Sem categoria"}
-                                  </span>
-                                  <Edit className="w-3 h-3 text-muted-foreground" />
-                                </div>
+                                 <span>
+                                   {transaction.category || "Sem categoria"}
+                                 </span>
                               )}
                             </td>
                              <td className="p-2 lg:p-4 text-sm max-w-xs">
