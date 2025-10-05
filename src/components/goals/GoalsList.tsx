@@ -15,6 +15,7 @@ interface Goal {
   color: string;
   icon: string;
   is_active: boolean;
+  cover_image: string | null;
 }
 
 interface GoalsListProps {
@@ -62,13 +63,21 @@ export const GoalsList = ({ onEditGoal }: GoalsListProps) => {
 
   if (goals.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 px-4">
-        <div className="bg-gradient-knumbers p-6 rounded-full mb-6">
-          <Target className="w-12 h-12 text-white" />
+      <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
+        <div className="relative mb-8">
+          <div className="absolute inset-0 bg-gradient-knumbers rounded-full blur-2xl opacity-20 animate-pulse" />
+          <div className="relative bg-muted p-8 rounded-full">
+            <Target className="w-16 h-16 text-primary" />
+          </div>
         </div>
-        <h3 className="text-2xl font-semibold mb-2">Nenhum objetivo criado</h3>
-        <p className="text-muted-foreground text-center max-w-md">
-          Comece criando seu primeiro objetivo e comece a poupar para realizar seus sonhos!
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 max-w-2xl">
+          Transforme seus sonhos em realidade
+        </h2>
+        <p className="text-muted-foreground text-center max-w-xl text-lg mb-2">
+          Organize seus objetivos, acompanhe seu progresso
+        </p>
+        <p className="text-muted-foreground text-center max-w-xl text-lg mb-8">
+          e conquiste suas metas, um passo de cada vez.
         </p>
       </div>
     );

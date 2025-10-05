@@ -48,6 +48,7 @@ export const GoalDialog = ({ open, onOpenChange, goalId }: GoalDialogProps) => {
   const [targetDate, setTargetDate] = useState("");
   const [selectedColor, setSelectedColor] = useState(GOAL_COLORS[0]);
   const [selectedIcon, setSelectedIcon] = useState(GOAL_ICONS[0].name);
+  const [coverImage, setCoverImage] = useState("");
 
   useEffect(() => {
     if (goalId && open) {
@@ -74,6 +75,7 @@ export const GoalDialog = ({ open, onOpenChange, goalId }: GoalDialogProps) => {
       setTargetDate(data.target_date || "");
       setSelectedColor(data.color);
       setSelectedIcon(data.icon);
+      setCoverImage(data.cover_image || "");
     } catch (error) {
       console.error("Erro ao carregar objetivo:", error);
       toast.error("Erro ao carregar objetivo");
@@ -88,6 +90,7 @@ export const GoalDialog = ({ open, onOpenChange, goalId }: GoalDialogProps) => {
     setTargetDate("");
     setSelectedColor(GOAL_COLORS[0]);
     setSelectedIcon(GOAL_ICONS[0].name);
+    setCoverImage("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -104,6 +107,7 @@ export const GoalDialog = ({ open, onOpenChange, goalId }: GoalDialogProps) => {
         target_date: targetDate || null,
         color: selectedColor,
         icon: selectedIcon,
+        cover_image: coverImage || null,
       };
 
       let error;
@@ -131,7 +135,7 @@ export const GoalDialog = ({ open, onOpenChange, goalId }: GoalDialogProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl">
         <DialogHeader>
           <DialogTitle className="text-2xl">
             {goalId ? "Editar Objetivo" : "Novo Objetivo"}
@@ -196,6 +200,29 @@ export const GoalDialog = ({ open, onOpenChange, goalId }: GoalDialogProps) => {
               value={targetDate}
               onChange={(e) => setTargetDate(e.target.value)}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="coverImage">URL da Imagem de Capa</Label>
+            <Input
+              id="coverImage"
+              value={coverImage}
+              onChange={(e) => setCoverImage(e.target.value)}
+              placeholder="https://exemplo.com/imagem.jpg"
+            />
+            {coverImage && (
+              <div className="mt-2 rounded-2xl overflow-hidden border-2 border-border">
+                <img
+                  src={coverImage}
+                  alt="Preview"
+                  className="w-full h-40 object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = "";
+                    e.currentTarget.style.display = "none";
+                  }}
+                />
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">

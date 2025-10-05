@@ -24,6 +24,7 @@ interface GoalCardProps {
     target_date: string | null;
     color: string;
     icon: string;
+    cover_image: string | null;
   };
   onEdit: () => void;
   onUpdate: () => void;
@@ -76,17 +77,29 @@ export const GoalCard = ({ goal, onEdit, onUpdate }: GoalCardProps) => {
   return (
     <>
       <Card
-        className="relative overflow-hidden group hover:shadow-2xl transition-all duration-300 cursor-pointer border-2"
+        className="relative overflow-hidden group hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 rounded-3xl"
         style={{ borderColor: `${goal.color}20` }}
       >
-        {/* Header with gradient */}
-        <div
-          className="h-32 p-6 relative"
-          style={{
-            background: `linear-gradient(135deg, ${goal.color} 0%, ${goal.color}dd 100%)`,
-          }}
-        >
-          <div className="flex justify-between items-start">
+        {/* Header with gradient or image */}
+        <div className="h-40 p-6 relative">
+          {goal.cover_image ? (
+            <>
+              <img
+                src={goal.cover_image}
+                alt={goal.name}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/60" />
+            </>
+          ) : (
+            <div
+              className="absolute inset-0"
+              style={{
+                background: `linear-gradient(135deg, ${goal.color} 0%, ${goal.color}dd 100%)`,
+              }}
+            />
+          )}
+          <div className="relative flex justify-between items-start h-full">
             <div className="bg-white/20 backdrop-blur-sm p-3 rounded-2xl">
               <IconComponent className="w-8 h-8 text-white" />
             </div>

@@ -343,6 +343,7 @@ export type Database = {
       savings_goals: {
         Row: {
           color: string
+          cover_image: string | null
           created_at: string
           current_amount: number
           description: string | null
@@ -357,6 +358,7 @@ export type Database = {
         }
         Insert: {
           color?: string
+          cover_image?: string | null
           created_at?: string
           current_amount?: number
           description?: string | null
@@ -371,6 +373,7 @@ export type Database = {
         }
         Update: {
           color?: string
+          cover_image?: string | null
           created_at?: string
           current_amount?: number
           description?: string | null
