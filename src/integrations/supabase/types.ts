@@ -351,6 +351,7 @@ export type Database = {
           description: string
           id: string
           original_message: string | null
+          payment_method: string | null
           source: string | null
           status: string | null
           transaction_type: string
@@ -368,6 +369,7 @@ export type Database = {
           description: string
           id?: string
           original_message?: string | null
+          payment_method?: string | null
           source?: string | null
           status?: string | null
           transaction_type: string
@@ -385,6 +387,7 @@ export type Database = {
           description?: string
           id?: string
           original_message?: string | null
+          payment_method?: string | null
           source?: string | null
           status?: string | null
           transaction_type?: string

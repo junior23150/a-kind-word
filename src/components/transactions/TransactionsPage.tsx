@@ -88,6 +88,7 @@ interface Transaction {
   original_message: string;
   user_id: string;
   bank_account_id: string | null;
+  payment_method?: string | null;
   status?: string;
   created_at: string;
   updated_at: string;

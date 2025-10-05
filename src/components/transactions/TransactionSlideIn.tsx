@@ -50,6 +50,7 @@ interface TransactionSlideInProps {
     transaction_type: "income" | "expense";
     date: string;
     bank_account_id: string | null;
+    payment_method?: string | null;
   } | null;
 }
 
@@ -138,6 +139,7 @@ export function TransactionSlideIn({
       setCategory(existingTransaction.category || "");
       setDate(new Date(existingTransaction.date));
       setFinancialAccount(existingTransaction.bank_account_id || "");
+      setPaymentMethod(existingTransaction.payment_method || "");
     }
   }, [existingTransaction]);
 
@@ -210,6 +212,7 @@ export function TransactionSlideIn({
         source: "manual",
         original_message: `Lançamento manual - ${description}`,
         bank_account_id: financialAccount || null,
+        payment_method: paymentMethod || null,
       };
 
       console.log("Dados da transação:", transactionData);
@@ -324,6 +327,7 @@ export function TransactionSlideIn({
         source: "manual",
         original_message: `Lançamento manual - ${description}`,
         bank_account_id: financialAccount || null,
+        payment_method: paymentMethod || null,
       };
 
       let transactionToSettle;
@@ -642,6 +646,7 @@ export function TransactionSlideIn({
                         <SelectItem value="pix">PIX</SelectItem>
                         <SelectItem value="transferencia">Transferência</SelectItem>
                         <SelectItem value="boleto">Boleto</SelectItem>
+                        <SelectItem value="vale-refeicao">Vale Refeição/Alimentação</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
