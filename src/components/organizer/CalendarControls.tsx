@@ -49,27 +49,28 @@ export function CalendarControls({
   };
 
   return (
-    <div className="bg-card rounded-lg border shadow-sm p-6 space-y-4">
+    <div className="bg-card rounded-2xl border shadow-sm p-6 space-y-4">
       <p className="text-foreground font-medium">
         Olá {profile?.full_name || "usuário"}, aqui estão suas atividades
       </p>
 
-      <div className="relative w-full sm:w-64">
+      <div className="relative w-full">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           placeholder="buscar eventos..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-10"
+          className="pl-10 rounded-full"
         />
       </div>
 
-      <div className="flex justify-center">
-        <div className="flex gap-1 bg-muted p-1 rounded-lg">
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex gap-1 bg-muted p-1 rounded-full">
           <Button
             variant={viewMode === "day" ? "default" : "ghost"}
             size="sm"
             onClick={() => onViewModeChange("day")}
+            className="rounded-full"
           >
             DIA
           </Button>
@@ -77,6 +78,7 @@ export function CalendarControls({
             variant={viewMode === "week" ? "default" : "ghost"}
             size="sm"
             onClick={() => onViewModeChange("week")}
+            className="rounded-full"
           >
             SEMANA
           </Button>
@@ -84,24 +86,25 @@ export function CalendarControls({
             variant={viewMode === "month" ? "default" : "ghost"}
             size="sm"
             onClick={() => onViewModeChange("month")}
+            className="rounded-full"
           >
             MÊS
           </Button>
         </div>
-      </div>
 
-      <div className="flex items-center justify-between">
-        <Button variant="ghost" size="icon" onClick={handlePrevious}>
-          <ChevronLeft className="w-5 h-5" />
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" onClick={handlePrevious} className="rounded-full">
+            <ChevronLeft className="w-5 h-5" />
+          </Button>
 
-        <span className="font-medium text-foreground">{dateRangeText}</span>
+          <span className="font-medium text-foreground min-w-[120px] text-center">{dateRangeText}</span>
 
-        <Button variant="ghost" size="icon" onClick={handleNext}>
-          <ChevronRight className="w-5 h-5" />
-        </Button>
+          <Button variant="ghost" size="icon" onClick={handleNext} className="rounded-full">
+            <ChevronRight className="w-5 h-5" />
+          </Button>
+        </div>
 
-        <Button variant="outline" onClick={onToday}>
+        <Button variant="outline" onClick={onToday} className="rounded-full">
           Hoje
         </Button>
       </div>
