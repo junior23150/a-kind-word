@@ -88,9 +88,12 @@ export function MonthView({ currentDate, searchQuery, onDateClick }: MonthViewPr
                   {dayActivities.slice(0, 2).map((activity) => (
                     <div
                       key={activity.id}
-                      className="text-xs p-1 rounded bg-muted/50 truncate"
+                      className="text-xs p-1 rounded bg-muted/50"
                     >
                       <p className="truncate font-medium">{activity.description}</p>
+                      {activity.status && (
+                        <p className="text-[10px] text-muted-foreground truncate">{activity.status}</p>
+                      )}
                     </div>
                   ))}
                   {dayActivities.length > 2 && (

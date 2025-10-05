@@ -12,6 +12,7 @@ export interface Activity {
   payment_method?: string | null;
   bank_account_name?: string | null;
   source: "transaction" | "recurring_bill";
+  status?: string | null;
 }
 
 export function useActivities(startDate: Date, endDate: Date) {
@@ -35,6 +36,7 @@ export function useActivities(startDate: Date, endDate: Date) {
           category,
           transaction_type,
           payment_method,
+          status,
           bank_accounts (
             bank_name
           )
@@ -66,6 +68,7 @@ export function useActivities(startDate: Date, endDate: Date) {
             payment_method: t.payment_method,
             bank_account_name: t.bank_accounts?.bank_name,
             source: "transaction",
+            status: t.status,
           });
         });
       }

@@ -68,16 +68,23 @@ export function WeekView({ currentDate, searchQuery, onDateClick }: WeekViewProp
                 {dayActivities.slice(0, 3).map((activity) => (
                   <div
                     key={activity.id}
-                    className="text-xs p-2 rounded bg-muted/50 truncate"
+                    className="text-xs p-2 rounded bg-muted/50"
                   >
                     <p className="font-medium truncate">{activity.description}</p>
-                    <p
-                      className={`font-semibold ${
-                        activity.type === "income" ? "text-green-600" : "text-red-600"
-                      }`}
-                    >
-                      {activity.type === "income" ? "+" : "-"} R$ {activity.amount.toFixed(2)}
-                    </p>
+                    <div className="flex items-center justify-between mt-1">
+                      <p
+                        className={`font-semibold ${
+                          activity.type === "income" ? "text-green-600" : "text-red-600"
+                        }`}
+                      >
+                        {activity.type === "income" ? "+" : "-"} R$ {activity.amount.toFixed(2)}
+                      </p>
+                      {activity.status && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-background text-muted-foreground">
+                          {activity.status}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 ))}
                 {dayActivities.length > 3 && (
