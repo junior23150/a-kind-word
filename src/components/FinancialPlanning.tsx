@@ -182,7 +182,8 @@ export function FinancialPlanning() {
           return t.transaction_type === 'income' && 
                  t.category === budget.category &&
                  tDate.getMonth() + 1 === budget.month &&
-                 tDate.getFullYear() === budget.year;
+                 tDate.getFullYear() === budget.year &&
+                 (t.status === 'Pago' || t.status === 'Recebido');
         }).reduce((sum, t) => sum + Number(t.amount), 0) || 0;
         
         return {
@@ -208,7 +209,8 @@ export function FinancialPlanning() {
           return t.transaction_type === 'expense' && 
                  t.category === budget.category &&
                  tDate.getMonth() + 1 === budget.month &&
-                 tDate.getFullYear() === budget.year;
+                 tDate.getFullYear() === budget.year &&
+                 (t.status === 'Pago' || t.status === 'Recebido');
         }).reduce((sum, t) => sum + Number(t.amount), 0) || 0;
         
         return {
