@@ -26,6 +26,7 @@ const Organizador = () => {
 
   const handleToday = () => {
     setCurrentDate(new Date());
+    setViewMode("day");
   };
 
   const getDateRangeText = () => {
