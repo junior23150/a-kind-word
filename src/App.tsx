@@ -20,6 +20,7 @@ import PatientDetails from "./pages/PatientDetails";
 import DashboardBusiness from "./pages/DashboardBusiness";
 import Categories from "./pages/Categories";
 import UserManagement from "./pages/UserManagement";
+import Objetivos from "./pages/Objetivos";
 
 const queryClient = new QueryClient();
 
@@ -84,6 +85,14 @@ const App = () => {
                   element={
                     <ProtectedRoute>
                       <PlanejamentoPessoal />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/objetivos"
+                  element={
+                    <ProtectedRoute>
+                      <Objetivos />
                     </ProtectedRoute>
                   }
                 />
