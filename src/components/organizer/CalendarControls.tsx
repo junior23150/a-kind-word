@@ -54,41 +54,39 @@ export function CalendarControls({
         Olá {profile?.full_name || "usuário"}, aqui estão suas atividades
       </p>
 
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <div className="relative w-full sm:w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="buscar eventos..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-10"
-          />
-        </div>
+      <div className="relative w-full sm:w-64">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Input
+          placeholder="buscar eventos..."
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+          className="pl-10"
+        />
+      </div>
 
-        <div className="flex items-center gap-2">
-          <div className="flex gap-1 bg-muted p-1 rounded-lg">
-            <Button
-              variant={viewMode === "day" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => onViewModeChange("day")}
-            >
-              DIA
-            </Button>
-            <Button
-              variant={viewMode === "week" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => onViewModeChange("week")}
-            >
-              SEMANA
-            </Button>
-            <Button
-              variant={viewMode === "month" ? "default" : "ghost"}
-              size="sm"
-              onClick={() => onViewModeChange("month")}
-            >
-              MÊS
-            </Button>
-          </div>
+      <div className="flex justify-center">
+        <div className="flex gap-1 bg-muted p-1 rounded-lg">
+          <Button
+            variant={viewMode === "day" ? "default" : "ghost"}
+            size="sm"
+            onClick={() => onViewModeChange("day")}
+          >
+            DIA
+          </Button>
+          <Button
+            variant={viewMode === "week" ? "default" : "ghost"}
+            size="sm"
+            onClick={() => onViewModeChange("week")}
+          >
+            SEMANA
+          </Button>
+          <Button
+            variant={viewMode === "month" ? "default" : "ghost"}
+            size="sm"
+            onClick={() => onViewModeChange("month")}
+          >
+            MÊS
+          </Button>
         </div>
       </div>
 
