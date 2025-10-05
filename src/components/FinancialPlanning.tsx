@@ -172,7 +172,7 @@ export function FinancialPlanning() {
         .from('transactions')
         .select('*')
         .eq('user_id', user.id)
-        .in('status', ['Pago', 'Recebido']);
+        .in('status', ['Paga', 'Recebido']);
 
       // Converter para formato do componente
       const loadedEntries = incomeBudgets.map(budget => {
@@ -183,7 +183,7 @@ export function FinancialPlanning() {
                  t.category === budget.category &&
                  tDate.getMonth() + 1 === budget.month &&
                  tDate.getFullYear() === budget.year &&
-                 (t.status === 'Pago' || t.status === 'Recebido');
+                 (t.status === 'Paga' || t.status === 'Recebido');
         }).reduce((sum, t) => sum + Number(t.amount), 0) || 0;
         
         return {
@@ -210,7 +210,7 @@ export function FinancialPlanning() {
                  t.category === budget.category &&
                  tDate.getMonth() + 1 === budget.month &&
                  tDate.getFullYear() === budget.year &&
-                 (t.status === 'Pago' || t.status === 'Recebido');
+                 (t.status === 'Paga' || t.status === 'Recebido');
         }).reduce((sum, t) => sum + Number(t.amount), 0) || 0;
         
         return {
