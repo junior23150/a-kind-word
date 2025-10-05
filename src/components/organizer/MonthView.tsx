@@ -7,6 +7,7 @@ import {
   format,
   isSameDay,
   isSameMonth,
+  parseISO,
 } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useActivities } from "@/hooks/useActivities";
@@ -37,7 +38,7 @@ export function MonthView({ currentDate, searchQuery, onDateClick }: MonthViewPr
 
   const getActivitiesForDay = (day: Date) => {
     return filteredActivities.filter((activity) =>
-      isSameDay(new Date(activity.date), day)
+      isSameDay(parseISO(activity.date), day)
     );
   };
 

@@ -1,5 +1,5 @@
 import { Calendar } from "lucide-react";
-import { format, isSameDay } from "date-fns";
+import { format, isSameDay, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useActivities } from "@/hooks/useActivities";
 import { Badge } from "@/components/ui/badge";
@@ -22,7 +22,7 @@ export function DayView({ currentDate, searchQuery, onDateClick }: DayViewProps)
   });
 
   const dayActivities = filteredActivities.filter((activity) =>
-    isSameDay(new Date(activity.date), currentDate)
+    isSameDay(parseISO(activity.date), currentDate)
   );
 
   const dayName = format(currentDate, "EEEE, dd 'de' MMMM", { locale: ptBR });

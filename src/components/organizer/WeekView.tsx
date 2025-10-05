@@ -1,4 +1,4 @@
-import { startOfWeek, endOfWeek, eachDayOfInterval, format, isSameDay } from "date-fns";
+import { startOfWeek, endOfWeek, eachDayOfInterval, format, isSameDay, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { useActivities } from "@/hooks/useActivities";
 import { Badge } from "@/components/ui/badge";
@@ -26,7 +26,7 @@ export function WeekView({ currentDate, searchQuery, onDateClick }: WeekViewProp
 
   const getActivitiesForDay = (day: Date) => {
     return filteredActivities.filter((activity) =>
-      isSameDay(new Date(activity.date), day)
+      isSameDay(parseISO(activity.date), day)
     );
   };
 

@@ -303,10 +303,14 @@ export type Database = {
           created_at: string
           description: string | null
           due_day: number
+          end_date: string | null
           id: string
           is_active: boolean
           last_notification_sent: string | null
           name: string
+          recurrence_type: string | null
+          start_date: string | null
+          total_installments: number | null
           updated_at: string
           user_id: string
         }
@@ -317,10 +321,14 @@ export type Database = {
           created_at?: string
           description?: string | null
           due_day: number
+          end_date?: string | null
           id?: string
           is_active?: boolean
           last_notification_sent?: string | null
           name: string
+          recurrence_type?: string | null
+          start_date?: string | null
+          total_installments?: number | null
           updated_at?: string
           user_id: string
         }
@@ -331,10 +339,14 @@ export type Database = {
           created_at?: string
           description?: string | null
           due_day?: number
+          end_date?: string | null
           id?: string
           is_active?: boolean
           last_notification_sent?: string | null
           name?: string
+          recurrence_type?: string | null
+          start_date?: string | null
+          total_installments?: number | null
           updated_at?: string
           user_id?: string
         }
