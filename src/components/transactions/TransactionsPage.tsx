@@ -121,7 +121,7 @@ export function TransactionsPage() {
   const [transactionsForPayment, setTransactionsForPayment] = useState<Transaction[]>([]);
 
   // Filter states
-  const [filterStatus, setFilterStatus] = useState("Em aberto");
+  const [filterStatus, setFilterStatus] = useState("Todas");
   const [filterCategory, setFilterCategory] = useState("Todas categorias");
   const [filterPaymentType, setFilterPaymentType] = useState("Todas");
   const [filterPaymentMethod, setFilterPaymentMethod] = useState("Todas");
@@ -129,6 +129,7 @@ export function TransactionsPage() {
   const [filterDocumentNumber, setFilterDocumentNumber] = useState("");
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [bankAccounts, setBankAccounts] = useState<any[]>([]);
+  const [allCategories, setAllCategories] = useState<any[]>([]);
   const [selectedTransactions, setSelectedTransactions] = useState<string[]>(
     []
   );
@@ -139,20 +140,6 @@ export function TransactionsPage() {
     "all" | "income" | "expense"
   >("all");
   const { toast } = useToast();
-
-  // Categories list
-  const categories = [
-    "Alimentação",
-    "Transporte",
-    "Saúde",
-    "Educação",
-    "Lazer",
-    "Moradia",
-    "Salário",
-    "Freelance",
-    "Investimentos",
-    "Outros",
-  ];
 
   // Carregar transações do Supabase
   const fetchTransactions = async () => {
@@ -208,12 +195,50 @@ export function TransactionsPage() {
     }
   };
 
+  // Carregar categorias do Supabase
+  const fetchCategories = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("is_active", true)
+        .order("name", { ascending: true });
+
+      if (error) throw error;
+
+      setAllCategories(data || []);
+    } catch (error) {
+      console.error("Erro ao carregar categorias:", error);
+    }
+  };
+
   useEffect(() => {
     if (user) {
       fetchTransactions();
       fetchBankAccounts();
+      fetchCategories();
     }
   }, [user, toast]);
+
+  // Resetar categoria quando tipo de pagamento mudar
+  useEffect(() => {
+    setFilterCategory("Todas categorias");
+  }, [filterPaymentType]);
+
+  // Filtrar categorias baseado no tipo de pagamento
+  const filteredCategoriesByType = (() => {
+    if (filterPaymentType === "Todas") {
+      return allCategories;
+    } else if (filterPaymentType === "Entradas") {
+      return allCategories.filter((cat) => cat.type === "income");
+    } else if (filterPaymentType === "Saídas") {
+      return allCategories.filter((cat) => cat.type === "expense");
+    }
+    return allCategories;
+  })();
 
   // Filtrar transações
   const filteredTransactions = transactions.filter((transaction) => {
@@ -239,7 +264,45 @@ export function TransactionsPage() {
       selectedAccount === "all" ||
       transaction.bank_account_id === selectedAccount;
 
-    return matchesSearch && matchesDateRange && matchesFilter && matchesAccount;
+    // Filtro de status
+    const matchesStatus =
+      filterStatus === "Todas" ||
+      getTransactionStatus(transaction) === filterStatus;
+
+    // Filtro de categoria
+    const matchesCategory =
+      filterCategory === "Todas categorias" ||
+      transaction.category === filterCategory;
+
+    // Filtro de tipo de pagamento
+    const matchesPaymentType =
+      filterPaymentType === "Todas" ||
+      (filterPaymentType === "Entradas" && transaction.transaction_type === "income") ||
+      (filterPaymentType === "Saídas" && transaction.transaction_type === "expense");
+
+    // Filtro de forma de pagamento
+    const matchesPaymentMethod =
+      filterPaymentMethod === "Todas" ||
+      transaction.payment_method === filterPaymentMethod;
+
+    // Filtro de valor
+    const matchesValue =
+      filterValue === "" ||
+      Math.abs(transaction.amount)
+        .toString()
+        .includes(filterValue.replace(/[^\d]/g, ""));
+
+    return (
+      matchesSearch &&
+      matchesDateRange &&
+      matchesFilter &&
+      matchesAccount &&
+      matchesStatus &&
+      matchesCategory &&
+      matchesPaymentType &&
+      matchesPaymentMethod &&
+      matchesValue
+    );
   });
 
   const totalIncome = filteredTransactions
@@ -577,7 +640,7 @@ export function TransactionsPage() {
 
               {/* Filter Content */}
               <div className="flex-1 overflow-y-auto p-4 space-y-6">
-                {/* Opção */}
+                {/* Opção (Status) */}
                 <div>
                   <Label className="text-sm font-medium text-gray-700 mb-2 block">
                     Opção
@@ -587,11 +650,32 @@ export function TransactionsPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="Todas">Todas</SelectItem>
                       <SelectItem value="Em aberto">Em aberto</SelectItem>
                       <SelectItem value="Vence hoje">Vence hoje</SelectItem>
                       <SelectItem value="Em Atraso">Em Atraso</SelectItem>
-                      <SelectItem value="Pago">Pago</SelectItem>
+                      <SelectItem value="Paga">Paga</SelectItem>
                       <SelectItem value="Recebido">Recebido</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {/* Tipo de pagamento */}
+                <div>
+                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Tipo de pagamento
+                  </Label>
+                  <Select
+                    value={filterPaymentType}
+                    onValueChange={setFilterPaymentType}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Todas">Todas</SelectItem>
+                      <SelectItem value="Entradas">Entradas</SelectItem>
+                      <SelectItem value="Saídas">Saídas</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -612,31 +696,11 @@ export function TransactionsPage() {
                       <SelectItem value="Todas categorias">
                         Todas categorias
                       </SelectItem>
-                      {categories.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
+                      {filteredCategoriesByType.map((category) => (
+                        <SelectItem key={category.id} value={category.name}>
+                          {category.name}
                         </SelectItem>
                       ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                {/* Tipo de pagamento */}
-                <div>
-                  <Label className="text-sm font-medium text-gray-700 mb-2 block">
-                    Tipo de pagamento
-                  </Label>
-                  <Select
-                    value={filterPaymentType}
-                    onValueChange={setFilterPaymentType}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Todas">Todas</SelectItem>
-                      <SelectItem value="Entrada">Entrada</SelectItem>
-                      <SelectItem value="Saída">Saída</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -656,15 +720,19 @@ export function TransactionsPage() {
                     <SelectContent>
                       <SelectItem value="Todas">Todas</SelectItem>
                       <SelectItem value="Dinheiro">Dinheiro</SelectItem>
-                      <SelectItem value="Cartão de Crédito">
-                        Cartão de Crédito
+                      <SelectItem value="Cartão de débito">
+                        Cartão de débito
                       </SelectItem>
-                      <SelectItem value="Cartão de Débito">
-                        Cartão de Débito
+                      <SelectItem value="Cartão de crédito">
+                        Cartão de crédito
                       </SelectItem>
                       <SelectItem value="PIX">PIX</SelectItem>
                       <SelectItem value="Transferência">
                         Transferência
+                      </SelectItem>
+                      <SelectItem value="Boleto">Boleto</SelectItem>
+                      <SelectItem value="Vale alimentação/refeição">
+                        Vale alimentação/refeição
                       </SelectItem>
                     </SelectContent>
                   </Select>
@@ -700,7 +768,7 @@ export function TransactionsPage() {
                   className="w-full text-green-600 hover:text-green-700 hover:bg-green-50"
                   onClick={() => {
                     // Clear filters logic here
-                    setFilterStatus("Em aberto");
+                    setFilterStatus("Todas");
                     setFilterCategory("Todas categorias");
                     setFilterPaymentType("Todas");
                     setFilterPaymentMethod("Todas");
@@ -897,6 +965,9 @@ export function TransactionsPage() {
                         <th className="text-left p-2 lg:p-4 font-medium text-muted-foreground text-sm">
                           Conta
                         </th>
+                        <th className="text-left p-2 lg:p-4 font-medium text-muted-foreground text-sm">
+                          Tipo de pagamento
+                        </th>
                         <th className="text-right p-2 lg:p-4 font-medium text-muted-foreground text-sm">
                           Valor
                         </th>
@@ -909,7 +980,7 @@ export function TransactionsPage() {
                       {filteredTransactions.length === 0 ? (
                         <tr>
                           <td
-                            colSpan={7}
+                            colSpan={8}
                             className="p-8 text-center text-muted-foreground"
                           >
                             Nenhuma transação encontrada
@@ -939,34 +1010,34 @@ export function TransactionsPage() {
                             <td className="p-2 lg:p-4 text-sm">
                               {formatDate(transaction.date)}
                             </td>
-                            <td className="p-2 lg:p-4 text-sm">
-                              {editingCategory === transaction.id ? (
-                                <Select
-                                  value={transaction.category || ""}
-                                  onValueChange={(value) =>
-                                    handleCategoryUpdate(transaction.id, value)
-                                  }
-                                >
-                                  <SelectTrigger className="w-full h-8">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    {categories.map((category) => (
-                                      <SelectItem
-                                        key={category}
-                                        value={category}
-                                      >
-                                        {category}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              ) : (
-                                 <span>
-                                   {transaction.category || "Sem categoria"}
-                                 </span>
-                              )}
-                            </td>
+                             <td className="p-2 lg:p-4 text-sm">
+                               {editingCategory === transaction.id ? (
+                                 <Select
+                                   value={transaction.category || ""}
+                                   onValueChange={(value) =>
+                                     handleCategoryUpdate(transaction.id, value)
+                                   }
+                                 >
+                                   <SelectTrigger className="w-full h-8">
+                                     <SelectValue />
+                                   </SelectTrigger>
+                                   <SelectContent>
+                                     {allCategories.map((category) => (
+                                       <SelectItem
+                                         key={category.id}
+                                         value={category.name}
+                                       >
+                                         {category.name}
+                                       </SelectItem>
+                                     ))}
+                                   </SelectContent>
+                                 </Select>
+                               ) : (
+                                  <span>
+                                    {transaction.category || "Sem categoria"}
+                                  </span>
+                               )}
+                             </td>
                              <td className="p-2 lg:p-4 text-sm max-w-xs">
                                <div className="flex items-center gap-2">
                                  <span className="truncate">{transaction.description}</span>
@@ -999,6 +1070,19 @@ export function TransactionsPage() {
                                    </span>
                                  )}
                                </div>
+                             </td>
+                             <td className="p-2 lg:p-4 text-sm">
+                               <span
+                                 className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                   transaction.transaction_type === "income"
+                                     ? "bg-green-100 text-green-800"
+                                     : "bg-red-100 text-red-800"
+                                 }`}
+                               >
+                                 {transaction.transaction_type === "income"
+                                   ? "Entrada"
+                                   : "Saída"}
+                               </span>
                              </td>
                             <td
                               className={`p-2 lg:p-4 text-sm text-right font-medium ${
