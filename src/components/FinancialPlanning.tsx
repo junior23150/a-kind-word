@@ -107,6 +107,7 @@ export function FinancialPlanning() {
     isRecurring: false,
     recurrenceType: "",
     installments: "",
+    endDate: "",
   });
 
   const [showNewCategoryInput, setShowNewCategoryInput] = useState(false);
@@ -123,6 +124,7 @@ export function FinancialPlanning() {
     isRecurring: false,
     recurrenceType: "",
     installments: "",
+    endDate: "",
   });
 
   const [showNewExpenseCategoryInput, setShowNewExpenseCategoryInput] = useState(false);
@@ -295,6 +297,13 @@ export function FinancialPlanning() {
       supabase.removeChannel(channel);
     };
   }, [user]);
+
+  // Função helper para calcular diferença de meses entre duas datas
+  const calcularDiferencaMeses = (dataInicio: Date, dataFim: Date): number => {
+    const anosDiferenca = dataFim.getFullYear() - dataInicio.getFullYear();
+    const mesesDiferenca = dataFim.getMonth() - dataInicio.getMonth();
+    return anosDiferenca * 12 + mesesDiferenca + 1; // +1 para incluir o mês inicial
+  };
 
   // Função para atualização manual
   const manualRefresh = async () => {
@@ -535,7 +544,16 @@ export function FinancialPlanning() {
                 monthsToCreate = parseInt(entryForm.installments) || 1;
                 break;
               case 'mensal':
-                monthsToCreate = 12;
+                if (!entryForm.endDate) {
+                  toast.error('Por favor, informe a data limite para recorrência mensal');
+                  return;
+                }
+                const endDate = new Date(entryForm.endDate);
+                if (endDate < baseDate) {
+                  toast.error('A data limite deve ser posterior à data prevista');
+                  return;
+                }
+                monthsToCreate = calcularDiferencaMeses(baseDate, endDate);
                 break;
               case 'trimestral':
                 monthsToCreate = 3;
@@ -648,6 +666,7 @@ export function FinancialPlanning() {
           isRecurring: false,
           recurrenceType: "",
           installments: "",
+          endDate: "",
         });
         setEditingEntry(null);
         setFormStep(1);
@@ -700,7 +719,16 @@ export function FinancialPlanning() {
                 monthsToCreate = parseInt(expenseForm.installments) || 1;
                 break;
               case 'mensal':
-                monthsToCreate = 12;
+                if (!expenseForm.endDate) {
+                  toast.error('Por favor, informe a data limite para recorrência mensal');
+                  return;
+                }
+                const endDate = new Date(expenseForm.endDate);
+                if (endDate < baseDate) {
+                  toast.error('A data limite deve ser posterior à data prevista');
+                  return;
+                }
+                monthsToCreate = calcularDiferencaMeses(baseDate, endDate);
                 break;
               case 'trimestral':
                 monthsToCreate = 3;
@@ -805,6 +833,7 @@ export function FinancialPlanning() {
           isRecurring: false,
           recurrenceType: "",
           installments: "",
+          endDate: "",
         });
         setEditingExpense(null);
         setFormStep(1);
@@ -1117,6 +1146,7 @@ export function FinancialPlanning() {
                         isRecurring: false,
                         recurrenceType: "",
                         installments: "",
+                        endDate: "",
                       });
                   }
                 }}
@@ -1377,6 +1407,7 @@ export function FinancialPlanning() {
                       isRecurring: false,
                       recurrenceType: "",
                       installments: "",
+                      endDate: "",
                     });
                   }
                 }}

@@ -50,6 +50,7 @@ interface EntryFormProps {
     isRecurring: boolean;
     recurrenceType: string;
     installments: string;
+    endDate: string;
   };
   setEntryForm: React.Dispatch<React.SetStateAction<any>>;
   incomeCategories: any[];
@@ -297,6 +298,23 @@ export function EntryForm({
                         min="1"
                         max="60"
                       />
+                    </div>
+                  )}
+
+                  {entryForm.recurrenceType === "mensal" && (
+                    <div className="space-y-2">
+                      <Label htmlFor="end-date" className="text-base font-medium text-gray-700">
+                        Data Limite *
+                      </Label>
+                      <Input
+                        id="end-date"
+                        type="date"
+                        value={entryForm.endDate}
+                        onChange={(e) => setEntryForm((prev: any) => ({ ...prev, endDate: e.target.value }))}
+                        className="h-12 rounded-2xl border-2"
+                        min={entryForm.date}
+                      />
+                      <p className="text-xs text-gray-500">Data da última parcela desta recorrência</p>
                     </div>
                   )}
                 </div>

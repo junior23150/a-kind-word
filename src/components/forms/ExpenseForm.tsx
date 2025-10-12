@@ -85,6 +85,7 @@ interface ExpenseFormProps {
     isRecurring: boolean;
     recurrenceType: string;
     installments: string;
+    endDate: string;
   };
   setExpenseForm: React.Dispatch<React.SetStateAction<any>>;
   categories: any[];
@@ -314,6 +315,23 @@ export function ExpenseForm({
                           min="1"
                           max="60"
                         />
+                    </div>
+                  )}
+
+                  {expenseForm.recurrenceType === "mensal" && (
+                    <div className="space-y-2">
+                      <Label htmlFor="end-date" className="text-base font-medium text-gray-700">
+                        Data Limite *
+                      </Label>
+                      <Input
+                        id="end-date"
+                        type="date"
+                        value={expenseForm.endDate}
+                        onChange={(e) => setExpenseForm((prev: any) => ({ ...prev, endDate: e.target.value }))}
+                        className="h-12 rounded-2xl border-2 focus:border-purple-500 focus:ring-purple-500"
+                        min={expenseForm.date}
+                      />
+                      <p className="text-xs text-gray-500">Data da última parcela desta recorrência</p>
                     </div>
                   )}
                 </div>
