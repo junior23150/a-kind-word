@@ -215,62 +215,6 @@ export function TransactionsPage() {
     }
   }, [user, toast]);
 
-  // Verificar e atualizar transações em atraso
-  useEffect(() => {
-    const checkOverdueTransactions = async () => {
-      if (!user || transactions.length === 0) return;
-
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-
-      const overdueTransactions = transactions.filter((t) => {
-        const transactionDate = new Date(t.date);
-        transactionDate.setHours(0, 0, 0, 0);
-
-        // Verificar se é recorrente e se está vencida
-        const isRecurring = (t.original_message && t.original_message.includes("Recorrente:")) || 
-                          (t.description.includes("(") && 
-                          t.description.includes("/") && 
-                          t.description.includes(")") &&
-                          /\(\d+\/\d+\)/.test(t.description));
-
-        return (
-          t.status === "Em Aberto" &&
-          isRecurring &&
-          transactionDate < today &&
-          t.transaction_type === "expense"
-        );
-      });
-
-      if (overdueTransactions.length > 0) {
-        try {
-          const updatePromises = overdueTransactions.map((t) =>
-            supabase
-              .from("transactions")
-              .update({ status: "Em Atraso" })
-              .eq("id", t.id)
-              .eq("user_id", user.id)
-          );
-
-          await Promise.all(updatePromises);
-
-          // Atualizar estado local
-          setTransactions((prev) =>
-            prev.map((t) =>
-              overdueTransactions.find((ot) => ot.id === t.id)
-                ? { ...t, status: "Em Atraso" }
-                : t
-            )
-          );
-        } catch (error) {
-          console.error("Erro ao atualizar transações em atraso:", error);
-        }
-      }
-    };
-
-    checkOverdueTransactions();
-  }, [transactions, user]);
-
   // Filtrar transações
   const filteredTransactions = transactions.filter((transaction) => {
     const transactionDate = new Date(transaction.date);
@@ -336,38 +280,25 @@ export function TransactionsPage() {
 
   // Função para calcular o status da transação
   const getTransactionStatus = (transaction: Transaction) => {
-    // Se tem status definido no banco, usar ele
+    // Sempre usar o status do banco (calculado pelo trigger e edge function)
     if (transaction.status) {
       return transaction.status;
     }
 
-    // Apenas transações de saída (despesas) têm status de pagamento
-    if (transaction.transaction_type === "income") {
-      return "Recebido";
-    }
-
+    // Fallback caso status seja null (não deveria acontecer com trigger)
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Zerar horas para comparação apenas de data
+    today.setHours(0, 0, 0, 0);
 
     const transactionDate = new Date(transaction.date);
     transactionDate.setHours(0, 0, 0, 0);
 
-    // Verificar se está em atraso (contas recorrentes não pagas após data de vencimento)
-    const isRecurring = (transaction.original_message && transaction.original_message.includes("Recorrente:")) || 
-                        (transaction.description.includes("(") && 
-                        transaction.description.includes("/") && 
-                        transaction.description.includes(")") &&
-                        /\(\d+\/\d+\)/.test(transaction.description));
-
-    if (isRecurring) {
-      if (transactionDate < today) {
-        return "Em Atraso";
-      } else {
-        return "Em Aberto";
-      }
+    if (transactionDate < today) {
+      return "Em Atraso";
+    } else if (transactionDate.getTime() === today.getTime()) {
+      return "Vence hoje";
+    } else {
+      return "Em Aberto";
     }
-
-    return "Em Aberto";
   };
 
   // Função para obter a cor do status
@@ -379,6 +310,8 @@ export function TransactionsPage() {
         return "bg-green-50 text-green-800 border-green-300";
       case "Em Aberto":
         return "bg-blue-50 text-blue-700 border-blue-200";
+      case "Vence hoje":
+        return "bg-yellow-50 text-yellow-800 border-yellow-300";
       case "Em Atraso":
         return "bg-red-50 text-red-800 border-red-300";
       default:
@@ -655,6 +588,7 @@ export function TransactionsPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Em aberto">Em aberto</SelectItem>
+                      <SelectItem value="Vence hoje">Vence hoje</SelectItem>
                       <SelectItem value="Em Atraso">Em Atraso</SelectItem>
                       <SelectItem value="Pago">Pago</SelectItem>
                       <SelectItem value="Recebido">Recebido</SelectItem>

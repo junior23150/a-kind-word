@@ -674,6 +674,10 @@ export type Database = {
         Args: { user_uuid: string }
         Returns: undefined
       }
+      update_transaction_statuses: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
     }
     Enums: {
       user_role: "admin" | "personal" | "business"

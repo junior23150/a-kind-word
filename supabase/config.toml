@@ -28,3 +28,6 @@ verify_jwt = false
 
 [functions.goals-ai-advisor]
 verify_jwt = true
+
+[functions.update-transaction-status]
+verify_jwt = false
